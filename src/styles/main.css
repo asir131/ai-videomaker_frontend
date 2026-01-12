@@ -1,0 +1,54 @@
+/* Main stylesheet - imports other styles */
+@import './components.css';
+@import './utilities.css';
+
+/* Base styles */
+body {
+  background-color: #ffffff;
+  color: #1f2937;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+html {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.dark html {
+  background-color: #111827 !important;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #999;
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: #666;
+}
+
+html.scroll-locked::-webkit-scrollbar,
+body.scroll-locked::-webkit-scrollbar {
+  display: none;
+}
+
+html.scroll-locked,
+body.scroll-locked {
+  scrollbar-width: none;
+}
+

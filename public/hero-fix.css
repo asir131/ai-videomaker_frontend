@@ -1,0 +1,42 @@
+/* Hero Section Fix - Override all conflicting styles */
+
+/* Remove any white overlays */
+.hero-gradient {
+    display: none !important;
+}
+
+/* Ensure hero section uses Tailwind gradient */
+.hero-section {
+    background: linear-gradient(135deg, #6366f1 0%, #9333ea 50%, #ec4899 100%) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Force NO white backgrounds anywhere in hero */
+.hero-section *,
+.hero-section p,
+.hero-section div {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Make sure ALL text is visible and white */
+.hero-section h1,
+.hero-section p,
+.hero-section span,
+.hero-section * {
+    color: white !important;
+}
+
+/* Ensure proper spacing */
+.hero-section {
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
+    min-height: 600px !important;
+}
+
+/* Keep the glassmorphism box visible */
+.hero-section .bg-white\/10 {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(20px) !important;
+}
