@@ -191,20 +191,10 @@ const ImageGenerator = () => {
         aspectRatio: '16:9',
         quality: 'Better',
         animate: false,
-        imageCount: scenes.length || 1,
+        imageCount: null, // User must choose - no default
         selectedStyle: null,
         additionalContext: ''
     });
-
-    // Update image count when scenes change
-    useEffect(() => {
-        if (scenes.length > 0) {
-            setGenerationSettings(prev => ({
-                ...prev,
-                imageCount: Math.min(scenes.length, 15)
-            }));
-        }
-    }, [scenes.length]);
 
     // Debug modal state
     useEffect(() => {
@@ -268,10 +258,15 @@ const ImageGenerator = () => {
         setImageGenerationProgress(0);
 
         try {
-            // STRICT: Do not fallback to scenes.length if imageCount is provided.
-            // If imageCount is missing/0, we default to 1 (safety) but definitely NOT scenes.length to avoid over-generation.
-            const requestedCount = currentSettings.imageCount ? parseInt(currentSettings.imageCount) : 0;
-            const targetCount = Math.min(requestedCount || 1, scenes.length);
+            // STRICT: Use the exact imageCount from settings, don't fallback to scenes.length
+            const requestedCount = currentSettings.imageCount ? parseInt(currentSettings.imageCount, 10) : 0;
+            const targetCount = requestedCount > 0 ? Math.min(requestedCount, scenes.length) : 1;
+            
+            console.log('📊 Image Generation Debug:');
+            console.log('   requestedCount:', requestedCount);
+            console.log('   scenes.length:', scenes.length);
+            console.log('   targetCount:', targetCount);
+            console.log('   currentSettings.imageCount:', currentSettings.imageCount);
 
             // RESET images array to match targetCount exactly.
             // This ensures if user requests 2 images, the array becomes length 2, removing any extra previous images.
@@ -370,6 +365,11 @@ Output ONLY the final prompt - no analysis or additional text.`;
     const handleGenerateWithSettings = async () => {
         if (!generationSettings.selectedStyle) {
             alert('Please select a style before generating images.');
+            return;
+        }
+
+        if (!generationSettings.imageCount || generationSettings.imageCount < 1) {
+            alert('Please enter a valid image count (1-' + Math.min(scenes.length, 15) + ').');
             return;
         }
 
@@ -604,21 +604,36 @@ Output ONLY the final prompt - no analysis or additional text.`;
                             {/* Row 2: Image Count */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Set Image Count
+                                    Set Image Count <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="number"
                                     min="1"
                                     max={Math.min(scenes.length, 15)}
-                                    value={generationSettings.imageCount}
+                                    value={generationSettings.imageCount || ''}
                                     onChange={(e) => {
                                         const maxAllowed = Math.min(scenes.length, 15);
-                                        const value = Math.min(maxAllowed, Math.max(1, parseInt(e.target.value) || 1));
-                                        setGenerationSettings({ ...generationSettings, imageCount: value });
+                                        const inputValue = e.target.value;
+                                        
+                                        // Allow empty input
+                                        if (inputValue === '') {
+                                            setGenerationSettings(prev => ({ ...prev, imageCount: null }));
+                                            return;
+                                        }
+                                        
+                                        const numValue = parseInt(inputValue, 10);
+                                        if (!isNaN(numValue) && numValue >= 1) {
+                                            const value = Math.min(maxAllowed, Math.max(1, numValue));
+                                            setGenerationSettings(prev => ({ ...prev, imageCount: value }));
+                                            console.log('📝 Image count updated to:', value);
+                                        }
                                     }}
+                                    placeholder="Enter number of images (1-15)"
                                     className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none"
                                 />
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">min: 1, max: {Math.min(scenes.length, 15)}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Required • min: 1, max: {Math.min(scenes.length, 15)} • You have {scenes.length} scenes available
+                                </p>
                             </div>
 
                             {/* Row 3: Style Selection */}
@@ -660,8 +675,8 @@ Output ONLY the final prompt - no analysis or additional text.`;
                             </button>
                             <button
                                 onClick={handleGenerateWithSettings}
-                                disabled={!generationSettings.selectedStyle}
-                                className={`px-8 py-3 rounded-lg font-bold text-white transition-all ${!generationSettings.selectedStyle
+                                disabled={!generationSettings.selectedStyle || !generationSettings.imageCount || generationSettings.imageCount < 1}
+                                className={`px-8 py-3 rounded-lg font-bold text-white transition-all ${!generationSettings.selectedStyle || !generationSettings.imageCount || generationSettings.imageCount < 1
                                     ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'
                                     : 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 shadow-lg hover:shadow-xl'
                                     }`}
@@ -876,138 +891,6 @@ Output ONLY the final prompt - no analysis or additional text.`;
                         </div>
                     )}
 
-                    {/* Timeline Editor - Shows which image appears when */}
-                    {images.length > 0 && scenes.length > 0 && (
-                        <div className="mt-6 p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span className="text-2xl">📊</span>
-                                    Video Timeline
-                                </h3>
-                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                    Total Duration: {scenes.length > 0 && scenes[scenes.length - 1]?.endTime ? scenes[scenes.length - 1].endTime : '0:00'}
-                                </div>
-                            </div>
-
-                            {/* Timeline visualization */}
-                            <div className="relative">
-                                {/* Time markers */}
-                                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-2 px-1">
-                                    <span>0:00</span>
-                                    {scenes.length > 0 && scenes[Math.floor(scenes.length / 2)]?.startTime && (
-                                        <span>{scenes[Math.floor(scenes.length / 2)].startTime}</span>
-                                    )}
-                                    {scenes.length > 0 && scenes[scenes.length - 1]?.endTime && (
-                                        <span>{scenes[scenes.length - 1].endTime}</span>
-                                    )}
-                                </div>
-
-                                {/* Timeline bar */}
-                                <div className="relative h-24 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                                    {images.map((img, index) => {
-                                        const scene = scenes[index];
-                                        // Check for undefined/null instead of falsy (0 is a valid startSeconds!)
-                                        if (!scene || scene.startSeconds === undefined || scene.startSeconds === null ||
-                                            scene.endSeconds === undefined || scene.endSeconds === null) {
-                                            console.warn(`⚠️ Scene ${index + 1} missing timing data:`, scene);
-                                            return null;
-                                        }
-
-                                        const totalDuration = scenes[scenes.length - 1]?.endSeconds || 1;
-                                        const startPercent = (scene.startSeconds / totalDuration) * 100;
-                                        const widthPercent = ((scene.endSeconds - scene.startSeconds) / totalDuration) * 100;
-
-                                        // Add small gap between segments (0.5% visual separation)
-                                        const gapSize = 0.5;
-                                        const adjustedWidth = Math.max(0, widthPercent - gapSize);
-
-                                        return (
-                                            <div
-                                                key={index}
-                                                draggable={true}
-                                                onDragStart={(e) => handleDragStart(e, index)}
-                                                onDragOver={(e) => handleDragOver(e, index)}
-                                                onDragLeave={handleDragLeave}
-                                                onDrop={(e) => handleDrop(e, index)}
-                                                onDragEnd={handleDragEnd}
-                                                className={`absolute top-0 h-full border-r-2 overflow-hidden group cursor-move hover:z-10 transition-all
-                                                    ${dragOverIndex === index ? 'border-4 border-blue-500 dark:border-blue-400 scale-105' : 'border-white dark:border-gray-900'}
-                                                    ${draggedIndex === index ? 'opacity-50 scale-95' : 'opacity-100'}
-                                                `}
-                                                style={{
-                                                    left: `${startPercent}%`,
-                                                    width: `${adjustedWidth}%`
-                                                }}
-                                                onClick={() => {
-                                                    if (!isDragging) {
-                                                        handleImageClick(index);
-                                                    }
-                                                }}
-                                                title={`Scene ${index + 1}: ${scene.startTime} - ${scene.endTime} (Drag to reorder)`}
-                                            >
-                                                {/* Background color based on status */}
-                                                <div className={`absolute inset-0 ${img.status === 'completed'
-                                                    ? 'bg-gradient-to-r from-pink-500 to-rose-500'
-                                                    : img.status === 'generating'
-                                                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500 animate-pulse'
-                                                        : img.status === 'error'
-                                                            ? 'bg-gradient-to-r from-red-500 to-red-600'
-                                                            : 'bg-gradient-to-r from-gray-400 to-gray-500'
-                                                    }`}>
-                                                    {/* Thumbnail if image is completed */}
-                                                    {img.status === 'completed' && img.url && (
-                                                        <img
-                                                            src={img.url}
-                                                            alt={`Scene ${index + 1}`}
-                                                            className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
-                                                        />
-                                                    )}
-                                                </div>
-
-                                                {/* Scene label */}
-                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                    <div className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-white text-xs font-bold group-hover:scale-110 transition-transform">
-                                                        {index + 1}
-                                                    </div>
-                                                </div>
-
-                                                {/* Drag indicator icon */}
-                                                <div className="absolute top-1 right-1 bg-black/40 rounded px-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                                    <span className="text-white text-xs">⋮⋮</span>
-                                                </div>
-
-                                                {/* Hover tooltip */}
-                                                <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
-                                                    <div className="bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl w-48">
-                                                        <p className="font-bold mb-1">Scene {index + 1}</p>
-                                                        <p className="text-gray-300">{scene.startTime} - {scene.endTime}</p>
-                                                        <p className="text-gray-400 mt-1 truncate">{scene.text}</p>
-                                                        <p className="text-blue-400 mt-2 text-[10px]">💡 Drag to reorder</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-
-                                {/* Legend */}
-                                <div className="flex flex-wrap gap-4 mt-4 text-xs">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded bg-gradient-to-r from-pink-500 to-rose-500"></div>
-                                        <span className="text-gray-600 dark:text-gray-400">Completed</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded bg-gradient-to-r from-yellow-500 to-orange-500"></div>
-                                        <span className="text-gray-600 dark:text-gray-400">Generating</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded bg-gradient-to-r from-gray-400 to-gray-500"></div>
-                                        <span className="text-gray-600 dark:text-gray-400">Pending</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 {images.length > 0 && (

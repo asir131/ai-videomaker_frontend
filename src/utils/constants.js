@@ -125,8 +125,10 @@ export const TYPEWRITER_SPEED = 2; // milliseconds per character
 
 // Languages for Style
 export const LANGUAGES = [
-  "English", "Spanish", "French", "German", "Italian", "Portuguese", "Dutch",
-  "Russian", "Japanese", "Chinese (Simplified)", "Chinese (Traditional)",
-  "Korean", "Arabic", "Hindi", "Turkish", "Polish", "Swedish", "Norwegian",
-  "Danish", "Finnish", "Greek", "Hebrew", "Thai", "Indonesian", "Vietnamese"
+  "English",
+  "German",
+  "Portuguese",
+  "Spanish",
+  "Hindi",
+  "Polish"
 ];

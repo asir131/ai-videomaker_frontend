@@ -30,17 +30,17 @@ const VideoCreationWizard = () => {
       title: 'Script',
       icon: FileText,
       component: ScriptGenerator,
-      description: 'Generate & edit your script',
+      description: 'Generate your script',
       completed: !!script
     },
-    // {
-    //   id: 'edit',
-    //   title: 'Edit',
-    //   icon: Edit,
-    //   component: ScriptEditor,
-    //   description: 'Review and edit your script',
-    //   completed: !!scenes && scenes.length > 0
-    // },
+    {
+      id: 'edit',
+      title: 'Edit',
+      icon: Edit,
+      component: ScriptEditor,
+      description: 'Review and edit your script',
+      completed: !!scenes && scenes.length > 0
+    },
     {
       id: 'images',
       title: 'Images',
@@ -111,7 +111,19 @@ const VideoCreationWizard = () => {
     if (hasAutoAdvanced[stepId]) return;
 
     // Check if current step is completed
-    if (currentStepData.completed && stepId !== 'script') {
+    // Auto-advance from script step when script is generated
+    if (stepId === 'script' && currentStepData.completed) {
+      const timer = setTimeout(() => {
+        setHasAutoAdvanced(prev => ({ ...prev, [stepId]: true }));
+        setCurrentStep(prev => prev + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 1500); // 1.5 second delay
+
+      return () => clearTimeout(timer);
+    }
+    
+    // Auto-advance from other steps (except edit and images steps which user controls)
+    if (currentStepData.completed && stepId !== 'edit' && stepId !== 'images') {
       // Wait a bit to show the completion state, then move to next
       const timer = setTimeout(() => {
         setHasAutoAdvanced(prev => ({ ...prev, [stepId]: true }));

@@ -1,26 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { readFileSync } from 'fs'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-// Read backend port from .backend-port file, fallback to 3000
-function getBackendPort() {
-  try {
-    const portFile = join(__dirname, '../backend/.backend-port')
-    const port = readFileSync(portFile, 'utf8').trim()
-    return port || '3000'
-  } catch (error) {
-    console.log('⚠️  .backend-port not found, using default port 3000')
-    return '3000'
-  }
-}
-
-const backendPort = getBackendPort()
-console.log(`🔗 Vite proxy configured for backend on port ${backendPort}`)
+// Backend configuration - update this if your backend runs on a different port
+const BACKEND_PORT = 3001
+console.log(`🔗 Vite proxy configured for backend on port ${BACKEND_PORT}`)
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,7 +12,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: `http://localhost:${backendPort}`,
+        target: `http://localhost:${BACKEND_PORT}`,
         changeOrigin: true,
         secure: false,
         ws: true,

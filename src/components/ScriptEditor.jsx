@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useScript } from "../context/ScriptContext";
 import { useMedia } from "../context/MediaContext";
 import { parseScriptIntoScenes } from "../utils/scriptUtils";
-import { Edit3, SkipForward, Loader2, Copy, Download } from "lucide-react";
+import { Edit3, Loader2, Copy, Download, ChevronRight } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { useToast } from "../context/ToastContext";
 
@@ -22,12 +22,6 @@ const ScriptEditor = ({ handleNext }) => {
     timeoutsRef.current = [];
   };
 
-  // Skip animation and show full script
-  const skipAnimation = () => {
-    cleanupAnimation();
-    setDisplayedScript(script);
-    setIsAnimating(false);
-  };
 
   useEffect(() => {
     if (script && !userEdited) {
@@ -72,8 +66,14 @@ const ScriptEditor = ({ handleNext }) => {
     }
 
     setUserEdited(true);
-    setScript(e.target.value);
-    setDisplayedScript(e.target.value);
+    const newScript = e.target.value;
+    setScript(newScript);
+    setDisplayedScript(newScript);
+    
+    // Update scenes when script changes
+    const sceneCount = 15;
+    const scenes = parseScriptIntoScenes(newScript, sceneCount, audioDuration);
+    setScenes(scenes);
   };
 
   const handleCopyScript = () => {
@@ -114,7 +114,7 @@ const ScriptEditor = ({ handleNext }) => {
               Review and Edit Your Script
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {isAnimating ? "Animating your script..." : "Refine your story."}
+              {isAnimating ? "Animating your script..." : "Refine your story. Script will be split into 15 scenes for image generation."}
             </p>
           </div>
         </div>
@@ -135,16 +135,6 @@ const ScriptEditor = ({ handleNext }) => {
             <Download size={18} />
           </button>
 
-          {/* Skip Animation Button */}
-          {isAnimating && (
-            <button
-              onClick={skipAnimation}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-all font-medium shadow-sm hover:shadow-md"
-            >
-              <SkipForward size={18} />
-              Skip Animation
-            </button>
-          )}
         </div>
       </div>
 
@@ -164,6 +154,19 @@ const ScriptEditor = ({ handleNext }) => {
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Loader2 size={16} className="animate-spin" />
             <span>Displaying script word by word...</span>
+          </div>
+        )}
+
+        {/* Continue Button */}
+        {!isAnimating && script && (
+          <div className="flex justify-end pt-4">
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+            >
+              Continue to Images
+              <ChevronRight size={20} />
+            </button>
           </div>
         )}
       </div>
