@@ -120,7 +120,10 @@ const VideoRenderer = () => {
 
         } catch (error) {
             console.error('Error rendering video:', error);
-            alert('Failed to render video: ' + error.message);
+            const errorMessage = error.details
+                ? `${error.message}\n\n${error.details}`
+                : error.message;
+            alert('Failed to render video: ' + errorMessage);
         } finally {
             setIsRenderingVideo(false);
             setLoading(prev => ({ ...prev, video: false }));

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useScript } from '../context/ScriptContext';
 import { useMedia } from '../context/MediaContext';
 import { useUI } from '../context/UIContext';
-import { ImageIcon, Palette, Loader2, Sparkles, Download, RefreshCw, Play, Pause, Music } from 'lucide-react';
+import { ImageIcon, Palette, Loader2, Sparkles, Download, RefreshCw, Play, Pause, Music, Upload, X } from 'lucide-react';
 import { API_BASE_URL } from '../utils/constants.js';
 import ProgressBar from './common/ProgressBar';
 
@@ -200,6 +200,11 @@ const ImageGenerator = () => {
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
     const [isAudioLoading, setIsAudioLoading] = useState(false);
     const audioRef = useRef(null);
+
+    // Upload state
+    const [showUploadModal, setShowUploadModal] = useState(false);
+    const [uploadingImages, setUploadingImages] = useState({});
+    const fileInputRef = useRef(null);
 
     // Debug modal state
     useEffect(() => {
@@ -558,6 +563,97 @@ Output ONLY the final prompt - no analysis or additional text.`;
         }
     }, []);
 
+    // Upload functions
+    const handleFileUpload = async (event) => {
+        const files = Array.from(event.target.files);
+        if (files.length === 0) return;
+
+        // Validate files
+        const validFiles = files.filter(file => {
+            if (!file.type.startsWith('image/')) {
+                alert(`${file.name} is not an image file.`);
+                return false;
+            }
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                alert(`${file.name} is too large. Maximum size is 10MB.`);
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length === 0) return;
+
+        // Limit to number of scenes
+        const maxImages = scenes.length;
+        const imagesToUpload = validFiles.slice(0, maxImages);
+
+        if (validFiles.length > maxImages) {
+            alert(`You can only upload up to ${maxImages} images for ${maxImages} scenes.`);
+        }
+
+        setUploadingImages({});
+        setShowUploadModal(false);
+
+        // Create image objects for upload
+        const newImages = Array(scenes.length).fill(null).map((_, index) => {
+            return images[index] || { status: 'pending', url: null };
+        });
+
+        // Process each uploaded image
+        for (let i = 0; i < imagesToUpload.length; i++) {
+            const file = imagesToUpload[i];
+            const sceneIndex = i;
+
+            try {
+                setUploadingImages(prev => ({ ...prev, [sceneIndex]: true }));
+
+                // Convert file to base64 data URL for immediate display
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                newImages[sceneIndex] = {
+                    status: 'completed',
+                    url: dataUrl,
+                    file: file,
+                    fileName: file.name,
+                    uploaded: true
+                };
+
+            } catch (error) {
+                console.error(`Error processing ${file.name}:`, error);
+                newImages[sceneIndex] = {
+                    status: 'error',
+                    error: `Failed to process ${file.name}: ${error.message}`
+                };
+            } finally {
+                setUploadingImages(prev => ({ ...prev, [sceneIndex]: false }));
+            }
+        }
+
+        setImages(newImages);
+
+        // Clear file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const openFileDialog = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const removeUploadedImage = (index) => {
+        const newImages = [...images];
+        newImages[index] = { status: 'pending', url: null };
+        setImages(newImages);
+    };
+
     if (!scenes.length) return null;
 
     return (
@@ -878,6 +974,60 @@ Output ONLY the final prompt - no analysis or additional text.`;
             )}
 
 
+            {/* Upload Modal */}
+            {showUploadModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-100 dark:border-gray-800">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Upload Images</h3>
+                                <button
+                                    onClick={() => setShowUploadModal(false)}
+                                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="text-center">
+                                    <div className="w-16 h-16 bg-pink-100 dark:bg-pink-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Upload size={32} className="text-pink-600 dark:text-pink-400" />
+                                    </div>
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Choose Images</h4>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                        Upload up to {scenes.length} images for your {scenes.length} scenes
+                                    </p>
+                                </div>
+
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleFileUpload}
+                                    className="hidden"
+                                />
+
+                                <button
+                                    onClick={openFileDialog}
+                                    className="w-full py-3 px-4 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-semibold rounded-lg transition-all hover:scale-105"
+                                >
+                                    Select Images
+                                </button>
+
+                                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                                    Supported formats: JPG, PNG, GIF, WebP (Max 10MB each)
+                                </p>
+                                <p className="text-xs text-blue-600 dark:text-blue-400 text-center mt-2">
+                                    💡 Uploaded images work exactly like AI-generated ones for video creation
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div id="image-generator" ref={containerRef} className="glass-card relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/5 rounded-full blur-3xl -z-10" />
 
@@ -890,6 +1040,27 @@ Output ONLY the final prompt - no analysis or additional text.`;
                         <p className="text-gray-500 dark:text-gray-400 text-sm">Generate cinematic scenes with AI</p>
                     </div>
                 </div>
+
+                {/* Upload Status */}
+                {images.some(img => img && img.status === 'completed') && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 border border-blue-200 dark:border-blue-800 mb-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+                                    <ImageIcon size={16} />
+                                </div>
+                                <div>
+                                    <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                                        {images.filter(img => img && img.status === 'completed').length} of {scenes.length} Scenes Ready
+                                    </div>
+                                    <div className="text-xs text-blue-600 dark:text-blue-400">
+                                        {images.filter(img => img && img.uploaded).length} uploaded, {images.filter(img => img && !img.uploaded && img.status === 'completed').length} generated
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Audio Preview Section */}
                 {generatedAudioUrl && (
@@ -959,26 +1130,38 @@ Output ONLY the final prompt - no analysis or additional text.`;
                 )}
 
                 <div className="mb-8">
-                    <button
-                        onClick={() => setShowGenerationModal(true)}
-                        disabled={isGeneratingImages}
-                        className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 min-h-[56px]
-                        ${isGeneratingImages
-                                ? 'bg-gray-400 cursor-not-allowed shadow-none'
-                                : 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 shadow-pink-500/20 hover:shadow-xl hover:shadow-pink-500/30 hover:scale-[1.02] active:scale-[0.98]'}`}
-                    >
-                        {isGeneratingImages ? (
-                            <>
-                                <Loader2 className="animate-spin" size={24} />
-                                <span>Generating Scenes... {Math.round((images.filter(i => i.status === 'completed').length / Math.min(generationSettings.imageCount || scenes.length, scenes.length)) * 100)}%</span>
-                            </>
-                        ) : (
-                            <>
-                                <Sparkles size={24} />
-                                <span>Generate All Images</span>
-                            </>
-                        )}
-                    </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                            onClick={() => setShowGenerationModal(true)}
+                            disabled={isGeneratingImages}
+                            className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 min-h-[56px]
+                            ${isGeneratingImages
+                                    ? 'bg-gray-400 cursor-not-allowed shadow-none'
+                                    : 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 shadow-pink-500/20 hover:shadow-xl hover:shadow-pink-500/30 hover:scale-[1.02] active:scale-[0.98]'}`}
+                        >
+                            {isGeneratingImages ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={24} />
+                                    <span>Generating... {Math.round((images.filter(i => i.status === 'completed').length / Math.min(generationSettings.imageCount || scenes.length, scenes.length)) * 100)}%</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles size={24} />
+                                    <span>Generate with AI</span>
+                                </>
+                            )}
+                        </button>
+
+                        <button
+                            onClick={() => setShowUploadModal(true)}
+                            disabled={isGeneratingImages}
+                            className={`w-full py-4 rounded-xl font-bold text-lg border-2 border-pink-600 text-pink-600 dark:text-pink-400 bg-white dark:bg-gray-800 shadow-lg transition-all transform flex items-center justify-center gap-3 min-h-[56px] hover:bg-pink-50 dark:hover:bg-pink-900/10 hover:scale-[1.02] active:scale-[0.98]
+                            ${isGeneratingImages ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            <Upload size={24} />
+                            <span>Upload Images</span>
+                        </button>
+                    </div>
 
                     {/* Progress Bar */}
                     {isGeneratingImages && (
@@ -996,9 +1179,12 @@ Output ONLY the final prompt - no analysis or additional text.`;
 
                 </div>
 
-                {images.length > 0 && (
+                {images.some(img => img && img.status === 'completed') && (
                     <div ref={scenesRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {images.map((img, index) => {
+                            // Skip empty slots
+                            if (!img || img.status !== 'completed') return null;
+
                             // Find the corresponding scene for this image
                             const scene = scenes[index];
                             if (!scene) return null; // Safety check
@@ -1017,6 +1203,15 @@ Output ONLY the final prompt - no analysis or additional text.`;
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                                        img.uploaded
+                                                            ? 'bg-blue-500/80 text-white'
+                                                            : 'bg-purple-500/80 text-white'
+                                                    }`}>
+                                                        {img.uploaded ? 'Uploaded' : 'Generated'}
+                                                    </span>
+                                                </div>
                                                 <p className="text-white text-sm line-clamp-2 mb-2">{scene.text}</p>
                                                 <div className="flex gap-2 pointer-events-auto">
                                                     <button
@@ -1025,22 +1220,37 @@ Output ONLY the final prompt - no analysis or additional text.`;
                                                             // Download functionality
                                                             const link = document.createElement('a');
                                                             link.href = img.url;
-                                                            link.download = `scene-${index + 1}.jpg`;
+                                                            link.download = img.uploaded ? (img.fileName || `scene-${index + 1}.jpg`) : `scene-${index + 1}.jpg`;
                                                             link.click();
                                                         }}
                                                         className="p-2 bg-white/20 backdrop-blur-md rounded-lg text-white hover:bg-white/30 transition-all hover:scale-110 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                                        title="Download image"
                                                     >
                                                         <Download size={16} />
                                                     </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleRegenerateImage(index);
-                                                        }}
-                                                        className="p-2 bg-white/20 backdrop-blur-md rounded-lg text-white hover:bg-white/30 transition-all hover:scale-110 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                    >
-                                                        <RefreshCw size={16} />
-                                                    </button>
+                                                    {img.uploaded ? (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                removeUploadedImage(index);
+                                                            }}
+                                                            className="p-2 bg-red-500/80 backdrop-blur-md rounded-lg text-white hover:bg-red-600/80 transition-all hover:scale-110 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                                            title="Remove uploaded image"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRegenerateImage(index);
+                                                            }}
+                                                            className="p-2 bg-white/20 backdrop-blur-md rounded-lg text-white hover:bg-white/30 transition-all hover:scale-110 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                                            title="Regenerate image"
+                                                        >
+                                                            <RefreshCw size={16} />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </>

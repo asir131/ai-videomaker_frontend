@@ -77,26 +77,38 @@ const StyleSelector = ({
                                         <span>•</span>
                                         <span>{style.wordCount} words</span>
                                     </div>
-                                    <div className='flex gap-2 mt-1'>
+                                    {/* Professional Action Buttons */}
+                                    <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onEditStyle(style);
                                             }}
-                                            className="px-3 w-full py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md transition-colors flex items-center gap-1.5"
+                                            className="group flex-1 relative overflow-hidden px-4 py-2.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-700 dark:text-blue-300 rounded-xl font-semibold text-sm border-2 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                                         >
-                                            <Edit size={12} />
-                                            Edit
+                                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-300 rounded-xl"></div>
+                                            <div className="relative flex items-center justify-center gap-2">
+                                                <div className="p-1 bg-blue-100 dark:bg-blue-900/50 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
+                                                    <Edit size={14} className="group-hover:scale-110 transition-transform" />
+                                                </div>
+                                                <span>Edit Style</span>
+                                            </div>
                                         </button>
+
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onDeleteStyle(e, style.id);
                                             }}
-                                            className="px-3 w-full py-1.5 bg-red-500 text-white rounded-lg text-xs font-medium hover:bg-red-600 shadow-md transition-colors flex items-center gap-1.5"
+                                            className="group flex-1 relative overflow-hidden px-4 py-2.5 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 text-red-700 dark:text-red-300 rounded-xl font-semibold text-sm border-2 border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                                         >
-                                            <Trash2 size={12} />
-                                            Delete
+                                            <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 to-rose-500/0 group-hover:from-red-500/5 group-hover:to-rose-500/5 transition-all duration-300 rounded-xl"></div>
+                                            <div className="relative flex items-center justify-center gap-2">
+                                                <div className="p-1 bg-red-100 dark:bg-red-900/50 rounded-lg group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors">
+                                                    <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
+                                                </div>
+                                                <span>Delete</span>
+                                            </div>
                                         </button>
                                     </div>
                                     {/* Action Buttons on Hover */}
