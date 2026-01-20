@@ -4,7 +4,7 @@ import { useMedia } from '../context/MediaContext';
 import { useUI } from '../context/UIContext';
 import { renderVideos, checkFFmpegStatus } from '../services/videoService';
 import { addVideoToHistory } from '../services/videoHistoryService';
-import { Film, Play, Download, AlertCircle, CheckCircle2, Loader2, Video } from 'lucide-react';
+import { Film, Download, AlertCircle, CheckCircle2, Loader2, Video, AlertTriangle } from 'lucide-react';
 // Animation imports removed to prevent runtime errors
 
 const VideoRenderer = () => {
@@ -146,10 +146,27 @@ const VideoRenderer = () => {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row items-center justify-between bg-gray-50 dark:bg-gray-800/50 p-8 rounded-2xl border border-gray-100 dark:border-gray-700">
                     <div className="mb-6 md:mb-0">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to Render?</h3>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            {generatedAudioUrl && images.some(img => img.url) ? 'Ready to Render!' : 'Almost Ready'}
+                        </h3>
                         <p className="text-gray-600 dark:text-gray-400 max-w-md">
-                            We'll combine your script, {scenes.length} generated scenes, and voiceover into a complete video with smooth transitions.
+                            {generatedAudioUrl && images.some(img => img.url)
+                                ? `We'll combine your script, ${scenes.length} scenes, and voiceover into a complete video.`
+                                : 'Please generate images and voiceover first, then come back here to render your video.'
+                            }
                         </p>
+                        {!generatedAudioUrl && (
+                            <div className="mt-3 flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
+                                <AlertCircle size={16} />
+                                <span>Voiceover required for video rendering</span>
+                            </div>
+                        )}
+                        {!images.some(img => img.url) && (
+                            <div className="mt-1 flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
+                                <AlertCircle size={16} />
+                                <span>Scene images required for video rendering</span>
+                            </div>
+                        )}
                     </div>
                     <button
                         onClick={handleRender}

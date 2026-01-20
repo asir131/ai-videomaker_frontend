@@ -150,7 +150,7 @@ STORYTELLING RULES FOR 90%+ RETENTION:
 USER REQUEST:
 ${userPrompt}`;
 
-            const data = await generateScript(fullPrompt, 8000);
+            const data = await generateScript(fullPrompt, 4096);
 
             if (data && data.content && data.content[0] && data.content[0].text) {
                 setScript(data.content[0].text);

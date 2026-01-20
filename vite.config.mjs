@@ -1,9 +1,29 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
+import path from 'path'
 
-// Backend configuration - update this if your backend runs on a different port
-const BACKEND_PORT = 3001
-console.log(`🔗 Vite proxy configured for backend on port ${BACKEND_PORT}`)
+// Dynamic backend port detection
+const getBackendPort = () => {
+  try {
+    // Check if backend port file exists (written by backend server)
+    const backendPortPath = path.join(process.cwd(), '..', 'ai-videomaker_backend', '.backend-port')
+    if (fs.existsSync(backendPortPath)) {
+      const port = parseInt(fs.readFileSync(backendPortPath, 'utf8').trim())
+      console.log(`🔗 Backend port detected from file: ${port}`)
+      return port
+    }
+  } catch (error) {
+    console.warn('⚠️ Could not read backend port file:', error.message)
+  }
+
+  // Fallback to default port
+  const defaultPort = 3001
+  console.log(`🔗 Using default backend port: ${defaultPort}`)
+  return defaultPort
+}
+
+const BACKEND_PORT = getBackendPort()
 
 // https://vitejs.dev/config/
 export default defineConfig({

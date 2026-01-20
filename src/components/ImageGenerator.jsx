@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useScript } from '../context/ScriptContext';
 import { useMedia } from '../context/MediaContext';
 import { useUI } from '../context/UIContext';
-import { ImageIcon, Palette, Loader2, Sparkles, Download, RefreshCw } from 'lucide-react';
+import { ImageIcon, Palette, Loader2, Sparkles, Download, RefreshCw, Play, Pause, Music } from 'lucide-react';
 import { API_BASE_URL } from '../utils/constants.js';
 import ProgressBar from './common/ProgressBar';
 
@@ -169,7 +169,7 @@ const ImageGenerator = () => {
     const containerRef = useRef(null);
     const scenesRef = useRef(null);
     const { scenes } = useScript();
-    const { images, setImages, isGeneratingImages, setIsGeneratingImages, imageGenerationProgress, setImageGenerationProgress } = useMedia();
+    const { images, setImages, isGeneratingImages, setIsGeneratingImages, imageGenerationProgress, setImageGenerationProgress, generatedAudioUrl } = useMedia();
     const { setLoading } = useUI();
 
     const [selectedStyle, setSelectedStyle] = useState('cinematic');
@@ -195,6 +195,11 @@ const ImageGenerator = () => {
         selectedStyle: null,
         additionalContext: ''
     });
+
+    // Audio playback state
+    const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+    const [isAudioLoading, setIsAudioLoading] = useState(false);
+    const audioRef = useRef(null);
 
     // Debug modal state
     useEffect(() => {
@@ -521,6 +526,37 @@ Output ONLY the final prompt - no analysis or additional text.`;
             setDragOverIndex(null);
         }, 100);
     };
+
+    // Audio playback functions
+    const toggleAudioPlay = () => {
+        if (!audioRef.current) return;
+
+        if (isAudioPlaying) {
+            audioRef.current.pause();
+            setIsAudioPlaying(false);
+            setIsAudioLoading(false);
+        } else {
+            setIsAudioLoading(true);
+            audioRef.current.play().then(() => {
+                setIsAudioPlaying(true);
+                setIsAudioLoading(false);
+            }).catch(error => {
+                console.error('Audio play failed:', error);
+                setIsAudioPlaying(false);
+                setIsAudioLoading(false);
+            });
+        }
+    };
+
+    // Handle audio end event
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (audio) {
+            const handleEnded = () => setIsAudioPlaying(false);
+            audio.addEventListener('ended', handleEnded);
+            return () => audio.removeEventListener('ended', handleEnded);
+        }
+    }, []);
 
     if (!scenes.length) return null;
 
@@ -854,6 +890,73 @@ Output ONLY the final prompt - no analysis or additional text.`;
                         <p className="text-gray-500 dark:text-gray-400 text-sm">Generate cinematic scenes with AI</p>
                     </div>
                 </div>
+
+                {/* Audio Preview Section */}
+                {generatedAudioUrl && (
+                    <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-2xl p-6 border-2 border-green-200 dark:border-green-800 mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white shadow-lg">
+                                    <Music size={24} />
+                                </div>
+                                <div>
+                                    <div className="font-bold text-gray-900 dark:text-white text-lg">Voiceover Ready</div>
+                                    <div className="text-sm text-green-600 dark:text-green-400">Your narration is prepared for the video</div>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={toggleAudioPlay}
+                                    disabled={!generatedAudioUrl || isAudioLoading}
+                                    className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-teal-600 text-white flex items-center justify-center hover:from-green-700 hover:to-teal-700 transition-all hover:scale-110 active:scale-95 shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                    title={isAudioLoading ? 'Loading...' : isAudioPlaying ? 'Pause voiceover' : 'Play voiceover'}
+                                >
+                                    {isAudioLoading ? (
+                                        <Loader2 size={20} className="animate-spin" />
+                                    ) : isAudioPlaying ? (
+                                        <Pause size={20} />
+                                    ) : (
+                                        <Play size={20} className="ml-0.5" />
+                                    )}
+                                </button>
+                                <a
+                                    href={generatedAudioUrl}
+                                    download="voiceover.mp3"
+                                    className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-all hover:scale-110 active:scale-95"
+                                    title="Download voiceover"
+                                >
+                                    <Download size={20} />
+                                </a>
+                            </div>
+                        </div>
+
+                        <audio
+                            ref={audioRef}
+                            src={generatedAudioUrl}
+                            className="hidden"
+                        />
+
+                        {/* Waveform Visualization */}
+                        <div className="flex items-center gap-1 h-16 mt-4">
+                            {[...Array(40)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="flex-1 bg-gradient-to-t from-green-500 to-teal-500 rounded-full transition-all duration-300"
+                                    style={{
+                                        height: isAudioPlaying ? `${20 + Math.random() * 80}%` : '20%',
+                                        opacity: isAudioPlaying ? 0.8 : 0.4
+                                    }}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="mt-4 text-center">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                Listen to your voiceover while generating matching visuals
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 <div className="mb-8">
                     <button
