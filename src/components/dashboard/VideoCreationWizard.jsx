@@ -7,7 +7,9 @@ import {
   Video,
   CheckCircle2,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Clock,
+  Palette
 } from 'lucide-react';
 import { useScript } from '../../context/ScriptContext';
 import { useMedia } from '../../context/MediaContext';
@@ -21,7 +23,7 @@ const VideoCreationWizard = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [hasAutoAdvanced, setHasAutoAdvanced] = useState({});
   const [manualNavigation, setManualNavigation] = useState(false);
-  const { script, scenes } = useScript();
+  const { script, scenes, title, selectedStyle } = useScript();
   const { images, generatedAudioUrl } = useMedia();
 
   const steps = [
@@ -42,20 +44,20 @@ const VideoCreationWizard = () => {
       completed: !!scenes && scenes.length > 0
     },
     {
-      id: 'images',
-      title: 'Images',
-      icon: ImageIcon,
-      component: ImageGenerator,
-      description: 'Generate scene images',
-      completed: images && images.length > 0 && images.every(img => img.url && img.status !== 'error')
-    },
-    {
       id: 'voice',
       title: 'Voice',
       icon: Mic,
       component: VoiceGenerator,
       description: 'Generate voiceover',
       completed: !!generatedAudioUrl
+    },
+    {
+      id: 'images',
+      title: 'Images',
+      icon: ImageIcon,
+      component: ImageGenerator,
+      description: 'Generate scene images',
+      completed: images && images.length > 0 && images.every(img => img.url && img.status !== 'error')
     },
     {
       id: 'render',
@@ -121,7 +123,7 @@ const VideoCreationWizard = () => {
 
       return () => clearTimeout(timer);
     }
-    
+
     // Auto-advance from other steps (except edit and images steps which user controls)
     if (currentStepData.completed && stepId !== 'edit' && stepId !== 'images') {
       // Wait a bit to show the completion state, then move to next
@@ -145,6 +147,40 @@ const VideoCreationWizard = () => {
             Step {currentStep + 1} of {steps.length}
           </span>
         </div>
+
+        {/* Script Summary - Only show when script exists */}
+        {script && (
+          <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 mb-4 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+                  <FileText size={16} />
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                    {title || 'Untitled Script'}
+                  </div>
+                  <div className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <FileText size={12} />
+                      {script.split(/\s+/).filter(word => word.length > 0).length} words
+                    </span>
+                    {selectedStyle && (
+                      <span className="flex items-center gap-1">
+                        <Palette size={12} />
+                        {selectedStyle.name}
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1">
+                      <Clock size={12} />
+                      ~{Math.ceil(script.split(/\s+/).filter(word => word.length > 0).length / 150)}min
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Step Indicators */}
         <div className="flex items-center justify-between relative">

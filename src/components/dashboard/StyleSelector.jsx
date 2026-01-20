@@ -46,11 +46,10 @@ const StyleSelector = ({
                                     onClick={() => onSelectStyle(style)}
                                     onMouseEnter={() => setHoveredStyleId(style.id)}
                                     onMouseLeave={() => setHoveredStyleId(null)}
-                                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all group ${
-                                        isSelected
+                                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all group ${isSelected
                                             ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 shadow-md'
                                             : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-md'
-                                    }`}
+                                        }`}
                                 >
                                     {/* Selected Indicator */}
                                     {isSelected && (
@@ -60,11 +59,10 @@ const StyleSelector = ({
                                     )}
 
                                     {/* Style Icon */}
-                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${
-                                        isSelected
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${isSelected
                                             ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'
                                             : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/30'
-                                    }`}>
+                                        }`}>
                                         <Sparkles size={18} />
                                     </div>
 
@@ -79,9 +77,30 @@ const StyleSelector = ({
                                         <span>•</span>
                                         <span>{style.wordCount} words</span>
                                     </div>
-
+                                    <div className='flex gap-2 mt-1'>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onEditStyle(style);
+                                            }}
+                                            className="px-3 w-full py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md transition-colors flex items-center gap-1.5"
+                                        >
+                                            <Edit size={12} />
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDeleteStyle(e, style.id);
+                                            }}
+                                            className="px-3 w-full py-1.5 bg-red-500 text-white rounded-lg text-xs font-medium hover:bg-red-600 shadow-md transition-colors flex items-center gap-1.5"
+                                        >
+                                            <Trash2 size={12} />
+                                            Delete
+                                        </button>
+                                    </div>
                                     {/* Action Buttons on Hover */}
-                                    {isHovered && !isSelected && (
+                                    {/* {isHovered && !isSelected && (
                                         <div className="absolute inset-0 bg-black/5 dark:bg-white/5 rounded-xl flex items-center justify-center gap-2 backdrop-blur-sm">
                                             <button
                                                 onClick={(e) => {
@@ -104,7 +123,7 @@ const StyleSelector = ({
                                                 Delete
                                             </button>
                                         </div>
-                                    )}
+                                    )} */}
                                 </div>
                             );
                         })}

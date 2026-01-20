@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { useScript } from "../context/ScriptContext";
 import { useMedia } from "../context/MediaContext";
 import { parseScriptIntoScenes } from "../utils/scriptUtils";
-import { Edit3, Loader2, Copy, Download, ChevronRight } from "lucide-react";
+import { Edit3, Loader2, Copy, Download, ChevronRight, FileText, Clock, Zap, Palette } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { useToast } from "../context/ToastContext";
 
 const ScriptEditor = ({ handleNext }) => {
   const containerRef = useRef(null);
   const timeoutsRef = useRef([]);
-  const { script, setScript, setScenes } = useScript();
+  const { script, setScript, setScenes, title, selectedStyle } = useScript();
   const { audioDuration } = useMedia();
   const { showSuccess, showError } = useToast();
   const [displayedScript, setDisplayedScript] = useState("");
@@ -58,6 +58,32 @@ const ScriptEditor = ({ handleNext }) => {
     };
   }, [script, audioDuration, setScenes, userEdited]);
 
+  // Language validation function
+  const isEnglishContent = (text) => {
+    // Check for common non-English character ranges
+    const nonEnglishPattern = /[\u0080-\uFFFF]/g; // Non-ASCII characters
+    const banglaPattern = /[\u0980-\u09FF]/g; // Bangla characters
+    const arabicPattern = /[\u0600-\u06FF]/g; // Arabic characters
+    const cyrillicPattern = /[\u0400-\u04FF]/g; // Cyrillic characters
+    const chinesePattern = /[\u4E00-\u9FFF]/g; // Chinese characters
+
+    const hasNonEnglish = nonEnglishPattern.test(text);
+    const hasBangla = banglaPattern.test(text);
+    const hasArabic = arabicPattern.test(text);
+    const hasCyrillic = cyrillicPattern.test(text);
+    const hasChinese = chinesePattern.test(text);
+
+    return {
+      isEnglish: !hasNonEnglish,
+      detectedLanguages: {
+        bangla: hasBangla,
+        arabic: hasArabic,
+        cyrillic: hasCyrillic,
+        chinese: hasChinese
+      }
+    };
+  };
+
   const handleScriptChange = (e) => {
     // Stop animation when user starts editing
     if (isAnimating) {
@@ -65,11 +91,27 @@ const ScriptEditor = ({ handleNext }) => {
       setIsAnimating(false);
     }
 
-    setUserEdited(true);
     const newScript = e.target.value;
+
+    // Language validation (only warn if significant amount of non-English content)
+    if (newScript.length > 10) { // Only check after some content is entered
+      const languageCheck = isEnglishContent(newScript);
+      if (!languageCheck.isEnglish && !userEdited) { // Only show warning once per editing session
+        const detectedLangs = Object.entries(languageCheck.detectedLanguages)
+          .filter(([lang, detected]) => detected)
+          .map(([lang]) => lang.charAt(0).toUpperCase() + lang.slice(1));
+
+        if (detectedLangs.length > 0) {
+          showWarning(`Non-English content detected (${detectedLangs.join(', ')}). For best results with voice generation and video creation, please use English content.`);
+          setUserEdited(true); // Prevent repeated warnings
+        }
+      }
+    }
+
+    setUserEdited(true);
     setScript(newScript);
     setDisplayedScript(newScript);
-    
+
     // Update scenes when script changes
     const sceneCount = 15;
     const scenes = parseScriptIntoScenes(newScript, sceneCount, audioDuration);
@@ -97,6 +139,26 @@ const ScriptEditor = ({ handleNext }) => {
       showError("Failed to download PDF");
     }
   };
+
+  // Calculate script statistics
+  const getScriptStats = () => {
+    if (!script) return null;
+
+    const words = script.trim().split(/\s+/).filter(word => word.length > 0);
+    const wordCount = words.length;
+    const charCount = script.length;
+    const estimatedReadTime = Math.ceil(wordCount / 150); // Average reading speed: 150 words/minute
+    const estimatedAudioDuration = Math.ceil(wordCount / 150 * 60); // Convert to seconds
+
+    return {
+      wordCount,
+      charCount,
+      estimatedReadTime,
+      estimatedAudioDuration
+    };
+  };
+
+  const scriptStats = getScriptStats();
 
   if (!script) return null;
 
@@ -138,6 +200,63 @@ const ScriptEditor = ({ handleNext }) => {
         </div>
       </div>
 
+      {/* Script Information Section */}
+      {scriptStats && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 mb-8 border border-blue-200 dark:border-blue-800">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-lg">
+              <FileText size={20} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Script Summary</h3>
+              <p className="text-sm text-blue-600 dark:text-blue-400">Professional analysis of your content</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Word Count */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-blue-100 dark:border-blue-800 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText size={16} className="text-blue-600 dark:text-blue-400" />
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Words</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{scriptStats.wordCount.toLocaleString()}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{scriptStats.charCount.toLocaleString()} characters</div>
+            </div>
+
+            {/* Estimated Duration */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-green-100 dark:border-green-800 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock size={16} className="text-green-600 dark:text-green-400" />
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Duration</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{scriptStats.estimatedReadTime}m</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">~{scriptStats.estimatedAudioDuration}s audio</div>
+            </div>
+
+            {/* Style Information */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-purple-100 dark:border-purple-800 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Palette size={16} className="text-purple-600 dark:text-purple-400" />
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Style</span>
+              </div>
+              <div className="text-sm font-bold text-gray-900 dark:text-white truncate">{selectedStyle?.name || 'Custom'}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{selectedStyle?.language || 'English'}</div>
+            </div>
+
+            {/* Mode */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-orange-100 dark:border-orange-800 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap size={16} className="text-orange-600 dark:text-orange-400" />
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Mode</span>
+              </div>
+              <div className="text-sm font-bold text-gray-900 dark:text-white">{selectedStyle?.mode || 'Standard'}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{selectedStyle?.wordCount || scriptStats.wordCount} words target</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-6">
         <div className="relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
@@ -164,7 +283,7 @@ const ScriptEditor = ({ handleNext }) => {
               onClick={handleNext}
               className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
             >
-              Continue to Images
+              Continue to Audio
               <ChevronRight size={20} />
             </button>
           </div>

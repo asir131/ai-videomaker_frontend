@@ -4,7 +4,7 @@ import { useMedia } from '../context/MediaContext';
 import { useUI } from '../context/UIContext';
 import { useToast } from '../context/ToastContext';
 import { VOICES, VOICE_PROVIDERS, API_BASE_URL } from '../utils/constants';
-import { Mic, Play, Pause, Volume2, StopCircle, Music, Download, Check, Loader2 } from 'lucide-react';
+import { Mic, Play, Pause, Volume2, StopCircle, Music, Download, Check, Loader2, FileText, Clock } from 'lucide-react';
 import ProgressBar from './common/ProgressBar';
 
 // Direct API call with abort support
@@ -37,7 +37,7 @@ const VoiceGenerator = () => {
     const audioRef = useRef(null);
     const abortControllerRef = useRef(null);
 
-    const { script } = useScript();
+    const { script, title, selectedStyle } = useScript();
     const {
         generatedAudioUrl, setGeneratedAudioUrl,
         setAudioDuration,
@@ -69,7 +69,6 @@ const VoiceGenerator = () => {
             setPreviewPlayingId(null);
             return;
         }
-
         // Stop any other preview
         previewAudioRef.current.pause();
         previewAudioRef.current.currentTime = 0;
@@ -202,6 +201,47 @@ const VoiceGenerator = () => {
                     <p className="text-gray-500 dark:text-gray-400 text-sm">Choose a voice and generate audio</p>
                 </div>
             </div>
+
+            {/* Script Information */}
+            {script && (
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-200 dark:border-indigo-800 mb-8">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
+                            <FileText size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Voice Generation Source</h3>
+                            <p className="text-sm text-indigo-600 dark:text-indigo-400">Script details for audio processing</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
+                        <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <h4 className="font-bold text-gray-900 dark:text-white text-lg">{title || 'Untitled Script'}</h4>
+                                    <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-full">
+                                        {selectedStyle?.name || 'Custom Style'}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <span className="flex items-center gap-1">
+                                        <FileText size={14} />
+                                        {script.split(/\s+/).filter(word => word.length > 0).length} words
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <Clock size={14} />
+                                        ~{Math.ceil(script.split(/\s+/).filter(word => word.length > 0).length / 150)}min audio
+                                    </span>
+                                </div>
+                                <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                                    {script.substring(0, 150)}{script.length > 150 ? '...' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Provider Tabs */}
             <div className="mb-8">

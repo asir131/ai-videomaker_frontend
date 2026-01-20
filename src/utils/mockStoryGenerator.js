@@ -1,6 +1,6 @@
 /**
  * Generates a mock story when API quota is exceeded
- * Creates an engaging 150-word story based on the title
+ * Creates an engaging English-only 150-word story based on the title
  */
 export function generateMockStory(title, wordCount = 150) {
   // Extract key words from title for story generation

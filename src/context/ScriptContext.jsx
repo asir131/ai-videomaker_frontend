@@ -10,6 +10,7 @@ export const ScriptProvider = ({ children }) => {
     const [wordCount, setWordCount] = useState(0);
     const [isGenerating, setIsGenerating] = useState(false);
     const [scenes, setScenes] = useState([]);
+    const [selectedStyle, setSelectedStyle] = useState(null);
 
     const value = {
         script,
@@ -21,7 +22,9 @@ export const ScriptProvider = ({ children }) => {
         isGenerating,
         setIsGenerating,
         scenes,
-        setScenes
+        setScenes,
+        selectedStyle,
+        setSelectedStyle
     };
 
     return (

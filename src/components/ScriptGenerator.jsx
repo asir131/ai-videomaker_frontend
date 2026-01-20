@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useScript } from '../context/ScriptContext';
 import { useUI } from '../context/UIContext';
 import { useToast } from '../context/ToastContext';
@@ -16,7 +16,8 @@ const ScriptGenerator = () => {
         title, setTitle,
         script, setScript,
         wordCount, setWordCount,
-        isGenerating, setIsGenerating
+        isGenerating, setIsGenerating,
+        selectedStyle, setSelectedStyle
     } = useScript();
 
     const { setLoading } = useUI();
@@ -28,7 +29,6 @@ const ScriptGenerator = () => {
 
     // Style System State
     const [styles, setStyles] = useState([]);
-    const [selectedStyle, setSelectedStyle] = useState(null);
     const [showStyleModal, setShowStyleModal] = useState(false);
     const [styleViewMode, setStyleViewMode] = useState('list'); // 'list', 'create', 'edit'
     const [newStyle, setNewStyle] = useState({
@@ -100,10 +100,10 @@ const ScriptGenerator = () => {
 
         try {
             const mainWordCount = wordCount || DEFAULTS.DEFAULT_WORD_COUNT;
-            let userPrompt = `Write a ${mainWordCount}-word story for this title: "${title}".`;
+            // Always generate content in English for consistency and best voice generation results
+            let userPrompt = `Write a ${mainWordCount}-word story for this title: "${title}". IMPORTANT: Write the entire story in ENGLISH only, regardless of any language settings.`;
 
             if (selectedStyle) {
-                userPrompt += ` Language: ${selectedStyle.language}.`;
                 userPrompt += ` Writing Mode: ${selectedStyle.mode}.`;
                 if (selectedStyle.referenceVideo) {
                     const referenceVideos = Array.isArray(selectedStyle.referenceVideo) 
@@ -127,6 +127,7 @@ const ScriptGenerator = () => {
 - Write as one continuous flowing story from beginning to end
 - Use natural paragraph breaks only
 - Write EXACTLY as it should be spoken aloud by a narrator
+- CRITICAL: Write the ENTIRE story in ENGLISH language only
 
 STORYTELLING RULES FOR 90%+ RETENTION:
 - Start with an immediate hook in the first 5 seconds that creates curiosity or shock
@@ -222,7 +223,45 @@ ${userPrompt}`;
         reader.readAsText(file);
     };
 
+    // Language validation function
+    const isEnglishContent = (text) => {
+        // Check for common non-English character ranges
+        const nonEnglishPattern = /[\u0080-\uFFFF]/g; // Non-ASCII characters
+        const banglaPattern = /[\u0980-\u09FF]/g; // Bangla characters
+        const arabicPattern = /[\u0600-\u06FF]/g; // Arabic characters
+        const cyrillicPattern = /[\u0400-\u04FF]/g; // Cyrillic characters
+        const chinesePattern = /[\u4E00-\u9FFF]/g; // Chinese characters
+
+        const hasNonEnglish = nonEnglishPattern.test(text);
+        const hasBangla = banglaPattern.test(text);
+        const hasArabic = arabicPattern.test(text);
+        const hasCyrillic = cyrillicPattern.test(text);
+        const hasChinese = chinesePattern.test(text);
+
+        return {
+            isEnglish: !hasNonEnglish,
+            detectedLanguages: {
+                bangla: hasBangla,
+                arabic: hasArabic,
+                cyrillic: hasCyrillic,
+                chinese: hasChinese
+            }
+        };
+    };
+
     const parseUploadedScript = (content, fileName) => {
+        // Language validation
+        const languageCheck = isEnglishContent(content);
+        if (!languageCheck.isEnglish) {
+            const detectedLangs = Object.entries(languageCheck.detectedLanguages)
+                .filter(([lang, detected]) => detected)
+                .map(([lang]) => lang.charAt(0).toUpperCase() + lang.slice(1));
+
+            if (detectedLangs.length > 0) {
+                showWarning(`Warning: Non-English content detected (${detectedLangs.join(', ')}). Please ensure your script is in English for best results.`);
+            }
+        }
+
         // Try to extract title from first line or filename
         let scriptContent = content.trim();
         let extractedTitle = '';
@@ -352,7 +391,7 @@ ${userPrompt}`;
         setNewStyle({
             name: '',
             wordCount: DEFAULTS.DEFAULT_WORD_COUNT,
-            language: 'English',
+            language: 'English', // Always default to English for consistency
             referenceVideo: [],
             mode: 'Fast',
             context: '',
