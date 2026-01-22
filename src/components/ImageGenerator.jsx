@@ -181,6 +181,9 @@ const ImageGenerator = () => {
     const [showImageModal, setShowImageModal] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(null);
 
+    // Mode toggle state
+    const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+
     // Drag-and-drop states for timeline reordering
     const [draggedIndex, setDraggedIndex] = useState(null);
     const [dragOverIndex, setDragOverIndex] = useState(null);
@@ -271,7 +274,7 @@ const ImageGenerator = () => {
             // STRICT: Use the exact imageCount from settings, don't fallback to scenes.length
             const requestedCount = currentSettings.imageCount ? parseInt(currentSettings.imageCount, 10) : 0;
             const targetCount = requestedCount > 0 ? Math.min(requestedCount, scenes.length) : 1;
-            
+
             console.log('📊 Image Generation Debug:');
             console.log('   requestedCount:', requestedCount);
             console.log('   scenes.length:', scenes.length);
@@ -672,102 +675,234 @@ Output ONLY the final prompt - no analysis or additional text.`;
                         <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Image Generation Settings</h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Configure your image generation preferences</p>
+                            {/* Mode Toggle */}
+                            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl border border-gray-200 dark:border-gray-600">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                        <span className="text-white font-bold text-sm">
+                                            {isAdvancedMode ? 'A' : 'B'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                                            {isAdvancedMode ? 'Advanced Mode' : 'Basic Mode'}
+                                        </h4>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            {isAdvancedMode ? 'Full control with advanced options' : 'Simple settings for quick generation'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+                                    className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 ${isAdvancedMode
+                                            ? 'bg-gradient-to-r from-purple-600 to-blue-600'
+                                            : 'bg-gray-300 dark:bg-gray-600'
+                                        } shadow-lg`}
+                                >
+                                    <span
+                                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isAdvancedMode ? 'translate-x-8' : 'translate-x-1'
+                                            }`}
+                                    />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Body */}
                         <div className="p-6 space-y-6">
-                            {/* Row 1: Aspect Ratio, Quality, Animate */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {/* Aspect Ratio */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Select Aspect Ratio
-                                    </label>
-                                    <select
-                                        value={generationSettings.aspectRatio}
-                                        onChange={(e) => setGenerationSettings({ ...generationSettings, aspectRatio: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none"
-                                    >
-                                        <option value="16:9">16:9 - Landscape (Widescreen)</option>
-                                        <option value="9:16">9:16 - Portrait (Vertical)</option>
-                                    </select>
-                                </div>
+                            {/* Row 1: Dynamic fields based on mode */}
+                            <div className={`grid gap-6 ${isAdvancedMode ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-4'}`}>
+                                {!isAdvancedMode ? (
+                                    <>
+                                        {/* Basic Mode Fields */}
+                                        {/* Aspect Ratio */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Aspect Ratio
+                                            </label>
+                                            <select
+                                                value={generationSettings.aspectRatio}
+                                                onChange={(e) => setGenerationSettings({ ...generationSettings, aspectRatio: e.target.value })}
+                                                className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                                            >
+                                                <option value="16:9">16:9 Landscape</option>
+                                                <option value="9:16">9:16 Portrait</option>
+                                            </select>
+                                        </div>
 
-                                {/* Quality */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Select Quality
-                                    </label>
-                                    <select
-                                        value={generationSettings.quality}
-                                        onChange={(e) => setGenerationSettings({ ...generationSettings, quality: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none"
-                                    >
-                                        <option value="Fine">Fine</option>
-                                        <option value="Good">Good</option>
-                                        <option value="Better">Better</option>
-                                        <option value="Best">Best</option>
-                                    </select>
-                                </div>
+                                        {/* Quality */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Quality Level
+                                            </label>
+                                            <select
+                                                value={generationSettings.quality}
+                                                onChange={(e) => setGenerationSettings({ ...generationSettings, quality: e.target.value })}
+                                                className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                                            >
+                                                <option value="Fine">Fine</option>
+                                                <option value="Good">Good</option>
+                                                <option value="Better">Better</option>
+                                                <option value="Best">Best</option>
+                                            </select>
+                                        </div>
 
-                                {/* Animate Images */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Animate Images?
-                                    </label>
-                                    <div className="flex items-center h-[48px]">
-                                        <button
-                                            onClick={() => setGenerationSettings({ ...generationSettings, animate: !generationSettings.animate })}
-                                            className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors ${generationSettings.animate ? 'bg-pink-600' : 'bg-gray-300 dark:bg-gray-600'
-                                                }`}
-                                        >
-                                            <span
-                                                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${generationSettings.animate ? 'translate-x-9' : 'translate-x-1'
-                                                    }`}
-                                            />
-                                        </button>
-                                        <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">
-                                            {generationSettings.animate ? 'Yes' : 'No'}
-                                        </span>
-                                    </div>
-                                </div>
+                                        {/* Animate Images */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Animation
+                                            </label>
+                                            <div className="flex items-center justify-between p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {generationSettings.animate ? 'Enabled' : 'Disabled'}
+                                                </span>
+                                                <button
+                                                    onClick={() => setGenerationSettings({ ...generationSettings, animate: !generationSettings.animate })}
+                                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${generationSettings.animate
+                                                        ? 'bg-indigo-600'
+                                                        : 'bg-gray-300 dark:bg-gray-600'
+                                                        }`}
+                                                >
+                                                    <span
+                                                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${generationSettings.animate ? 'translate-x-6' : 'translate-x-1'
+                                                            }`}
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Image Count */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Image Count <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="space-y-1">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max={Math.min(scenes.length, 15)}
+                                                    value={generationSettings.imageCount || ''}
+                                                    onChange={(e) => {
+                                                        const maxAllowed = Math.min(scenes.length, 15);
+                                                        const inputValue = e.target.value;
+                                                        if (inputValue === '') {
+                                                            setGenerationSettings(prev => ({ ...prev, imageCount: null }));
+                                                            return;
+                                                        }
+
+                                                        const numValue = parseInt(inputValue, 10);
+                                                        if (!isNaN(numValue) && numValue >= 1) {
+                                                            const value = Math.min(maxAllowed, Math.max(1, numValue));
+                                                            setGenerationSettings(prev => ({ ...prev, imageCount: value }));
+                                                        }
+                                                    }}
+                                                    placeholder="1-15"
+                                                    className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                                                />
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                    Max: {Math.min(scenes.length, 15)} scenes available
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        {/* Advanced Mode Fields */}
+                                        {/* Animation */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Animation
+                                            </label>
+                                            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {generationSettings.animate ? 'Enabled' : 'Disabled'}
+                                                </span>
+                                                <button
+                                                    onClick={() => setGenerationSettings({ ...generationSettings, animate: !generationSettings.animate })}
+                                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${generationSettings.animate
+                                                        ? 'bg-indigo-600'
+                                                        : 'bg-gray-300 dark:bg-gray-600'
+                                                        }`}
+                                                >
+                                                    <span
+                                                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${generationSettings.animate ? 'translate-x-6' : 'translate-x-1'
+                                                            }`}
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Image Count with Prompt Safety */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Image Count <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="space-y-2">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max={Math.min(scenes.length, 15)}
+                                                    value={generationSettings.imageCount || ''}
+                                                    onChange={(e) => {
+                                                        const maxAllowed = Math.min(scenes.length, 15);
+                                                        const inputValue = e.target.value;
+                                                        if (inputValue === '') {
+                                                            setGenerationSettings(prev => ({ ...prev, imageCount: null }));
+                                                            return;
+                                                        }
+
+                                                        const numValue = parseInt(inputValue, 10);
+                                                        if (!isNaN(numValue) && numValue >= 1) {
+                                                            const value = Math.min(maxAllowed, Math.max(1, numValue));
+                                                            setGenerationSettings(prev => ({ ...prev, imageCount: value }));
+                                                        }
+                                                    }}
+                                                    placeholder="1-15"
+                                                    className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                                                />
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="promptSafety"
+                                                        className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                    />
+                                                    <label htmlFor="promptSafety" className="text-xs text-gray-600 dark:text-gray-400">
+                                                        Enable prompt safety filters
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Timeline Options */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                Timeline Options
+                                            </label>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="timelineSplits"
+                                                        className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                    />
+                                                    <label htmlFor="timelineSplits" className="text-sm text-gray-700 dark:text-gray-300">
+                                                        Enable timeline splits
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="timelineView"
+                                                        className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                    />
+                                                    <label htmlFor="timelineView" className="text-sm text-gray-700 dark:text-gray-300">
+                                                        Timeline view
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
-
-                            {/* Row 2: Image Count */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Set Image Count <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max={Math.min(scenes.length, 15)}
-                                    value={generationSettings.imageCount || ''}
-                                    onChange={(e) => {
-                                        const maxAllowed = Math.min(scenes.length, 15);
-                                        const inputValue = e.target.value;
-                                        
-                                        // Allow empty input
-                                        if (inputValue === '') {
-                                            setGenerationSettings(prev => ({ ...prev, imageCount: null }));
-                                            return;
-                                        }
-                                        
-                                        const numValue = parseInt(inputValue, 10);
-                                        if (!isNaN(numValue) && numValue >= 1) {
-                                            const value = Math.min(maxAllowed, Math.max(1, numValue));
-                                            setGenerationSettings(prev => ({ ...prev, imageCount: value }));
-                                            console.log('📝 Image count updated to:', value);
-                                        }
-                                    }}
-                                    placeholder="Enter number of images (1-15)"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none"
-                                />
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    Required • min: 1, max: {Math.min(scenes.length, 15)} • You have {scenes.length} scenes available
-                                </p>
-                            </div>
-
                             {/* Row 3: Style Selection */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -782,19 +917,21 @@ Output ONLY the final prompt - no analysis or additional text.`;
                                 </button>
                             </div>
 
-                            {/* Row 4: Additional Context */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Additional Context (Optional)
-                                </label>
-                                <textarea
-                                    value={generationSettings.additionalContext}
-                                    onChange={(e) => setGenerationSettings({ ...generationSettings, additionalContext: e.target.value })}
-                                    rows="3"
-                                    placeholder="Add any additional instructions or context for image generation..."
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none resize-none"
-                                />
-                            </div>
+                            {/* Row 4: Additional Context (Basic Mode Only) */}
+                            {!isAdvancedMode && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Additional Context (Optional)
+                                    </label>
+                                    <textarea
+                                        value={generationSettings.additionalContext}
+                                        onChange={(e) => setGenerationSettings({ ...generationSettings, additionalContext: e.target.value })}
+                                        rows="3"
+                                        placeholder="Add any additional instructions or context for image generation..."
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 outline-none resize-none"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         {/* Footer */}
@@ -1204,11 +1341,10 @@ Output ONLY the final prompt - no analysis or additional text.`;
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                                        img.uploaded
-                                                            ? 'bg-blue-500/80 text-white'
-                                                            : 'bg-purple-500/80 text-white'
-                                                    }`}>
+                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${img.uploaded
+                                                        ? 'bg-blue-500/80 text-white'
+                                                        : 'bg-purple-500/80 text-white'
+                                                        }`}>
                                                         {img.uploaded ? 'Uploaded' : 'Generated'}
                                                     </span>
                                                 </div>

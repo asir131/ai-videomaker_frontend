@@ -6,11 +6,8 @@ import VideoLibrary from '../components/dashboard/VideoLibrary';
 import CreditsDashboard from '../components/dashboard/CreditsDashboard';
 import Settings from '../components/dashboard/Settings';
 import YouTubeIntegration from '../components/dashboard/YouTubeIntegration';
-
 const AppPage = () => {
-    // Debug: Confirm new layout is loading
-    console.log('AppPage: Using new DashboardLayout');
-    
+    console.log('AppPage: Using new DashboardLayout');  
     return (
         <DashboardLayout>
             <Routes>
@@ -29,7 +26,6 @@ const AppPage = () => {
     );
 };
 
-// Simple Help Page
 const HelpPage = () => {
     return (
         <div className="space-y-6">

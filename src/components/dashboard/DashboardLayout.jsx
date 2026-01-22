@@ -10,8 +10,8 @@ import {
   Menu, 
   X,
   LogOut,
-  User
 } from 'lucide-react';
+import logo from "../../assets/logo.jpg"
 import { useAuth } from '../../context/AuthContext';
 import CreditsNavbar from './CreditsNavbar';
 
@@ -63,7 +63,8 @@ const DashboardLayout = ({ children }) => {
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                <Video size={20} strokeWidth={2.5} />
+                {/* <Video size={20} strokeWidth={2.5} /> */}
+                <img className='rounded-xl' src={logo} alt="" />
               </div>
               <span className="font-heading font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
                 StoryVid AI

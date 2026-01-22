@@ -29,6 +29,9 @@ const BACKEND_PORT = getBackendPort()
 export default defineConfig({
   plugins: [react()],
   server: {
+    allowedHosts: [
+      "areas-solving-employed-races.trycloudflare.com",
+    ],
     port: 5173,
     proxy: {
       '/api': {

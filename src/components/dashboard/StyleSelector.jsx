@@ -47,8 +47,8 @@ const StyleSelector = ({
                                     onMouseEnter={() => setHoveredStyleId(style.id)}
                                     onMouseLeave={() => setHoveredStyleId(null)}
                                     className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all group ${isSelected
-                                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 shadow-md'
-                                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-md'
+                                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 shadow-md'
+                                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-md'
                                         }`}
                                 >
                                     {/* Selected Indicator */}
@@ -60,8 +60,8 @@ const StyleSelector = ({
 
                                     {/* Style Icon */}
                                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${isSelected
-                                            ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'
-                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/30'
+                                        ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/30'
                                         }`}>
                                         <Sparkles size={18} />
                                     </div>
@@ -91,10 +91,9 @@ const StyleSelector = ({
                                                 <div className="p-1 bg-blue-100 dark:bg-blue-900/50 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
                                                     <Edit size={14} className="group-hover:scale-110 transition-transform" />
                                                 </div>
-                                                <span>Edit Style</span>
+                                                <span>Edit</span>
                                             </div>
                                         </button>
-
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
