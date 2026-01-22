@@ -207,6 +207,18 @@ const ImageGenerator = () => {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [uploadingImages, setUploadingImages] = useState({});
     const fileInputRef = useRef(null);
+    const audioInputRef = useRef(null);
+
+    const handleAudioReplacement = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setGeneratedAudioUrl(url);
+            // Reset duration so it recalculates
+            setAudioDuration(0);
+            // setAudioCurrentTime(0); // Optional: reset time
+        }
+    };
 
     // Debug modal state
     useEffect(() => {
@@ -1117,7 +1129,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
                                                 </div>
                                             </div>
 
-                                            <div className="relative h-24 bg-blue-50 dark:bg-indigo-900/20 rounded-xl border border-blue-100 dark:border-indigo-900/50 overflow-hidden">
+                                            <div className="relative h-24 bg-blue-50 dark:bg-indigo-900/20 rounded-xl border border-blue-100 dark:border-indigo-900/50 overflow-hidden px-2">
                                                 {/* Segments Visualization */}
                                                 <div className="absolute inset-0 flex items-center px-4">
                                                     <div className="w-full h-1 bg-white/30 dark:bg-slate-700/50 absolute top-1/2 -translate-y-1/2 left-1"></div>
@@ -1465,6 +1477,20 @@ Output ONLY the final prompt - no analysis or additional text.`;
                                 >
                                     <Download size={20} />
                                 </a>
+                                <button
+                                    onClick={() => audioInputRef.current?.click()}
+                                    className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center hover:bg-teal-200 dark:hover:bg-teal-900/50 transition-all hover:scale-110 active:scale-95"
+                                    title="Replace with custom audio"
+                                >
+                                    <RefreshCw size={20} />
+                                </button>
+                                <input
+                                    ref={audioInputRef}
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={handleAudioReplacement}
+                                    className="hidden"
+                                />
                             </div>
                         </div>
 
@@ -1644,9 +1670,9 @@ Output ONLY the final prompt - no analysis or additional text.`;
                         })}
                     </div>
                 )}
-            </div>
+            </div >
             {/* Hidden Audio Element for Tracking Time */}
-            <audio
+            < audio
                 ref={audioRef}
                 src={generatedAudioUrl}
                 onTimeUpdate={(e) => setAudioCurrentTime(e.currentTarget.currentTime)}
