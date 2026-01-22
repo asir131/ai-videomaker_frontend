@@ -4,7 +4,7 @@ import { useMedia } from '../context/MediaContext';
 import { useUI } from '../context/UIContext';
 import { useToast } from '../context/ToastContext';
 import { VOICES, VOICE_PROVIDERS, API_BASE_URL } from '../utils/constants';
-import { Mic, Play, Pause, Volume2, StopCircle, Music, Download, Check, Loader2, FileText, Clock } from 'lucide-react';
+import { Mic, Play, Pause, Volume2, StopCircle, Music, Download, Check, Loader2, FileText, Clock, Edit2, X, Save } from 'lucide-react';
 import ProgressBar from './common/ProgressBar';
 
 // Direct API call with abort support
@@ -37,7 +37,7 @@ const VoiceGenerator = () => {
     const audioRef = useRef(null);
     const abortControllerRef = useRef(null);
 
-    const { script, title, selectedStyle } = useScript();
+    const { script, setScript, title, selectedStyle } = useScript();
     const {
         generatedAudioUrl, setGeneratedAudioUrl,
         setAudioDuration,
@@ -52,6 +52,8 @@ const VoiceGenerator = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [progressStage, setProgressStage] = useState('');
     const [showAllVoices, setShowAllVoices] = useState(false);
+    const [isEditingScript, setIsEditingScript] = useState(false);
+    const [editedScript, setEditedScript] = useState('');
 
     // Preview state
     const [previewPlayingId, setPreviewPlayingId] = useState(null);
@@ -185,7 +187,40 @@ const VoiceGenerator = () => {
         }
     };
 
-    if (!script) return null;
+    const handleEditScript = () => {
+        setEditedScript(script || '');
+        setIsEditingScript(true);
+    };
+
+    const handlePasteNewScript = () => {
+        setEditedScript('');
+        setIsEditingScript(true);
+    };
+
+    const handleSaveScript = () => {
+        if (editedScript.trim()) {
+            setScript(editedScript.trim());
+            showSuccess('Script updated successfully!');
+        } else {
+            showError('Script cannot be empty');
+            return;
+        }
+        setIsEditingScript(false);
+    };
+
+    const handleCancelEdit = () => {
+        setEditedScript('');
+        setIsEditingScript(false);
+    };
+
+    const handleClearScript = () => {
+        if (window.confirm('Are you sure you want to clear the script? You can paste a new one.')) {
+            setScript('');
+            setEditedScript('');
+            setIsEditingScript(false);
+            showSuccess('Script cleared. You can now paste a new script.');
+        }
+    };
 
     return (
         <div className="glass-card relative overflow-hidden">
@@ -203,42 +238,118 @@ const VoiceGenerator = () => {
             </div>
 
             {/* Script Information */}
-            {script && (
+            {script || isEditingScript ? (
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-200 dark:border-indigo-800 mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
+                                <FileText size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Voice Generation Source</h3>
+                                <p className="text-sm text-indigo-600 dark:text-indigo-400">Script details for audio processing</p>
+                            </div>
+                        </div>
+                        {!isEditingScript && (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handleEditScript}
+                                    className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center gap-2"
+                                >
+                                    <Edit2 size={16} />
+                                    Replace Script
+                                </button>
+                                <button
+                                    onClick={handleClearScript}
+                                    className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/50 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center gap-2"
+                                >
+                                    <X size={16} />
+                                    Clear
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {isEditingScript ? (
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
+                            <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Paste or edit your script here
+                                </label>
+                                <textarea
+                                    value={editedScript}
+                                    onChange={(e) => setEditedScript(e.target.value)}
+                                    placeholder="Paste your script here..."
+                                    className="w-full min-h-[200px] p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"
+                                    autoFocus
+                                />
+                                <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                    {editedScript.split(/\s+/).filter(word => word.length > 0).length} words • 
+                                    ~{Math.ceil(editedScript.split(/\s+/).filter(word => word.length > 0).length / 150)}min audio
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handleSaveScript}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <Save size={16} />
+                                    Save Script
+                                </button>
+                                <button
+                                    onClick={handleCancelEdit}
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <X size={16} />
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <h4 className="font-bold text-gray-900 dark:text-white text-lg">{title || 'Untitled Script'}</h4>
+                                        <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-full">
+                                            {selectedStyle?.name || 'Custom Style'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                        <span className="flex items-center gap-1">
+                                            <FileText size={14} />
+                                            {script.split(/\s+/).filter(word => word.length > 0).length} words
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Clock size={14} />
+                                            ~{Math.ceil(script.split(/\s+/).filter(word => word.length > 0).length / 150)}min audio
+                                        </span>
+                                    </div>
+                                    <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                                        {script.substring(0, 150)}{script.length > 150 ? '...' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ) : (
                 <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-200 dark:border-indigo-800 mb-8">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
                             <FileText size={20} />
                         </div>
-                        <div>
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Voice Generation Source</h3>
-                            <p className="text-sm text-indigo-600 dark:text-indigo-400">Script details for audio processing</p>
+                        <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">No Script Available</h3>
+                            <p className="text-sm text-indigo-600 dark:text-indigo-400">Paste your script to generate voiceover</p>
                         </div>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <h4 className="font-bold text-gray-900 dark:text-white text-lg">{title || 'Untitled Script'}</h4>
-                                    <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-full">
-                                        {selectedStyle?.name || 'Custom Style'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                                    <span className="flex items-center gap-1">
-                                        <FileText size={14} />
-                                        {script.split(/\s+/).filter(word => word.length > 0).length} words
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <Clock size={14} />
-                                        ~{Math.ceil(script.split(/\s+/).filter(word => word.length > 0).length / 150)}min audio
-                                    </span>
-                                </div>
-                                <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
-                                    {script.substring(0, 150)}{script.length > 150 ? '...' : ''}
-                                </div>
-                            </div>
-                        </div>
+                        <button
+                            onClick={handlePasteNewScript}
+                            className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center gap-2"
+                        >
+                            <FileText size={16} />
+                            Paste Script
+                        </button>
                     </div>
                 </div>
             )}
@@ -349,10 +460,15 @@ const VoiceGenerator = () => {
                 {!isGeneratingVoice ? (
                     <button
                         onClick={handleGenerateVoice}
-                        className="w-full py-5 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]"
+                        disabled={!script}
+                        className={`w-full py-5 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 ${
+                            script 
+                                ? 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]'
+                                : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60'
+                        }`}
                     >
                         <Volume2 size={24} />
-                        <span>Generate Voiceover</span>
+                        <span>{script ? 'Generate Voiceover' : 'Paste a script to generate voiceover'}</span>
                     </button>
                 ) : (
                     <button
