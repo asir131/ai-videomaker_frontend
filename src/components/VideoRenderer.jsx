@@ -130,6 +130,33 @@ const VideoRenderer = () => {
         }
     };
 
+    const handleDownloadAllAssets = async () => {
+        // 1. Download Audio
+        if (generatedAudioUrl) {
+            const link = document.createElement('a');
+            link.href = generatedAudioUrl;
+            link.download = 'voiceover.mp3';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 2. Download Images (Sequential to avoid browser blocking)
+        const completedImages = images.filter(img => img && img.status === 'completed');
+
+        for (let i = 0; i < completedImages.length; i++) {
+            const img = completedImages[i];
+            await new Promise(resolve => setTimeout(resolve, 300)); // Small delay
+
+            const link = document.createElement('a');
+            link.href = img.url;
+            link.download = `scene-${i + 1}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     if (!script) return null;
 
     return (
@@ -170,7 +197,31 @@ const VideoRenderer = () => {
                                 <span>Scene images required for video rendering</span>
                             </div>
                         )}
+
                     </div>
+
+                    {/* Project Assets Download Section */}
+                    {generatedAudioUrl && images.some(img => img.url) && (
+                        <div className="w-full md:w-auto mb-6 md:mb-0 md:mr-6 flex-1 md:text-right border-t md:border-t-0 md:border-r border-gray-200 dark:border-gray-700 pt-6 md:pt-0 md:pr-6">
+                            <h4 className="text-sm font-bold text-teal-600 dark:text-teal-400 mb-2 uppercase tracking-wider">Project Media</h4>
+                            <div className="flex flex-col md:items-end gap-1 mb-3">
+                                <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+                                    {images.filter(i => i.status === 'completed').length} Images Ready
+                                </span>
+                                <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+                                    Voiceover Track Ready
+                                </span>
+                            </div>
+                            <button
+                                onClick={handleDownloadAllAssets}
+                                className="px-5 py-2.5 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 rounded-lg text-sm font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors flex items-center gap-2 ml-auto"
+                            >
+                                <Download size={16} />
+                                Download All Assets
+                            </button>
+                        </div>
+                    )}
+
                     <button
                         onClick={handleRender}
                         disabled={isRenderingVideo}

@@ -209,6 +209,17 @@ const ImageGenerator = () => {
     const fileInputRef = useRef(null);
     const audioInputRef = useRef(null);
 
+    const [resultPreviewIndex, setResultPreviewIndex] = useState(0);
+    const [expandedAccordions, setExpandedAccordions] = useState({});
+
+    // Reset preview index when images change
+    useEffect(() => {
+        const firstCompleted = images.findIndex(img => img && img.status === 'completed');
+        if (firstCompleted !== -1) {
+            setResultPreviewIndex(firstCompleted);
+        }
+    }, [images]);
+
     const handleAudioReplacement = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -1186,7 +1197,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
                                     }`}
                             >
                                 <Sparkles size={18} />
-                                Generate {generationSettings.imageCount || (isAdvancedMode ? 10 : 0)} Prompts
+                                Generate {generationSettings.imageCount || (isAdvancedMode ? 10 : 0)} Images
                             </button>
                         </div>
                     </div>
@@ -1572,107 +1583,191 @@ Output ONLY the final prompt - no analysis or additional text.`;
 
                 </div>
 
-                {images.some(img => img && img.status === 'completed') && (
-                    <div ref={scenesRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {images.map((img, index) => {
-                            // Skip empty slots
-                            if (!img || img.status !== 'completed') return null;
+            </div>
 
-                            // Find the corresponding scene for this image
-                            const scene = scenes[index];
-                            if (!scene) return null; // Safety check
+            {/* Post-Generation Result View */}
+            {images.some(img => img && (img.status === 'completed' || img.status === 'generating')) && (
+                <div ref={scenesRef} className="mt-8 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Once the image is generated</h2>
 
-                            return (
-                                <div
-                                    key={index}
-                                    className="group relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-video border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer"
-                                    onClick={() => handleImageClick(index)}
-                                >
-                                    {img.status === 'completed' ? (
-                                        <>
-                                            <img
-                                                src={img.url}
-                                                alt={`Scene ${index + 1}`}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${img.uploaded
-                                                        ? 'bg-blue-500/80 text-white'
-                                                        : 'bg-purple-500/80 text-white'
-                                                        }`}>
-                                                        {img.uploaded ? 'Uploaded' : 'Generated'}
-                                                    </span>
-                                                </div>
-                                                <p className="text-white text-sm line-clamp-2 mb-2">{scene.text}</p>
-                                                <div className="flex gap-2 pointer-events-auto">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            // Download functionality
-                                                            const link = document.createElement('a');
-                                                            link.href = img.url;
-                                                            link.download = img.uploaded ? (img.fileName || `scene-${index + 1}.jpg`) : `scene-${index + 1}.jpg`;
-                                                            link.click();
-                                                        }}
-                                                        className="p-2 bg-white/20 backdrop-blur-md rounded-lg text-white hover:bg-white/30 transition-all hover:scale-110 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                        title="Download image"
-                                                    >
-                                                        <Download size={16} />
-                                                    </button>
-                                                    {img.uploaded ? (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                removeUploadedImage(index);
-                                                            }}
-                                                            className="p-2 bg-red-500/80 backdrop-blur-md rounded-lg text-white hover:bg-red-600/80 transition-all hover:scale-110 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                            title="Remove uploaded image"
-                                                        >
-                                                            <X size={16} />
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleRegenerateImage(index);
-                                                            }}
-                                                            className="p-2 bg-white/20 backdrop-blur-md rounded-lg text-white hover:bg-white/30 transition-all hover:scale-110 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                                                            title="Regenerate image"
-                                                        >
-                                                            <RefreshCw size={16} />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </>
-                                    ) : img.status === 'generating' ? (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-                                            <Loader2 className="animate-spin mb-2" size={32} />
-                                            <span className="text-sm font-medium">Creating Scene {index + 1}...</span>
-                                        </div>
-                                    ) : img.status === 'error' ? (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-red-500 p-4 text-center">
-                                            <span className="text-sm font-medium">Generation Failed</span>
-                                            <button className="mt-2 text-xs underline">Retry</button>
-                                        </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+
+                        {/* Preview Card Section */}
+                        <div className="mb-8">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">First image preview</h3>
+
+                            <div className="flex flex-col lg:flex-row gap-8">
+                                {/* Left: Image Preview */}
+                                <div className="w-full lg:w-1/2 aspect-video bg-gray-100 dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 relative group">
+                                    {images[resultPreviewIndex] && images[resultPreviewIndex].status === 'completed' ? (
+                                        <img
+                                            src={images[resultPreviewIndex].url}
+                                            alt={`Scene ${resultPreviewIndex + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
                                     ) : (
-                                        <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-600">
-                                            <ImageIcon size={32} />
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            {images[resultPreviewIndex]?.status === 'generating' ? (
+                                                <div className="text-center">
+                                                    <Loader2 className="animate-spin mb-2 mx-auto" />
+                                                    <span>Generating...</span>
+                                                </div>
+                                            ) : (
+                                                <span>Select a completed scene</span>
+                                            )}
                                         </div>
                                     )}
+                                </div>
 
-                                    <div className="absolute top-2 left-2 px-2 py-1 bg-black/50 backdrop-blur-md rounded text-xs font-bold text-white">
-                                        Scene {index + 1}
+                                {/* Right: Controls */}
+                                <div className="w-full lg:w-1/2 flex flex-col justify-between">
+                                    <div>
+                                        {/* Scene Selector Dropdown */}
+                                        <div className="mb-6 relative">
+                                            <select
+                                                value={resultPreviewIndex}
+                                                onChange={(e) => setResultPreviewIndex(parseInt(e.target.value))}
+                                                className="w-full appearance-none px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:border-blue-300 transition-colors"
+                                            >
+                                                {scenes.map((scene, i) => (
+                                                    <option key={i} value={i} disabled={!images[i] || images[i].status !== 'completed'}>
+                                                        Scene {i + 1} - {scene.text.substring(0, 30)}... {(!images[i] || images[i].status !== 'completed') ? '(Pending)' : ''}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
+                                            </div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex flex-wrap gap-3">
+                                            <button
+                                                onClick={() => handleRegenerateImage(resultPreviewIndex)}
+                                                disabled={isGeneratingImages}
+                                                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Regenerate
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    const link = document.createElement('a');
+                                                    link.href = images[resultPreviewIndex].url;
+                                                    link.download = `scene-${resultPreviewIndex + 1}.jpg`;
+                                                    link.click();
+                                                }}
+                                                disabled={!images[resultPreviewIndex] || images[resultPreviewIndex].status !== 'completed'}
+                                                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Download
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        </div>
+
+                        {/* Remaining Prompts List */}
+                        <div>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                    Remaining prompts ({scenes.length})
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        if (Object.keys(expandedAccordions).length === scenes.length) {
+                                            setExpandedAccordions({});
+                                        } else {
+                                            const all = {};
+                                            scenes.forEach((_, i) => all[i] = true);
+                                            setExpandedAccordions(all);
+                                        }
+                                    }}
+                                    className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline"
+                                >
+                                    {Object.keys(expandedAccordions).length === scenes.length ? 'Collapse All' : 'Expand All'}
+                                </button>
+                            </div>
+
+                            <div className="border border-gray-200 dark:border-gray-700 rounded-xl divide-y divide-gray-200 dark:divide-gray-700 overflow-hidden">
+                                {scenes.map((scene, i) => (
+                                    <div key={i} className="bg-white dark:bg-gray-800/50">
+                                        <button
+                                            onClick={() => setExpandedAccordions(prev => ({ ...prev, [i]: !prev[i] }))}
+                                            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+                                        >
+                                            <div className="font-semibold text-gray-700 dark:text-gray-200">Scene {i + 1}</div>
+                                            <div className={`transform transition-transform ${expandedAccordions[i] ? 'rotate-180' : ''}`}>
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M6 9l6 6 6-6" /></svg>
+                                            </div>
+                                        </button>
+
+                                        {/* Accordion Content */}
+                                        {expandedAccordions[i] && (
+                                            <div className="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800">
+                                                <div className="flex gap-4">
+                                                    {images[i] && images[i].status === 'completed' ? (
+                                                        <img
+                                                            src={images[i].url}
+                                                            alt={`Scene ${i + 1}`}
+                                                            className="w-24 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-24 h-16 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                                                            <ImageIcon size={16} className="text-gray-400" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{scene.text}</p>
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => handleRegenerateImage(i)}
+                                                                className="text-xs text-blue-600 font-semibold hover:underline"
+                                                            >
+                                                                Regenerate
+                                                            </button>
+                                                            {images[i] && images[i].status === 'completed' && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setResultPreviewIndex(i);
+                                                                        window.scrollTo({ top: scenesRef.current.offsetTop - 100, behavior: 'smooth' });
+                                                                    }}
+                                                                    className="text-xs text-gray-500 font-semibold hover:underline"
+                                                                >
+                                                                    View in Preview
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Footer Controls */}
+                        <div className="mt-8 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-6">
+                            <button
+                                onClick={() => setShowGenerationModal(true)}
+                                className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+                            >
+                                Back to settings
+                            </button>
+                            <button
+                                onClick={handleGenerateWithSettings}
+                                disabled={isGeneratingImages}
+                                className="px-6 py-2.5 border border-blue-600 text-blue-600 dark:text-blue-400 font-bold rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                            >
+                                Generate {generationSettings.imageCount || 10} more Images
+                            </button>
+                        </div>
                     </div>
-                )}
-            </div >
+                </div>
+            )}
             {/* Hidden Audio Element for Tracking Time */}
-            < audio
+            <audio
                 ref={audioRef}
                 src={generatedAudioUrl}
                 onTimeUpdate={(e) => setAudioCurrentTime(e.currentTarget.currentTime)}
