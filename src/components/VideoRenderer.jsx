@@ -4,7 +4,7 @@ import { useMedia } from '../context/MediaContext';
 import { useUI } from '../context/UIContext';
 import { renderVideos, checkFFmpegStatus } from '../services/videoService';
 import { addVideoToHistory } from '../services/videoHistoryService';
-import { Film, Download, AlertCircle, CheckCircle2, Loader2, Video, AlertTriangle } from 'lucide-react';
+import { Film, Download, AlertCircle, CheckCircle2, Loader2, Video, AlertTriangle, Settings, X } from 'lucide-react';
 // Animation imports removed to prevent runtime errors
 
 const VideoRenderer = () => {
@@ -18,6 +18,14 @@ const VideoRenderer = () => {
     const { setLoading } = useUI();
 
     const [renderResult, setRenderResult] = useState(null);
+
+    // Transition Settings State
+    const [showTransitionSettings, setShowTransitionSettings] = useState(false);
+    const [transitionSettings, setTransitionSettings] = useState({
+        duration: 0.55,
+        type: 'fade',
+        enabled: true
+    });
 
     // Animation effect removed - was causing runtime errors
     // useEffect(() => {
@@ -83,7 +91,11 @@ const VideoRenderer = () => {
                 scenesData,
                 generatedAudioUrl,
                 title,
-                { type: 'fade', duration: 0.5 },
+                title,
+                {
+                    type: transitionSettings.enabled ? transitionSettings.type : 'none',
+                    duration: transitionSettings.enabled ? Number(transitionSettings.duration) : 0
+                },
                 true // renderFullVideo
             );
 
@@ -212,13 +224,22 @@ const VideoRenderer = () => {
                                     Voiceover Track Ready
                                 </span>
                             </div>
-                            <button
-                                onClick={handleDownloadAllAssets}
-                                className="px-5 py-2.5 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 rounded-lg text-sm font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors flex items-center gap-2 ml-auto"
-                            >
-                                <Download size={16} />
-                                Download All Assets
-                            </button>
+                            <div className="flex gap-2 justify-end">
+                                <button
+                                    onClick={() => setShowTransitionSettings(true)}
+                                    className="px-4 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                                >
+                                    <Settings size={16} />
+                                    Transitions
+                                </button>
+                                <button
+                                    onClick={handleDownloadAllAssets}
+                                    className="px-5 py-2.5 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 rounded-lg text-sm font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors flex items-center gap-2"
+                                >
+                                    <Download size={16} />
+                                    Download Assets
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -289,6 +310,97 @@ const VideoRenderer = () => {
                     </div>
                 )}
             </div>
+
+            {/* Transition Settings Modal */}
+            {showTransitionSettings && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100 dark:border-gray-800 animate-in zoom-in-50 duration-200">
+                        <div className="p-6 space-y-6">
+                            {/* Duration Input */}
+                            <div className="flex items-center justify-between">
+                                <label className="text-lg font-medium text-gray-900 dark:text-white">Transition Duration:</label>
+                                <input
+                                    type="number"
+                                    step="0.05"
+                                    min="0.1"
+                                    max="5.0"
+                                    value={transitionSettings.duration}
+                                    onChange={(e) => setTransitionSettings(prev => ({ ...prev, duration: parseFloat(e.target.value) }))}
+                                    className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-lg text-center focus:ring-2 focus:ring-blue-500 outline-none bg-transparent"
+                                />
+                            </div>
+
+                            {/* Presets */}
+                            <div className="flex justify-between px-1">
+                                {[
+                                    { label: '0.25 (Quick)', value: 0.25 },
+                                    { label: '1.05 (Balanced)', value: 1.05 },
+                                    { label: '2.0 (Dramatic)', value: 2.0 }
+                                ].map((preset) => (
+                                    <button
+                                        key={preset.value}
+                                        onClick={() => setTransitionSettings(prev => ({ ...prev, duration: preset.value }))}
+                                        className={`text-xs ${transitionSettings.duration === preset.value ? 'text-blue-600 font-bold' : 'text-gray-500 hover:text-gray-900'}`}
+                                    >
+                                        {preset.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Basic Label */}
+                            <div className="flex items-center gap-2">
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${!transitionSettings.enabled ? 'border-blue-600' : 'border-gray-400'}`}>
+                                    {!transitionSettings.enabled && <div className="w-2 h-2 bg-blue-600 rounded-full" />}
+                                </div>
+                                <span className="font-medium">Basic</span>
+                            </div>
+
+                            {/* Enable Toggle Box */}
+                            <div
+                                onClick={() => setTransitionSettings(prev => ({ ...prev, enabled: !prev.enabled }))}
+                                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${transitionSettings.enabled ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'}`}
+                            >
+                                <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${transitionSettings.enabled ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                                    {transitionSettings.enabled && <CheckCircle2 size={14} />}
+                                </div>
+                                <span className="font-medium text-gray-900 dark:text-white">Enable transition to merge <span className="font-bold">full video</span></span>
+                            </div>
+
+                            {/* Type Selection */}
+                            <div className="grid grid-cols-2 gap-3">
+                                {['fade', 'FadeBlack'].map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => setTransitionSettings(prev => ({ ...prev, type: type.toLowerCase() === 'fadeblack' ? 'fade_black' : 'fade' }))}
+                                        className={`py-3 px-4 rounded-lg text-center font-medium transition-all ${(type === 'FadeBlack' && transitionSettings.type === 'fade_black') || (type === 'fade' && transitionSettings.type === 'fade')
+                                                ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800'
+                                                : 'bg-gray-50 text-gray-600 border border-transparent hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300'
+                                            }`}
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Footer Actions */}
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                <button
+                                    onClick={() => setShowTransitionSettings(false)}
+                                    className="px-6 py-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => setShowTransitionSettings(false)}
+                                    className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
