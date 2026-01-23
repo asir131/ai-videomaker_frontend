@@ -7,7 +7,7 @@ import path from 'path'
 const getBackendPort = () => {
   try {
     // Check if backend port file exists (written by backend server)
-    const backendPortPath = path.join(process.cwd(), '..', 'ai-videomaker_backend', '.backend-port')
+    const backendPortPath = path.join(process.cwd(), '..', 'ai_video_backend', '.backend-port')
     if (fs.existsSync(backendPortPath)) {
       const port = parseInt(fs.readFileSync(backendPortPath, 'utf8').trim())
       console.log(`🔗 Backend port detected from file: ${port}`)

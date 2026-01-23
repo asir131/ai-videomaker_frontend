@@ -1,13 +1,7 @@
-// =====================================================================
-// CONSTANTS - MIGRATED TO src/utils/constants.js
-// These are kept here for backward compatibility during migration
-// TODO: Remove after full migration to new structure
-// =====================================================================
-// how many words per 1 credit for TTS
 const VOICE_RATE_WORDS_PER_CREDIT = 120;
 
 // ⚡ DARK MODE - Initialize immediately (before page loads)
-(function() {
+(function () {
   if (localStorage.getItem('darkMode') === 'true') {
     document.documentElement.classList.add('dark');
   }
@@ -35,7 +29,7 @@ if (!localStorage.getItem('enableTransitions')) {
 }
 
 // Additional safety check on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // If enableTransitions is not explicitly 'true', force it to 'false'
   if (localStorage.getItem('enableTransitions') !== 'true') {
     localStorage.setItem('enableTransitions', 'false');
@@ -44,9 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Initialize voice functionality after DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const voiceIcon = document.getElementById('voiceIcon');
-  const scriptEl  = document.getElementById('scriptContent');
+  const scriptEl = document.getElementById('scriptContent');
 
   if (!voiceIcon || !scriptEl) {
     console.error('❌ Voice elements not found in DOM');
@@ -67,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🔄 Refresh voice icon - Ready:', ready, '| isGenerating:', window.isGenerating, '| hasText:', scriptHasText());
     voiceIcon.classList.toggle('disabled', !ready);
     voiceIcon.setAttribute('aria-disabled', String(!ready));
-    
+
     // Always ensure pointer events are enabled when ready
     if (ready) {
       voiceIcon.style.pointerEvents = 'auto';
@@ -81,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function onScriptGenerationComplete() {
     window.isGenerating = false;
-    
+
     // Force enable voice icon directly (don't rely on scriptHasText check)
     if (voiceIcon) {
       voiceIcon.classList.remove('disabled');
@@ -90,10 +84,10 @@ document.addEventListener('DOMContentLoaded', function() {
       voiceIcon.style.cursor = 'pointer'; // Force cursor
       console.log('✅ Voice icon enabled directly');
     }
-    
+
     // Also call refreshVoiceIcon to update state
     refreshVoiceIcon();
-    
+
     // Enable image icon after script is complete
     const imageIcon = document.getElementById('imageIcon');
     if (imageIcon) {
@@ -103,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
       imageIcon.style.cursor = 'pointer'; // Force cursor
       console.log('✅ Image icon enabled after script generation');
     }
-    
+
     // Re-check after a short delay to ensure everything is synced
     setTimeout(() => {
       refreshVoiceIcon();
@@ -112,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, 500);
   }
-  
+
   // Create refreshImageIcon function
   function refreshImageIcon() {
     const imageIcon = document.getElementById('imageIcon');
@@ -120,13 +114,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const hasScript = scriptHasText();
       // Image icon should be enabled if script exists (voice check happens on click)
       const shouldEnable = hasScript;
-      
+
       imageIcon.classList.toggle('disabled', !shouldEnable);
       imageIcon.setAttribute('aria-disabled', String(!shouldEnable));
       console.log('🔄 Refresh image icon - Enabled:', shouldEnable, '| hasScript:', hasScript);
     }
   }
-  
+
   window.refreshImageIcon = refreshImageIcon;
 
   // Make functions globally available
@@ -135,10 +129,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Initialize voice estimate functionality after DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  const voiceEstWrap   = document.getElementById('voiceEstWrap');
-  const voiceCredVal   = document.getElementById('voiceCredVal');
-  const voiceProgress  = document.getElementById('voiceProgress');
+document.addEventListener('DOMContentLoaded', function () {
+  const voiceEstWrap = document.getElementById('voiceEstWrap');
+  const voiceCredVal = document.getElementById('voiceCredVal');
+  const voiceProgress = document.getElementById('voiceProgress');
   const audioContainer = document.getElementById('audioContainer');
   const voiceIcon = document.getElementById('voiceIcon');
 
@@ -151,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const wc = parseInt(document.getElementById('wordCount')?.textContent || '0', 10);
     return Math.max(1, Math.round(wc / VOICE_RATE_WORDS_PER_CREDIT));
   }
-  
+
   function updateVoiceEstimate() {
     if (voiceIcon.classList.contains('disabled')) {
       voiceEstWrap.classList.add('hidden');
@@ -190,130 +184,130 @@ document.addEventListener('DOMContentLoaded', function() {
 // TODO: Remove after full migration to new structure
 // =====================================================================
 // Full list of 21 ElevenLabs voices - ALL available for selection!
-  const ELEVENLABS_VOICES = [
-    { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", style: "Calm and professional" },
-    { id: "AZnzlk1XvdvUeBnXmlld", name: "Domi", style: "Strong and confident" },
-    { id: "EXAVITQu4vr4xnSDxMaL", name: "Bella", style: "Soft and gentle" },
-    { id: "ErXwobaYiN019PkySvjV", name: "Antoni", style: "Warm and friendly" },
-    { id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli", style: "Young and energetic" },
-    { id: "TxGEqnHWrfWFTfGW9XjX", name: "Josh", style: "Deep narrator" },
-    { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", style: "Crisp storyteller" },
-    { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", style: "Clear and articulate" },
-    { id: "yoZ06aMxZJJ28mfd3POQ", name: "Sam", style: "Raspy character" },
-    { id: "CwhRBWXzGAHq8TQ4Fs17", name: "Serena", style: "Pleasant narrator" },
-    { id: "ODq5zmih8GrVes37Dizd", name: "Patrick", style: "Smooth baritone" },
-    { id: "IKne3meq5aSn9XLyUdCD", name: "Charlie", style: "Casual Australian" },
-    { id: "onwK4e9ZLuTAKqWW03F9", name: "Daniel", style: "British narrator" },
-    { id: "pFZP5JQG7iQjIQuC4Bku", name: "Lily", style: "British woman" },
-    { id: "XB0fDUnXU5powFXDhCwa", name: "Charlotte", style: "English Swedish" },
-    { id: "iP95p4xoKVk53GoZ742B", name: "Chris", style: "Casual American" },
-    { id: "nPczCjzI2devNBz1zQrb", name: "Brian", style: "Fairy tale voice" },
-    { id: "N2lVS1w4EtoT3dr4eOWO", name: "Callum", style: "Hoarse male" },
-    { id: "Zlb1dXrM653N07WRdFW3", name: "Emily", style: "Calm American" },
-    { id: "ThT5KcBeYPX3keUQqHPh", name: "Dorothy", style: "Pleasant British" },
-    { id: "aMSt68OGf4xUZAnLpTU8", name: "Juniper", style: "Expressive storyteller" }
-  ];
-  
-  // Speechify voices for non-premium option
-  const SPEECHIFY_VOICES = [
-    { id: 'henry', name: 'Henry', style: 'Warm and friendly' },
-    { id: 'snoop', name: 'Snoop', style: 'Cool and laid-back' },
-    { id: 'gwyneth', name: 'Gwyneth', style: 'Elegant and sophisticated' },
-    { id: 'mrbeast', name: 'Mr. Beast', style: 'Energetic and enthusiastic' },
-    { id: 'james', name: 'James', style: 'Professional narrator' },
-    { id: 'olivia', name: 'Olivia', style: 'Clear and articulate' },
-    { id: 'noah', name: 'Noah', style: 'Confident and strong' },
-    { id: 'emma', name: 'Emma', style: 'Gentle and soothing' }
-  ];
-  
-  // Map old style names to ElevenLabs voices (for backwards compatibility)
-  const ELEVENLABS_VOICE_MAP = {
-    "Rachel":    "21m00Tcm4TlvDq8ikWAM",
-    "Domi":      "AZnzlk1XvdvUeBnXmlld",
-    "Bella":     "EXAVITQu4vr4xnSDxMaL",
-    "Antoni":    "ErXwobaYiN019PkySvjV",
-    "Elli":      "MF3mGyEYCl7XYWbV9V6O",
-    "Josh":      "TxGEqnHWrfWFTfGW9XjX",
-    "Arnold":    "VR6AewLTigWG4xSOukaG",
-    "Adam":      "pNInz6obpgDQGcFmaJgB",
-    "Sam":       "yoZ06aMxZJJ28mfd3POQ",
-    "Serena":    "CwhRBWXzGAHq8TQ4Fs17",
-    "Patrick":   "ODq5zmih8GrVes37Dizd",
-    "Charlie":   "IKne3meq5aSn9XLyUdCD",
-    "Daniel":    "onwK4e9ZLuTAKqWW03F9",
-    "Lily":      "pFZP5JQG7iQjIQuC4Bku",
-    "Charlotte": "XB0fDUnXU5powFXDhCwa",
-    "Chris":     "iP95p4xoKVk53GoZ742B",
-    "Brian":     "nPczCjzI2devNBz1zQrb",
-    "Callum":    "N2lVS1w4EtoT3dr4eOWO",
-    "Emily":     "Zlb1dXrM653N07WRdFW3",
-    "Dorothy":   "ThT5KcBeYPX3keUQqHPh",
-    "Juniper":   "aMSt68OGf4xUZAnLpTU8"
-  };
+const ELEVENLABS_VOICES = [
+  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", style: "Calm and professional" },
+  { id: "AZnzlk1XvdvUeBnXmlld", name: "Domi", style: "Strong and confident" },
+  { id: "EXAVITQu4vr4xnSDxMaL", name: "Bella", style: "Soft and gentle" },
+  { id: "ErXwobaYiN019PkySvjV", name: "Antoni", style: "Warm and friendly" },
+  { id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli", style: "Young and energetic" },
+  { id: "TxGEqnHWrfWFTfGW9XjX", name: "Josh", style: "Deep narrator" },
+  { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", style: "Crisp storyteller" },
+  { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", style: "Clear and articulate" },
+  { id: "yoZ06aMxZJJ28mfd3POQ", name: "Sam", style: "Raspy character" },
+  { id: "CwhRBWXzGAHq8TQ4Fs17", name: "Serena", style: "Pleasant narrator" },
+  { id: "ODq5zmih8GrVes37Dizd", name: "Patrick", style: "Smooth baritone" },
+  { id: "IKne3meq5aSn9XLyUdCD", name: "Charlie", style: "Casual Australian" },
+  { id: "onwK4e9ZLuTAKqWW03F9", name: "Daniel", style: "British narrator" },
+  { id: "pFZP5JQG7iQjIQuC4Bku", name: "Lily", style: "British woman" },
+  { id: "XB0fDUnXU5powFXDhCwa", name: "Charlotte", style: "English Swedish" },
+  { id: "iP95p4xoKVk53GoZ742B", name: "Chris", style: "Casual American" },
+  { id: "nPczCjzI2devNBz1zQrb", name: "Brian", style: "Fairy tale voice" },
+  { id: "N2lVS1w4EtoT3dr4eOWO", name: "Callum", style: "Hoarse male" },
+  { id: "Zlb1dXrM653N07WRdFW3", name: "Emily", style: "Calm American" },
+  { id: "ThT5KcBeYPX3keUQqHPh", name: "Dorothy", style: "Pleasant British" },
+  { id: "aMSt68OGf4xUZAnLpTU8", name: "Juniper", style: "Expressive storyteller" }
+];
 
-  // =====================================================================
-  // VOICE SELECTION - MIGRATED TO src/components/VoiceGenerator.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  function getSelectedVoiceId() {
-    if (window.getSelectedVoiceIdNew && typeof window.getSelectedVoiceIdNew === 'function') {
-      return window.getSelectedVoiceIdNew();
+// Speechify voices for non-premium option
+const SPEECHIFY_VOICES = [
+  { id: 'henry', name: 'Henry', style: 'Warm and friendly' },
+  { id: 'snoop', name: 'Snoop', style: 'Cool and laid-back' },
+  { id: 'gwyneth', name: 'Gwyneth', style: 'Elegant and sophisticated' },
+  { id: 'mrbeast', name: 'Mr. Beast', style: 'Energetic and enthusiastic' },
+  { id: 'james', name: 'James', style: 'Professional narrator' },
+  { id: 'olivia', name: 'Olivia', style: 'Clear and articulate' },
+  { id: 'noah', name: 'Noah', style: 'Confident and strong' },
+  { id: 'emma', name: 'Emma', style: 'Gentle and soothing' }
+];
+
+// Map old style names to ElevenLabs voices (for backwards compatibility)
+const ELEVENLABS_VOICE_MAP = {
+  "Rachel": "21m00Tcm4TlvDq8ikWAM",
+  "Domi": "AZnzlk1XvdvUeBnXmlld",
+  "Bella": "EXAVITQu4vr4xnSDxMaL",
+  "Antoni": "ErXwobaYiN019PkySvjV",
+  "Elli": "MF3mGyEYCl7XYWbV9V6O",
+  "Josh": "TxGEqnHWrfWFTfGW9XjX",
+  "Arnold": "VR6AewLTigWG4xSOukaG",
+  "Adam": "pNInz6obpgDQGcFmaJgB",
+  "Sam": "yoZ06aMxZJJ28mfd3POQ",
+  "Serena": "CwhRBWXzGAHq8TQ4Fs17",
+  "Patrick": "ODq5zmih8GrVes37Dizd",
+  "Charlie": "IKne3meq5aSn9XLyUdCD",
+  "Daniel": "onwK4e9ZLuTAKqWW03F9",
+  "Lily": "pFZP5JQG7iQjIQuC4Bku",
+  "Charlotte": "XB0fDUnXU5powFXDhCwa",
+  "Chris": "iP95p4xoKVk53GoZ742B",
+  "Brian": "nPczCjzI2devNBz1zQrb",
+  "Callum": "N2lVS1w4EtoT3dr4eOWO",
+  "Emily": "Zlb1dXrM653N07WRdFW3",
+  "Dorothy": "ThT5KcBeYPX3keUQqHPh",
+  "Juniper": "aMSt68OGf4xUZAnLpTU8"
+};
+
+// =====================================================================
+// VOICE SELECTION - MIGRATED TO src/components/VoiceGenerator.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+function getSelectedVoiceId() {
+  if (window.getSelectedVoiceIdNew && typeof window.getSelectedVoiceIdNew === 'function') {
+    return window.getSelectedVoiceIdNew();
+  }
+  // Fallback to old implementation
+  try {
+    const styles = JSON.parse(localStorage.getItem('styles') || '[]');
+    const idxStr = localStorage.getItem('currentStyleIdx');
+
+    console.log('=== Voice Selection Debug ===');
+    console.log('currentStyleIdx string:', idxStr);
+
+    // Check if we have a valid style index
+    if (idxStr === null || idxStr === undefined || idxStr === '') {
+      console.log('No style selected, using default voice: aMSt68OGf4xUZAnLpTU8 (Juniper - Always Works)');
+      return "aMSt68OGf4xUZAnLpTU8"; // Juniper default - GUARANTEED TO WORK
     }
-    // Fallback to old implementation
-    try {
-      const styles = JSON.parse(localStorage.getItem('styles')||'[]');
-      const idxStr = localStorage.getItem('currentStyleIdx');
-      
-      console.log('=== Voice Selection Debug ===');
-      console.log('currentStyleIdx string:', idxStr);
-      
-      // Check if we have a valid style index
-      if (idxStr === null || idxStr === undefined || idxStr === '') {
-        console.log('No style selected, using default voice: aMSt68OGf4xUZAnLpTU8 (Juniper - Always Works)');
-        return "aMSt68OGf4xUZAnLpTU8"; // Juniper default - GUARANTEED TO WORK
-      }
-      
-      const idx = parseInt(idxStr);
-      if (isNaN(idx) || idx < 0 || idx >= styles.length) {
-        console.log('Invalid style index, using default voice: aMSt68OGf4xUZAnLpTU8 (Juniper - Always Works)');
-        return "aMSt68OGf4xUZAnLpTU8"; // Juniper default - GUARANTEED TO WORK
-      }
-      
-      const chosenVoice = styles[idx]?.voice;
-      
-      console.log('Current style index:', idx);
-      console.log('All styles:', styles);
-      console.log('Selected style:', styles[idx]);
-      console.log('Chosen voice value:', chosenVoice);
-      
-      if (!chosenVoice) {
-        console.log('No voice found in style, using default: aMSt68OGf4xUZAnLpTU8 (Juniper)');
-        return "aMSt68OGf4xUZAnLpTU8"; // Juniper default - ALWAYS WORKS
-      }
-      
-      // Check if it's already a valid voice ID (IDs are long alphanumeric strings)
-      if (chosenVoice.length > 15 && /^[A-Za-z0-9_-]+$/.test(chosenVoice)) {
-        console.log('✅ Valid voice ID found:', chosenVoice);
-        return chosenVoice;
-      }
-      
-      // Otherwise it's a name, map it to ID
-      const mappedId = ELEVENLABS_VOICE_MAP[chosenVoice] || "aMSt68OGf4xUZAnLpTU8";
-      console.log('Voice name mapped to ID:', chosenVoice, '->', mappedId);
-      return mappedId;
-    } catch (err) {
-      console.error('Error getting voice ID:', err);
+
+    const idx = parseInt(idxStr);
+    if (isNaN(idx) || idx < 0 || idx >= styles.length) {
+      console.log('Invalid style index, using default voice: aMSt68OGf4xUZAnLpTU8 (Juniper - Always Works)');
+      return "aMSt68OGf4xUZAnLpTU8"; // Juniper default - GUARANTEED TO WORK
+    }
+
+    const chosenVoice = styles[idx]?.voice;
+
+    console.log('Current style index:', idx);
+    console.log('All styles:', styles);
+    console.log('Selected style:', styles[idx]);
+    console.log('Chosen voice value:', chosenVoice);
+
+    if (!chosenVoice) {
+      console.log('No voice found in style, using default: aMSt68OGf4xUZAnLpTU8 (Juniper)');
       return "aMSt68OGf4xUZAnLpTU8"; // Juniper default - ALWAYS WORKS
     }
+
+    // Check if it's already a valid voice ID (IDs are long alphanumeric strings)
+    if (chosenVoice.length > 15 && /^[A-Za-z0-9_-]+$/.test(chosenVoice)) {
+      console.log('✅ Valid voice ID found:', chosenVoice);
+      return chosenVoice;
+    }
+
+    // Otherwise it's a name, map it to ID
+    const mappedId = ELEVENLABS_VOICE_MAP[chosenVoice] || "aMSt68OGf4xUZAnLpTU8";
+    console.log('Voice name mapped to ID:', chosenVoice, '->', mappedId);
+    return mappedId;
+  } catch (err) {
+    console.error('Error getting voice ID:', err);
+    return "aMSt68OGf4xUZAnLpTU8"; // Juniper default - ALWAYS WORKS
   }
+}
 
 // Voice icon click handler - wrapped in DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const voiceIcon = document.getElementById('voiceIcon');
   const voiceEstWrap = document.getElementById('voiceEstWrap');
   const voiceProgress = document.getElementById('voiceProgress');
   const audioContainer = document.getElementById('audioContainer');
-  
+
   if (!voiceIcon) {
     console.error('❌ Voice icon not found');
     return;
@@ -333,28 +327,28 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('   Icon element:', voiceIcon);
     console.log('   Event target:', e.target);
     console.log('   Current classes:', voiceIcon.className);
-    
+
     // Force enable pointer events (in case CSS is blocking)
     voiceIcon.style.pointerEvents = 'auto';
     voiceIcon.style.cursor = 'pointer';
-    
+
     // Check if disabled class is present (which blocks pointer events)
     if (voiceIcon.classList.contains('disabled')) {
       console.warn('⚠️ Voice icon is disabled - removing disabled class');
       voiceIcon.classList.remove('disabled');
       voiceIcon.setAttribute('aria-disabled', 'false');
     }
-    
+
     // Double-check pointer-events style
     const computedStyle = window.getComputedStyle(voiceIcon);
     if (computedStyle.pointerEvents === 'none') {
       console.warn('⚠️ Voice icon has pointer-events: none - fixing');
       voiceIcon.style.pointerEvents = 'auto';
     }
-    
+
     const text = document.getElementById('scriptContent')?.innerText?.trim() || '';
     console.log('   Script text length:', text.length);
-    
+
     if (!text) {
       console.warn('⚠️ No script text found');
       alert('No script text found. Please generate a script first.');
@@ -371,14 +365,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const voiceEstWrapEl = document.getElementById('voiceEstWrap');
     const voiceProgressEl = document.getElementById('voiceProgress');
-    
+
     if (voiceEstWrapEl) voiceEstWrapEl.classList.add('hidden');
     if (voiceProgressEl) {
       voiceProgressEl.classList.remove('hidden');
       voiceProgressEl.textContent = '0%';
     }
     voiceIcon.classList.add('disabled');
-    voiceIcon.setAttribute('aria-disabled','true');
+    voiceIcon.setAttribute('aria-disabled', 'true');
 
     let p = 0;
     const timer = setInterval(() => {
@@ -392,19 +386,19 @@ document.addEventListener('DOMContentLoaded', function() {
       const voiceName = getSelectedVoiceId(); // Gets voice ID from localStorage style settings
       console.log('🎤 Using voice ID for generation:', voiceName);
       console.log('🎤 Script text preview:', text.substring(0, 100) + '...');
-      
+
       const textSpeed = (() => {
         try {
-          const styles = JSON.parse(localStorage.getItem('styles')||'[]');
+          const styles = JSON.parse(localStorage.getItem('styles') || '[]');
           const idx = parseInt(localStorage.getItem('currentStyleIdx'));
           return Math.max(0.25, Math.min(4, parseFloat(styles?.[idx]?.voiceSpeed) || 1));
         } catch { return 1; }
       })();
-      
+
       // ✅ FIXED: Get similarity and stability from style settings
       const voiceSettings = (() => {
         try {
-          const styles = JSON.parse(localStorage.getItem('styles')||'[]');
+          const styles = JSON.parse(localStorage.getItem('styles') || '[]');
           const idx = parseInt(localStorage.getItem('currentStyleIdx'));
           const style = styles?.[idx];
           return {
@@ -415,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
           return { stability: 0.5, similarity_boost: 0.75 };
         }
       })();
-      
+
       console.log('🎤 Voice settings from style:', voiceSettings);
 
       // Call backend voice generation endpoint
@@ -437,11 +431,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to generate voice');
       }
-      
+
       const data = await response.json();
       clearInterval(timer);
       voiceProgress.textContent = '100%';
-      
+
       // Create audio element with base64 data
       const audioUrl = `data:${data.contentType};base64,${data.audio}`;
       generatedAudioUrl = audioUrl; // Store for later use in downloads
@@ -450,10 +444,10 @@ document.addEventListener('DOMContentLoaded', function() {
           <source src="${audioUrl}" type="${data.contentType}">
         </audio>`;
       audioContainer.classList.remove('hidden');
-      
+
       // ✅ SHOW AUDIO IMMEDIATELY - Don't wait for duration!
       setTimeout(() => voiceProgress.classList.add('hidden'), 500);
-      
+
       // ✅ Get duration in BACKGROUND (non-blocking) with 5-second timeout
       getAudioDurationWithTimeout(audioUrl, 5000).then(duration => {
         actualAudioDuration = duration;
@@ -462,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ Could not get audio duration, will use word estimation:', err);
         actualAudioDuration = 0; // Will fall back to word-based estimation
       });
-      
+
       if (!window.voiceCharged) {
         const balEl = document.getElementById('creditBalance');
         const current = parseInt(balEl?.textContent || '0', 10);
@@ -473,16 +467,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         window.voiceCharged = true;
       }
-      
+
       // Enable image generation icon after voice is generated
       const imageIcon = document.getElementById('imageIcon');
       if (imageIcon) {
         imageIcon.classList.remove('disabled');
         imageIcon.setAttribute('aria-disabled', 'false');
       }
-      
+
       return;
-      
+
     } catch (err) {
       clearInterval(timer);
       voiceProgress.classList.add('hidden');
@@ -496,12 +490,12 @@ document.addEventListener('DOMContentLoaded', function() {
       voiceEstWrap.classList.remove('hidden');
     } finally {
       voiceIcon.classList.remove('disabled');
-      voiceIcon.setAttribute('aria-disabled','false');
+      voiceIcon.setAttribute('aria-disabled', 'false');
       voiceIcon.style.pointerEvents = 'auto';
       voiceIcon.style.cursor = 'pointer';
     }
   }
-  
+
   // Attach click handler with multiple event types for better coverage
   voiceIcon.addEventListener('click', handleVoiceIconClick, true); // Use capture phase
   voiceIcon.addEventListener('mousedown', (e) => {
@@ -510,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function() {
       handleVoiceIconClick(e);
     }
   });
-  
+
   // Also attach to parent container as fallback (event delegation)
   const scriptOutput = document.getElementById('scriptOutput');
   if (scriptOutput) {
@@ -522,17 +516,17 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, true); // Use capture phase
   }
-  
+
   // Test: Add a simple click test
-  voiceIcon.onclick = function(e) {
+  voiceIcon.onclick = function (e) {
     console.log('🎤 Voice icon onclick (direct) - TEST');
     e.stopPropagation();
   };
-  
+
   console.log('✅ Voice icon click handler attached');
   console.log('   Voice icon element:', voiceIcon);
   console.log('   Voice icon classes:', voiceIcon.className);
-  
+
   // Function to handle image icon click
   function handleImageIconClick(e) {
     e.preventDefault();
@@ -540,23 +534,23 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🖼️ Image icon clicked - HANDLER FIRED!');
     console.log('   Icon disabled?', imageIcon.classList.contains('disabled'));
     console.log('   Icon element:', imageIcon);
-    
+
     // Force enable pointer events (in case CSS is blocking)
     imageIcon.style.pointerEvents = 'auto';
     imageIcon.style.cursor = 'pointer';
-    
+
     if (imageIcon.classList.contains('disabled')) {
       console.warn('⚠️ Image icon is disabled - removing disabled class');
       imageIcon.classList.remove('disabled');
       imageIcon.setAttribute('aria-disabled', 'false');
     }
-    
+
     // Check if voice has been generated (required for image generation)
     if (!generatedAudioUrl) {
       alert('Please generate voice over first before creating images.');
       return;
     }
-    
+
     console.log('🖼️ Opening image modal...');
     // Open image generation modal
     if (typeof openImageModal === 'function') {
@@ -566,7 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alert('Image modal function not available. Please refresh the page.');
     }
   }
-  
+
   // Image icon click handler - only works after voice generation
   const imageIcon = document.getElementById('imageIcon');
   if (!imageIcon) {
@@ -580,17 +574,17 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('   Icon disabled?', imageIcon.classList.contains('disabled'));
       console.log('   Icon element:', imageIcon);
       console.log('   generatedAudioUrl:', generatedAudioUrl);
-      
+
       // Force enable pointer events (in case CSS is blocking)
       imageIcon.style.pointerEvents = 'auto';
       imageIcon.style.cursor = 'pointer';
-      
+
       if (imageIcon.classList.contains('disabled')) {
         console.warn('⚠️ Image icon is disabled - removing disabled class');
         imageIcon.classList.remove('disabled');
         imageIcon.setAttribute('aria-disabled', 'false');
       }
-      
+
       // Temporarily allow image generation without voice (for testing)
       // Check if voice has been generated (required for image generation)
       if (!generatedAudioUrl) {
@@ -599,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
       }
-      
+
       console.log('🖼️ Opening image modal...');
       // Open image generation modal - try multiple ways
       if (typeof window.openImageModal === 'function') {
@@ -619,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
-    
+
     imageIcon.addEventListener('click', handleImageIconClick, true); // Use capture phase
     imageIcon.addEventListener('mousedown', (e) => {
       console.log('🖱️ Image icon mousedown event');
@@ -627,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function() {
         handleImageIconClick(e);
       }
     });
-    
+
     // Also attach to parent container as fallback (event delegation)
     const scriptOutput = document.getElementById('scriptOutput');
     if (scriptOutput) {
@@ -639,13 +633,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }, true); // Use capture phase
     }
-    
+
     // Test: Add a simple click test
-    imageIcon.onclick = function(e) {
+    imageIcon.onclick = function (e) {
       console.log('🖼️ Image icon onclick (direct) - TEST');
       handleImageIconClick(e);
     };
-    
+
     console.log('✅ Image icon click handler attached');
     console.log('   Image icon element:', imageIcon);
     console.log('   Image icon classes:', imageIcon.className);
@@ -654,432 +648,432 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Image modal functions
 function openImageModal() {
-    console.log('🖼️ openImageModal called');
-    const modal = document.getElementById('imageGenerationModal');
-    console.log('   Modal element:', modal);
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      console.log('✅ Image modal opened');
-      if (typeof updateImageCreditsEstimate === 'function') {
-        updateImageCreditsEstimate();
-      } else {
-        console.warn('⚠️ updateImageCreditsEstimate not found');
-      }
+  console.log('🖼️ openImageModal called');
+  const modal = document.getElementById('imageGenerationModal');
+  console.log('   Modal element:', modal);
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    console.log('✅ Image modal opened');
+    if (typeof updateImageCreditsEstimate === 'function') {
+      updateImageCreditsEstimate();
     } else {
-      console.error('❌ Image generation modal not found in DOM');
+      console.warn('⚠️ updateImageCreditsEstimate not found');
     }
+  } else {
+    console.error('❌ Image generation modal not found in DOM');
   }
-  
-  // Expose globally
-  window.openImageModal = openImageModal;
-  
-  function closeImageModal() {
-    const modal = document.getElementById('imageGenerationModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
+}
+
+// Expose globally
+window.openImageModal = openImageModal;
+
+function closeImageModal() {
+  const modal = document.getElementById('imageGenerationModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
   }
-  
-  // Style selector functions
-  // =====================================================================
-  // STYLE SELECTOR - MIGRATED TO src/components/ImageModal.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  let currentStylePage = 1;
-  let selectedStyle = { id: 'realistic', name: 'Realistic' };
-  
-  function openStyleSelector() {
-    if (window.openStyleSelectorNew && typeof window.openStyleSelectorNew === 'function') {
-      return window.openStyleSelectorNew();
-    }
-    // Fallback to old implementation
-    const modal = document.getElementById('styleSelectorModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      currentStylePage = 1;
-      showStylePage(1);
-    }
+}
+
+// Style selector functions
+// =====================================================================
+// STYLE SELECTOR - MIGRATED TO src/components/ImageModal.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+let currentStylePage = 1;
+let selectedStyle = { id: 'realistic', name: 'Realistic' };
+
+function openStyleSelector() {
+  if (window.openStyleSelectorNew && typeof window.openStyleSelectorNew === 'function') {
+    return window.openStyleSelectorNew();
   }
-  
-  function closeStyleSelector() {
-    if (window.closeStyleSelectorNew && typeof window.closeStyleSelectorNew === 'function') {
-      return window.closeStyleSelectorNew();
-    }
-    // Fallback to old implementation
-    const modal = document.getElementById('styleSelectorModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
+  // Fallback to old implementation
+  const modal = document.getElementById('styleSelectorModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    currentStylePage = 1;
+    showStylePage(1);
   }
-  
-  function showStylePage(page) {
-    if (window.showStylePageNew && typeof window.showStylePageNew === 'function') {
-      return window.showStylePageNew(page);
-    }
-    // Fallback to old implementation
-    // Hide all pages
-    document.getElementById('stylesPage1').classList.add('hidden');
-    document.getElementById('stylesPage2').classList.add('hidden');
-    document.getElementById('stylesPage3').classList.add('hidden');
-    
-    // Show selected page
-    document.getElementById(`stylesPage${page}`).classList.remove('hidden');
-    document.getElementById(`stylesPage${page}`).classList.add('grid');
-    
-    // Update page number
-    document.getElementById('currentPage').textContent = page;
-    
-    // Update button states
-    document.getElementById('prevPageBtn').disabled = page === 1;
-    document.getElementById('nextPageBtn').disabled = page === 3;
-    
-    currentStylePage = page;
+}
+
+function closeStyleSelector() {
+  if (window.closeStyleSelectorNew && typeof window.closeStyleSelectorNew === 'function') {
+    return window.closeStyleSelectorNew();
   }
-  
-  function nextStylePage() {
-    if (window.nextStylePageNew && typeof window.nextStylePageNew === 'function') {
-      return window.nextStylePageNew();
-    }
-    // Fallback to old implementation
-    if (currentStylePage < 3) {
-      showStylePage(currentStylePage + 1);
-    }
+  // Fallback to old implementation
+  const modal = document.getElementById('styleSelectorModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
   }
-  
-  function previousStylePage() {
-    if (window.previousStylePageNew && typeof window.previousStylePageNew === 'function') {
-      return window.previousStylePageNew();
-    }
-    // Fallback to old implementation
-    if (currentStylePage > 1) {
-      showStylePage(currentStylePage - 1);
-    }
+}
+
+function showStylePage(page) {
+  if (window.showStylePageNew && typeof window.showStylePageNew === 'function') {
+    return window.showStylePageNew(page);
   }
-  
-  window.selectImageStyle = function selectImageStyle(styleId, styleName, imageUrl, event) {
-    if (window.selectImageStyleNew && typeof window.selectImageStyleNew === 'function') {
-      return window.selectImageStyleNew(styleId, styleName, imageUrl, event);
-    }
-    // Fallback to old implementation
-    // Prevent event bubbling
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
-    
-    selectedStyle = { id: styleId, name: styleName };
-    
-    console.log('🎨 Style selected:', styleId, styleName);
-    
-    // Update the selected style display in main modal
-    const nameElement = document.getElementById('selectedStyleName');
-    if (nameElement) {
-      nameElement.textContent = styleName;
-      console.log('✅ Updated style name to:', styleName);
-    }
-    
-    // Update the image preview
-    const imageElement = document.getElementById('selectedStyleImage');
-    if (imageElement) {
-      if (imageUrl) {
-        // Use provided imageUrl
-        imageElement.src = imageUrl;
-        imageElement.alt = styleName;
-        console.log('✅ Updated image URL');
-      } else {
-        // Try to find the image from the style card
-        const styleCards = document.querySelectorAll('.style-card');
-        for (const card of styleCards) {
-          const cardImage = card.querySelector('img');
-          if (cardImage && cardImage.alt === styleName) {
-            imageElement.src = cardImage.src;
-            imageElement.alt = styleName;
-            console.log('✅ Found and updated image from card');
-            break;
-          }
-        }
-      }
-    }
-    
-    // Highlight selected style card
-    document.querySelectorAll('.style-card').forEach(card => {
-      card.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
-    });
-    
-    // Find the clicked card - could be the element itself or a parent
-    let clickedCard = null;
-    if (event) {
-      // Start from the event target and go up until we find style-card
-      let element = event.target || event.srcElement;
-      while (element && element !== document.body) {
-        if (element.classList && element.classList.contains('style-card')) {
-          clickedCard = element;
+  // Fallback to old implementation
+  // Hide all pages
+  document.getElementById('stylesPage1').classList.add('hidden');
+  document.getElementById('stylesPage2').classList.add('hidden');
+  document.getElementById('stylesPage3').classList.add('hidden');
+
+  // Show selected page
+  document.getElementById(`stylesPage${page}`).classList.remove('hidden');
+  document.getElementById(`stylesPage${page}`).classList.add('grid');
+
+  // Update page number
+  document.getElementById('currentPage').textContent = page;
+
+  // Update button states
+  document.getElementById('prevPageBtn').disabled = page === 1;
+  document.getElementById('nextPageBtn').disabled = page === 3;
+
+  currentStylePage = page;
+}
+
+function nextStylePage() {
+  if (window.nextStylePageNew && typeof window.nextStylePageNew === 'function') {
+    return window.nextStylePageNew();
+  }
+  // Fallback to old implementation
+  if (currentStylePage < 3) {
+    showStylePage(currentStylePage + 1);
+  }
+}
+
+function previousStylePage() {
+  if (window.previousStylePageNew && typeof window.previousStylePageNew === 'function') {
+    return window.previousStylePageNew();
+  }
+  // Fallback to old implementation
+  if (currentStylePage > 1) {
+    showStylePage(currentStylePage - 1);
+  }
+}
+
+window.selectImageStyle = function selectImageStyle(styleId, styleName, imageUrl, event) {
+  if (window.selectImageStyleNew && typeof window.selectImageStyleNew === 'function') {
+    return window.selectImageStyleNew(styleId, styleName, imageUrl, event);
+  }
+  // Fallback to old implementation
+  // Prevent event bubbling
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  selectedStyle = { id: styleId, name: styleName };
+
+  console.log('🎨 Style selected:', styleId, styleName);
+
+  // Update the selected style display in main modal
+  const nameElement = document.getElementById('selectedStyleName');
+  if (nameElement) {
+    nameElement.textContent = styleName;
+    console.log('✅ Updated style name to:', styleName);
+  }
+
+  // Update the image preview
+  const imageElement = document.getElementById('selectedStyleImage');
+  if (imageElement) {
+    if (imageUrl) {
+      // Use provided imageUrl
+      imageElement.src = imageUrl;
+      imageElement.alt = styleName;
+      console.log('✅ Updated image URL');
+    } else {
+      // Try to find the image from the style card
+      const styleCards = document.querySelectorAll('.style-card');
+      for (const card of styleCards) {
+        const cardImage = card.querySelector('img');
+        if (cardImage && cardImage.alt === styleName) {
+          imageElement.src = cardImage.src;
+          imageElement.alt = styleName;
+          console.log('✅ Found and updated image from card');
           break;
         }
-        element = element.parentElement;
-      }
-      
-      // If not found, try currentTarget
-      if (!clickedCard && event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains('style-card')) {
-        clickedCard = event.currentTarget;
       }
     }
-    
-    // Add highlight to clicked card
-    if (clickedCard) {
-      clickedCard.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
-      console.log('✅ Highlighted selected card');
-    }
-    
-    // Close style selector
-    closeStyleSelector();
-    
-    console.log('✅ Style selection complete:', selectedStyle);
-    
-    return false; // Prevent default behavior
   }
-  
-  // =====================================================================
-  // IMAGE CREDITS ESTIMATE - MIGRATED TO src/components/ImageModal.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Update credits estimate based on settings
-  function updateImageCreditsEstimate() {
-    if (window.updateImageCreditsEstimateNew && typeof window.updateImageCreditsEstimateNew === 'function') {
-      return window.updateImageCreditsEstimateNew();
-    }
-    // Fallback to old implementation
-    const quality = document.getElementById('imageQuality')?.value || 'better';
-    const count = parseInt(document.getElementById('imageCount')?.value || 3);
-    const animate = document.getElementById('imageAnimate')?.checked || false;
-    
-    let costPerImage = quality === 'standard' ? 30 : quality === 'better' ? 60 : 120;
-    if (animate) costPerImage *= 2; // Animation doubles the cost
-    
-    const total = costPerImage * count;
-    const estimateEl = document.getElementById('imageCreditsEstimate');
-    if (estimateEl) estimateEl.textContent = total;
-  }
-  
-  // Add event listeners for credits estimate
-  // This is now handled by initializeImageModal() in src/components/ImageModal.js
-  document.addEventListener('DOMContentLoaded', () => {
-    // Only set up if new modal hasn't been initialized
-    if (!window.imageModalInitialized) {
-      const qualitySelect = document.getElementById('imageQuality');
-      const countInput = document.getElementById('imageCount');
-      const animateCheckbox = document.getElementById('imageAnimate');
-      
-      if (qualitySelect) qualitySelect.addEventListener('change', updateImageCreditsEstimate);
-      if (countInput) countInput.addEventListener('input', updateImageCreditsEstimate);
-      if (animateCheckbox) animateCheckbox.addEventListener('change', updateImageCreditsEstimate);
-    }
+
+  // Highlight selected style card
+  document.querySelectorAll('.style-card').forEach(card => {
+    card.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
   });
-  
-  // Generate images button handler
-  let generatedScenes = [];
-  let currentProjectData = null;
-  let generatedAudioUrl = null;
-  let actualAudioDuration = 0; // Store actual audio duration in seconds
-  let characterMemory = {};
-  let currentSceneIndex = 0;
-  // Get actual duration from audio element
-  async function getAudioDuration(audioUrl) {
-    return new Promise((resolve) => {
-      const audio = new Audio(audioUrl);
-      audio.addEventListener('loadedmetadata', () => {
+
+  // Find the clicked card - could be the element itself or a parent
+  let clickedCard = null;
+  if (event) {
+    // Start from the event target and go up until we find style-card
+    let element = event.target || event.srcElement;
+    while (element && element !== document.body) {
+      if (element.classList && element.classList.contains('style-card')) {
+        clickedCard = element;
+        break;
+      }
+      element = element.parentElement;
+    }
+
+    // If not found, try currentTarget
+    if (!clickedCard && event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains('style-card')) {
+      clickedCard = event.currentTarget;
+    }
+  }
+
+  // Add highlight to clicked card
+  if (clickedCard) {
+    clickedCard.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+    console.log('✅ Highlighted selected card');
+  }
+
+  // Close style selector
+  closeStyleSelector();
+
+  console.log('✅ Style selection complete:', selectedStyle);
+
+  return false; // Prevent default behavior
+}
+
+// =====================================================================
+// IMAGE CREDITS ESTIMATE - MIGRATED TO src/components/ImageModal.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Update credits estimate based on settings
+function updateImageCreditsEstimate() {
+  if (window.updateImageCreditsEstimateNew && typeof window.updateImageCreditsEstimateNew === 'function') {
+    return window.updateImageCreditsEstimateNew();
+  }
+  // Fallback to old implementation
+  const quality = document.getElementById('imageQuality')?.value || 'better';
+  const count = parseInt(document.getElementById('imageCount')?.value || 3);
+  const animate = document.getElementById('imageAnimate')?.checked || false;
+
+  let costPerImage = quality === 'standard' ? 30 : quality === 'better' ? 60 : 120;
+  if (animate) costPerImage *= 2; // Animation doubles the cost
+
+  const total = costPerImage * count;
+  const estimateEl = document.getElementById('imageCreditsEstimate');
+  if (estimateEl) estimateEl.textContent = total;
+}
+
+// Add event listeners for credits estimate
+// This is now handled by initializeImageModal() in src/components/ImageModal.js
+document.addEventListener('DOMContentLoaded', () => {
+  // Only set up if new modal hasn't been initialized
+  if (!window.imageModalInitialized) {
+    const qualitySelect = document.getElementById('imageQuality');
+    const countInput = document.getElementById('imageCount');
+    const animateCheckbox = document.getElementById('imageAnimate');
+
+    if (qualitySelect) qualitySelect.addEventListener('change', updateImageCreditsEstimate);
+    if (countInput) countInput.addEventListener('input', updateImageCreditsEstimate);
+    if (animateCheckbox) animateCheckbox.addEventListener('change', updateImageCreditsEstimate);
+  }
+});
+
+// Generate images button handler
+let generatedScenes = [];
+let currentProjectData = null;
+let generatedAudioUrl = null;
+let actualAudioDuration = 0; // Store actual audio duration in seconds
+let characterMemory = {};
+let currentSceneIndex = 0;
+// Get actual duration from audio element
+async function getAudioDuration(audioUrl) {
+  return new Promise((resolve) => {
+    const audio = new Audio(audioUrl);
+    audio.addEventListener('loadedmetadata', () => {
+      console.log('🎵 Audio duration loaded:', audio.duration, 'seconds');
+      resolve(audio.duration);
+    });
+    audio.addEventListener('error', () => {
+      console.warn('⚠️ Could not load audio duration, using estimation');
+      resolve(0);
+    });
+  });
+}
+
+// Get audio duration with timeout (don't wait forever for large files)
+async function getAudioDurationWithTimeout(audioUrl, timeoutMs = 5000) {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(audioUrl);
+    let resolved = false;
+
+    // Set timeout - if duration takes too long, give up and use estimation
+    const timeoutId = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        console.warn(`⚠️ Audio duration timeout after ${timeoutMs}ms, will use word-based estimation`);
+        resolve(0); // Return 0 = will use word-based estimation
+      }
+    }, timeoutMs);
+
+    audio.addEventListener('loadedmetadata', () => {
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(timeoutId);
         console.log('🎵 Audio duration loaded:', audio.duration, 'seconds');
         resolve(audio.duration);
-      });
-      audio.addEventListener('error', () => {
-        console.warn('⚠️ Could not load audio duration, using estimation');
+      }
+    });
+
+    audio.addEventListener('error', (e) => {
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(timeoutId);
+        console.warn('⚠️ Error loading audio duration:', e);
         resolve(0);
-      });
+      }
     });
-  }
-  
-  // Get audio duration with timeout (don't wait forever for large files)
-  async function getAudioDurationWithTimeout(audioUrl, timeoutMs = 5000) {
-    return new Promise((resolve, reject) => {
-      const audio = new Audio(audioUrl);
-      let resolved = false;
-      
-      // Set timeout - if duration takes too long, give up and use estimation
-      const timeoutId = setTimeout(() => {
-        if (!resolved) {
-          resolved = true;
-          console.warn(`⚠️ Audio duration timeout after ${timeoutMs}ms, will use word-based estimation`);
-          resolve(0); // Return 0 = will use word-based estimation
-        }
-      }, timeoutMs);
-      
-      audio.addEventListener('loadedmetadata', () => {
-        if (!resolved) {
-          resolved = true;
-          clearTimeout(timeoutId);
-          console.log('🎵 Audio duration loaded:', audio.duration, 'seconds');
-          resolve(audio.duration);
-        }
-      });
-      
-      audio.addEventListener('error', (e) => {
-        if (!resolved) {
-          resolved = true;
-          clearTimeout(timeoutId);
-          console.warn('⚠️ Error loading audio duration:', e);
-          resolve(0);
-        }
-      });
-    });
-  }
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    const generateBtn = document.getElementById('generateImagesBtn');
-    if (generateBtn) {
-      generateBtn.addEventListener('click', async () => {
-        // Images are now generated using OpenAI DALL-E via backend
-        
-        const aspectRatio = document.getElementById('imageAspectRatio')?.value || '16:9';
-        const quality = document.getElementById('imageQuality')?.value || 'standard';
-        const animate = document.getElementById('imageAnimate')?.checked || false;
-        let count = parseInt(document.getElementById('imageCount')?.value || 3);
-        const context = document.getElementById('imageContext')?.value.trim() || '';
-        const style = selectedStyle;
-        
-        // Get the script content first
-        const scriptText = document.getElementById('scriptContent')?.textContent || document.getElementById('scriptContent')?.innerText || '';
-        if (!scriptText) {
-          alert('Please generate a script first!');
-          return;
-        }
-        
-        // 📊 Calculate dynamic minimum images based on audio duration
-        const wordCount = scriptText.trim().split(/\s+/).length;
-        const wordsPerMinute = 150; // Average speaking rate
-        const durationMinutes = wordCount / wordsPerMinute;
-        
-        // Dynamic minimum based on audio duration (1 image per 10 minutes):
-        // 0-10 min: 1 image
-        // 10-20 min: 2 images
-        // 20-30 min: 3 images
-        // 30-40 min: 4 images
-        // 40-50 min: 5 images
-        // 50-60 min: 6 images
-        // 60+ min: Math.ceil(duration / 10)
-        let minimumImages = Math.max(1, Math.ceil(durationMinutes / 10));
-        
-        // Enforce minimum
-        if (count < minimumImages) {
-          count = minimumImages;
-          console.log(`⚠️ Voice duration: ${durationMinutes.toFixed(1)} minutes - Setting minimum ${minimumImages} images (1 per 10 minutes)`);
-          alert(`Based on your ${durationMinutes.toFixed(1)}-minute voiceover, minimum ${minimumImages} images required (1 per 10 minutes). Adjusted automatically.`);
-        } else {
-          console.log(`✅ Voice duration: ${durationMinutes.toFixed(1)} minutes - Using ${count} images (minimum: ${minimumImages})`);
-        }
-        
-        const settings = { aspectRatio, quality, animate, count, context, style };
-        
-        console.log('Image generation settings:', settings);
-        
-        // Close image modal and open generated media modal
-        closeImageModal();
-        openGeneratedMediaModal();
-        
-        // Start image generation
-        await generateImagesForScript(scriptText, settings);
-      });
-    }
   });
-  
-  // =====================================================================
-  // PARSE SCRIPT INTO SCENES - MIGRATED TO src/components/ScriptGenerator.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  
-  // Parse script into scenes with timestamps
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const generateBtn = document.getElementById('generateImagesBtn');
+  if (generateBtn) {
+    generateBtn.addEventListener('click', async () => {
+      // Images are now generated using OpenAI DALL-E via backend
+
+      const aspectRatio = document.getElementById('imageAspectRatio')?.value || '16:9';
+      const quality = document.getElementById('imageQuality')?.value || 'standard';
+      const animate = document.getElementById('imageAnimate')?.checked || false;
+      let count = parseInt(document.getElementById('imageCount')?.value || 3);
+      const context = document.getElementById('imageContext')?.value.trim() || '';
+      const style = selectedStyle;
+
+      // Get the script content first
+      const scriptText = document.getElementById('scriptContent')?.textContent || document.getElementById('scriptContent')?.innerText || '';
+      if (!scriptText) {
+        alert('Please generate a script first!');
+        return;
+      }
+
+      // 📊 Calculate dynamic minimum images based on audio duration
+      const wordCount = scriptText.trim().split(/\s+/).length;
+      const wordsPerMinute = 150; // Average speaking rate
+      const durationMinutes = wordCount / wordsPerMinute;
+
+      // Dynamic minimum based on audio duration (1 image per 10 minutes):
+      // 0-10 min: 1 image
+      // 10-20 min: 2 images
+      // 20-30 min: 3 images
+      // 30-40 min: 4 images
+      // 40-50 min: 5 images
+      // 50-60 min: 6 images
+      // 60+ min: Math.ceil(duration / 10)
+      let minimumImages = Math.max(1, Math.ceil(durationMinutes / 10));
+
+      // Enforce minimum
+      if (count < minimumImages) {
+        count = minimumImages;
+        console.log(`⚠️ Voice duration: ${durationMinutes.toFixed(1)} minutes - Setting minimum ${minimumImages} images (1 per 10 minutes)`);
+        alert(`Based on your ${durationMinutes.toFixed(1)}-minute voiceover, minimum ${minimumImages} images required (1 per 10 minutes). Adjusted automatically.`);
+      } else {
+        console.log(`✅ Voice duration: ${durationMinutes.toFixed(1)} minutes - Using ${count} images (minimum: ${minimumImages})`);
+      }
+
+      const settings = { aspectRatio, quality, animate, count, context, style };
+
+      console.log('Image generation settings:', settings);
+
+      // Close image modal and open generated media modal
+      closeImageModal();
+      openGeneratedMediaModal();
+
+      // Start image generation
+      await generateImagesForScript(scriptText, settings);
+    });
+  }
+});
+
+// =====================================================================
+// PARSE SCRIPT INTO SCENES - MIGRATED TO src/components/ScriptGenerator.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+
+// Parse script into scenes with timestamps
 async function parseScriptIntoScenes(scriptText, targetCount) {
   // Use new component if available
   if (window.parseScriptIntoScenesNew && typeof window.parseScriptIntoScenesNew === 'function') {
     return await window.parseScriptIntoScenesNew(scriptText, targetCount);
   }
-  
+
   // Fallback to old implementation
   const words = scriptText.split(/\s+/);
   const wordsPerScene = Math.floor(words.length / targetCount);
   const scenes = [];
-  
+
   console.log(`📝 Parsing script into ${targetCount} scenes and generating image prompts...`);
-  
+
   // ✅ Use actual audio duration if available, otherwise estimate
   const useActualDuration = actualAudioDuration > 0;
   const totalDuration = useActualDuration ? actualAudioDuration : (words.length / (150 / 60));
-  
+
   if (useActualDuration) {
     console.log('✅ Using ACTUAL audio duration:', actualAudioDuration, 'seconds');
   } else {
     console.log('⚠️ Audio duration not available, using word-based estimation');
   }
-  
+
   // 🆕 RESET CHARACTER MEMORY for new generation
   characterMemory = {};
   currentSceneIndex = 0;
-  
+
   // Helper function: Find nearest sentence ending after target word position
   function findSentenceEnd(words, targetWordIndex) {
     // Join words from target onwards to search for sentence endings
     const textFromTarget = words.slice(targetWordIndex).join(' ');
-    
+
     // Find first occurrence of sentence-ending punctuation followed by space and capital letter
     const sentenceEndMatch = textFromTarget.match(/[.!?]\s+(?=[A-Z"])/);
-    
+
     if (!sentenceEndMatch) {
       // No sentence ending found, return target as-is
       return targetWordIndex;
     }
-    
+
     // Calculate position AFTER the punctuation and space (where next sentence starts)
     const endPosition = sentenceEndMatch.index + sentenceEndMatch[0].length;
-    
+
     // Count how many words that represents
     const textUpToEnd = textFromTarget.slice(0, endPosition);
     const wordsUpToEnd = textUpToEnd.trim().split(/\s+/).length;
-    
+
     return targetWordIndex + wordsUpToEnd;
   }
-  
+
   // Store scene boundaries to ensure next scene starts where previous ended
   const sceneBoundaries = [];
-  
+
   for (let i = 0; i < targetCount; i++) {
     // For first scene, start at 0. For others, start where previous scene ended
     const startWord = i === 0 ? 0 : sceneBoundaries[i - 1];
     let endWord = (i === targetCount - 1) ? words.length : (i + 1) * wordsPerScene;
-    
+
     // For all scenes except the last, find the nearest sentence ending
     if (i < targetCount - 1) {
       endWord = findSentenceEnd(words, endWord);
       // Make sure we don't go past the end
       if (endWord > words.length) endWord = words.length;
     }
-    
+
     // Store this boundary for next scene to use
     sceneBoundaries.push(endWord);
-    
+
     const sceneText = words.slice(startWord, endWord).join(' ');
-    
+
     // Calculate timestamps
     const startRatio = startWord / words.length;
     const endRatio = endWord / words.length;
     const startTime = startRatio * totalDuration;
     const endTime = endRatio * totalDuration;
-    
+
     // 🆕 Generate AI-powered image prompt WITH character memory
     const imagePrompt = await generateImagePrompt(sceneText, i);
-    
+
     scenes.push({
       number: i + 1,
       text: sceneText,
@@ -1090,40 +1084,40 @@ async function parseScriptIntoScenes(scriptText, targetCount) {
       imageUrl: null,
       prompt: imagePrompt
     });
-    
+
     console.log(`✅ Scene ${i + 1} prompt generated (${formatTimestamp(startTime)} - ${formatTimestamp(endTime)})`);
   }
-  
+
   return scenes;
 }
-  // Format seconds to HH:MM:SS.MS
-  function formatTimestamp(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-    const ms = Math.floor((seconds % 1) * 100);
-    
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
-  }
-  
-  // =====================================================================
-  // IMAGE PROMPT GENERATION - MIGRATED TO src/components/ImageGenerator.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Generate image prompt from scene text using Claude API (TUBEGEN STYLE)
+// Format seconds to HH:MM:SS.MS
+function formatTimestamp(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 100);
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+}
+
+// =====================================================================
+// IMAGE PROMPT GENERATION - MIGRATED TO src/components/ImageGenerator.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Generate image prompt from scene text using Claude API (TUBEGEN STYLE)
 async function generateImagePrompt(sceneText, sceneIndex) {
   if (window.generateImagePromptNew && typeof window.generateImagePromptNew === 'function') {
     return window.generateImagePromptNew(sceneText, sceneIndex);
   }
   // Fallback to old implementation
   console.log('🎨 Generating ultra-detailed image prompt with Claude API...');
-  
+
   currentSceneIndex = sceneIndex;
-  
+
   // Get the selected style
   const styleName = selectedStyle ? selectedStyle.name : 'Realistic';
   console.log('📌 Using style:', styleName);
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/chatgpt`, {
       method: 'POST',
@@ -1712,20 +1706,20 @@ NOW OUTPUT YOUR PROMPT (JUST THE PROMPT!):
 
     const data = await response.json();
     let imagePrompt = data.response || data.content || data.choices?.[0]?.message?.content || data.message || '';
-    
+
     // ⚠️ CRITICAL CLEANUP: Remove ALL analysis/debug text
     // Claude sometimes includes analysis before the prompt, we only want the final prompt!
-    
+
     // Remove opening quotes
     imagePrompt = imagePrompt.replace(/^["']|["']$/g, '').trim();
-    
+
     // If there are multiple paragraphs, take the LAST ONE (the actual prompt)
     const paragraphs = imagePrompt.split('\n\n').filter(p => p.trim().length > 0);
     if (paragraphs.length > 1) {
       // Find the paragraph that starts with "A realistic photograph" or "An official" or "A professional"
-      const promptParagraph = paragraphs.find(p => 
-        p.startsWith('A realistic photograph') || 
-        p.startsWith('An official') || 
+      const promptParagraph = paragraphs.find(p =>
+        p.startsWith('A realistic photograph') ||
+        p.startsWith('An official') ||
         p.startsWith('A professional') ||
         p.startsWith('A classical') ||
         p.startsWith('A stick figure') ||
@@ -1738,56 +1732,56 @@ NOW OUTPUT YOUR PROMPT (JUST THE PROMPT!):
         imagePrompt = paragraphs[paragraphs.length - 1];
       }
     }
-    
+
     // Remove any lines that look like analysis headers
     imagePrompt = imagePrompt.split('\n')
       .filter(line => {
         const trimmed = line.trim();
         // Remove lines with analysis markers
         if (trimmed.startsWith('**ANALYZING') ||
-            trimmed.startsWith('✅') ||
-            trimmed.startsWith('❌') ||
-            trimmed.startsWith('━━━') ||
-            trimmed.startsWith('TUBEGEN-QUALITY') ||
-            trimmed.startsWith('**TUBEGEN') ||
-            trimmed.startsWith('CHARACTERS:') ||
-            trimmed.startsWith('SETTING:') ||
-            trimmed.startsWith('KEY MOMENT:') ||
-            trimmed.startsWith('MOOD:') ||
-            trimmed === '') {
+          trimmed.startsWith('✅') ||
+          trimmed.startsWith('❌') ||
+          trimmed.startsWith('━━━') ||
+          trimmed.startsWith('TUBEGEN-QUALITY') ||
+          trimmed.startsWith('**TUBEGEN') ||
+          trimmed.startsWith('CHARACTERS:') ||
+          trimmed.startsWith('SETTING:') ||
+          trimmed.startsWith('KEY MOMENT:') ||
+          trimmed.startsWith('MOOD:') ||
+          trimmed === '') {
           return false;
         }
         return true;
       })
       .join(' ')
       .trim();
-    
+
     // Remove markdown bold markers
     imagePrompt = imagePrompt.replace(/\*\*/g, '');
-    
+
     // Remove any remaining section headers
     imagePrompt = imagePrompt.replace(/^(ANALYZING SCENE|CHARACTERS|SETTING|KEY MOMENT|MOOD|TUBEGEN-QUALITY PROMPT):/gi, '');
-    
+
     // Extract and save character descriptions for future scenes
     extractAndSaveCharacters(sceneText, imagePrompt);
-    
+
     // Ensure it ends properly with professional photography specs
     if (!imagePrompt.includes('(no visible text)')) {
       // Remove any old-style endings first
       imagePrompt = imagePrompt.replace(/,?\s*(cinematic composition|photorealistic style|sharp details).*$/i, '');
-      
+
       // Add professional photography specs ending
       imagePrompt = imagePrompt.trim() + ', professional photography, studio lighting, high resolution 8K, sharp focus on faces, vivid colors, high contrast, dramatic lighting, cinematic composition, photorealistic style, commercial photography quality, crystal clear image (no visible text)';
     }
-    
+
     console.log('✅ Generated professional quality prompt:', imagePrompt);
     return imagePrompt;
   } catch (error) {
     console.warn('⚠️ Claude prompt generation failed, using smart fallback:', error.message);
-    
+
     // SMART FALLBACK: Extract basic details from scene text
     const firstSentences = sceneText.slice(0, 800);
-    
+
     // Find character names (capitalized words)
     const characters = [];
     const nameMatches = firstSentences.match(/\b[A-Z][a-z]+\b/g) || [];
@@ -1796,48 +1790,48 @@ NOW OUTPUT YOUR PROMPT (JUST THE PROMPT!):
         characters.push(name);
       }
     });
-    
+
     // Find setting keywords
     let setting = 'indoor setting';
     if (firstSentences.match(/bank|office|conference/i)) setting = 'bank conference room';
     if (firstSentences.match(/car|vehicle|driving/i)) setting = 'car interior';
     if (firstSentences.match(/outdoor|street|park|forest/i)) setting = 'outdoor location';
     if (firstSentences.match(/home|house|kitchen|bedroom/i)) setting = 'home interior';
-    
+
     // Find age mentions
     const ageMatch = firstSentences.match(/(\d+)[-\s]year[-\s]old/i);
     const age = ageMatch ? ageMatch[1] : '';
-    
+
     // Build medium-shot prompt showing upper body
     const mainChar = characters[0] || 'a person';
     const secondChar = characters[1] || null;
     const ageDesc = age ? `${age}-year-old ` : '';
-    
+
     let mediumShotPrompt = `A realistic photograph of a ${ageDesc}${mainChar} with expressive face`;
-    
+
     // Add action if found
     if (firstSentences.match(/grip|hold/i)) mediumShotPrompt += ' holding something';
     if (firstSentences.match(/sit|seat/i)) mediumShotPrompt += ' seated';
     if (firstSentences.match(/stand/i)) mediumShotPrompt += ' standing';
-    
+
     // Add second character
     if (secondChar) {
       mediumShotPrompt += `, with ${secondChar} nearby`;
     }
-    
+
     // Add setting naturally
     mediumShotPrompt += ` in ${setting}, natural lighting, cinematic composition, photorealistic style, sharp details (no visible text)`;
-    
+
     return mediumShotPrompt;
   }
 }
 
 
-  // =====================================================================
-  // CHARACTER EXTRACTION - MIGRATED TO src/components/ImageGenerator.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // 🆕 NEW FUNCTION: Extract and save character descriptions (ENHANCED v2.0)
+// =====================================================================
+// CHARACTER EXTRACTION - MIGRATED TO src/components/ImageGenerator.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// 🆕 NEW FUNCTION: Extract and save character descriptions (ENHANCED v2.0)
 function extractAndSaveCharacters(sceneText, generatedPrompt) {
   if (window.extractAndSaveCharactersNew && typeof window.extractAndSaveCharactersNew === 'function') {
     return window.extractAndSaveCharactersNew(sceneText, generatedPrompt);
@@ -1846,18 +1840,18 @@ function extractAndSaveCharacters(sceneText, generatedPrompt) {
   // 🔒 CRITICAL: SPECIES DETECTION AND LOCKING
   // If Scene 1 has a lion, ALL scenes must have the SAME lion!
   // If Scene 1 has a human, ALL scenes must have the SAME human!
-  
+
   if (currentSceneIndex === 0) {
     // SCENE 1: Detect the species from the generated prompt
     const promptLower = generatedPrompt.toLowerCase();
-    
+
     // Check for animals (lion, elephant, tiger, etc.)
     const animalSpecies = [
       'lion', 'lioness', 'elephant', 'tiger', 'leopard', 'cheetah',
       'wolf', 'bear', 'fox', 'deer', 'giraffe', 'zebra', 'monkey',
       'dog', 'cat', 'bird', 'eagle', 'hawk', 'owl', 'horse', 'rabbit'
     ];
-    
+
     let detectedSpecies = null;
     for (const animal of animalSpecies) {
       if (promptLower.includes(animal)) {
@@ -1865,13 +1859,13 @@ function extractAndSaveCharacters(sceneText, generatedPrompt) {
         break;
       }
     }
-    
+
     if (detectedSpecies) {
       // 🦁 ANIMAL STORY DETECTED!
       characterMemory['MAIN_SPECIES'] = detectedSpecies;
       characterMemory['SPECIES_LOCK'] = 'ANIMAL';
       console.log(`🦁 SPECIES LOCKED: ${detectedSpecies.toUpperCase()} - ALL scenes will feature this animal!`);
-      
+
       // Extract animal description from prompt
       const animalDescPattern = new RegExp(`(a[^,\\.]*${detectedSpecies}[^,\\.]{0,100})`, 'i');
       const animalMatch = generatedPrompt.match(animalDescPattern);
@@ -1879,48 +1873,48 @@ function extractAndSaveCharacters(sceneText, generatedPrompt) {
         characterMemory['MainCharacter'] = animalMatch[1].trim();
         console.log(`📝 Animal character saved: ${characterMemory['MainCharacter']}`);
       }
-    } else if (promptLower.includes('person') || promptLower.includes('man') || 
-               promptLower.includes('woman') || promptLower.includes('child') ||
-               promptLower.match(/\d+[-\s]year[-\s]old/)) {
+    } else if (promptLower.includes('person') || promptLower.includes('man') ||
+      promptLower.includes('woman') || promptLower.includes('child') ||
+      promptLower.match(/\d+[-\s]year[-\s]old/)) {
       // 👤 HUMAN STORY DETECTED!
       characterMemory['SPECIES_LOCK'] = 'HUMAN';
       console.log(`👤 SPECIES LOCKED: HUMAN - ALL scenes will feature human characters!`);
     }
   }
-  
+
   // Extract names (capitalized words that appear multiple times)
   const namePattern = /\b([A-Z][a-z]+)\b/g;
   const names = {};
   let match;
-  
+
   while ((match = namePattern.exec(sceneText)) !== null) {
     const name = match[1];
     // Skip common words and pronouns
     if (['The', 'This', 'That', 'She', 'He', 'They', 'I', 'It', 'We', 'You', 'A', 'An', 'In', 'On', 'At'].includes(name)) continue;
     names[name] = (names[name] || 0) + 1;
   }
-  
+
   // Save frequently mentioned names (appeared 2+ times OR update existing)
   Object.entries(names).forEach(([name, count]) => {
     // Save if appeared 2+ times, OR if it's already in memory (to update/enhance description)
     const shouldSave = count >= 2 || characterMemory[name];
-    
+
     if (shouldSave) {
       // Try multiple extraction strategies for better accuracy
       const nameLower = name.toLowerCase();
-      
+
       // Strategy 1: Find age-based descriptions (e.g., "73-year-old woman named Cordelia")
       const ageDescPattern = new RegExp(`(\\d+[\\s-]year[\\s-]old[^,\\.]*\\b${nameLower}\\b[^,\\.]*)`, 'i');
       const ageMatch = generatedPrompt.match(ageDescPattern);
-      
+
       // Strategy 2: Find descriptive phrases with name
       const contextPattern = new RegExp(`([^,\\.]{10,80}\\b${nameLower}\\b[^,\\.]{10,80})`, 'i');
       const contextMatch = generatedPrompt.match(contextPattern);
-      
+
       // Strategy 3: Find "character in clothing" patterns
       const clothingPattern = new RegExp(`(${nameLower}[^,\\.]*(?:wearing|in a|in an|with)[^,\\.]{10,50})`, 'i');
       const clothingMatch = generatedPrompt.match(clothingPattern);
-      
+
       // Use the best match (prefer age descriptions first for accuracy)
       let bestDescription = null;
       if (ageMatch && ageMatch[1]) {
@@ -1930,7 +1924,7 @@ function extractAndSaveCharacters(sceneText, generatedPrompt) {
       } else if (contextMatch && contextMatch[1]) {
         bestDescription = contextMatch[1].trim();
       }
-      
+
       // Only update if we found a better/first description
       if (bestDescription) {
         // If character exists, only update if new description is longer/more detailed
@@ -1943,113 +1937,113 @@ function extractAndSaveCharacters(sceneText, generatedPrompt) {
   });
 }
 
-  // =====================================================================
-  // IMAGE GENERATION - MIGRATED TO src/components/ImageGenerator.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Generate images using AI33.pro API - PROGRESSIVE MODE
-  let currentImageIndex = 0;
-  let totalImagesToGenerate = 0;
-  
-  async function generateImagesForScript(scriptText, settings) {
-    if (window.generateImagesForScriptNew && typeof window.generateImagesForScriptNew === 'function') {
-      return window.generateImagesForScriptNew(scriptText, settings);
-    }
-    // Fallback to old implementation
-    const scenes = await parseScriptIntoScenes(scriptText, settings.count);
-    generatedScenes = scenes;
-    currentImageIndex = 0;
-    totalImagesToGenerate = scenes.length;
-    
-    const container = document.getElementById('generatedScenesContainer');
-    const loading = document.getElementById('scenesLoading');
-    
-    // Show initial display with all scenes
-    displayGeneratedScenes(scenes);
-    
-    // Show loading for first image only (with null check)
-    if (loading) {
-      loading.innerHTML = `
+// =====================================================================
+// IMAGE GENERATION - MIGRATED TO src/components/ImageGenerator.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Generate images using AI33.pro API - PROGRESSIVE MODE
+let currentImageIndex = 0;
+let totalImagesToGenerate = 0;
+
+async function generateImagesForScript(scriptText, settings) {
+  if (window.generateImagesForScriptNew && typeof window.generateImagesForScriptNew === 'function') {
+    return window.generateImagesForScriptNew(scriptText, settings);
+  }
+  // Fallback to old implementation
+  const scenes = await parseScriptIntoScenes(scriptText, settings.count);
+  generatedScenes = scenes;
+  currentImageIndex = 0;
+  totalImagesToGenerate = scenes.length;
+
+  const container = document.getElementById('generatedScenesContainer');
+  const loading = document.getElementById('scenesLoading');
+
+  // Show initial display with all scenes
+  displayGeneratedScenes(scenes);
+
+  // Show loading for first image only (with null check)
+  if (loading) {
+    loading.innerHTML = `
         <div class="text-center mb-6">
           <div class="inline-block w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <p class="text-gray-600 dark:text-gray-400 font-semibold">Generating first image...</p>
           <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">Image 1 of ${settings.count}</p>
         </div>
       `;
-      loading.classList.remove('hidden');
-    }
-    
-    // Generate ONLY the first image
-    try {
-      console.log(`\n🎨 Generating first image (1/${scenes.length})...`);
-      const imageUrl = await callOpenAIAPI(scenes[0].prompt, settings);
-      scenes[0].imageUrl = imageUrl;
-      console.log(`✅ First image completed`);
-      
-      // Update display after first image
-      displayGeneratedScenes(scenes);
-      currentImageIndex = 1; // Move to next
-      
-    } catch (error) {
-      console.error(`❌ Error generating first image:`, error);
-      scenes[0].imageUrl = 'error';
-      scenes[0].error = error.message;
-      displayGeneratedScenes(scenes);
-    }
-    
-    // Hide loading (with null check)
-    if (loading) {
-      loading.classList.add('hidden');
-    }
-    
-    // Show "Generate Next" button if more images to generate
-    if (currentImageIndex < totalImagesToGenerate) {
-      showGenerateNextButton();
-    }
-    
-    // Store project data
-    currentProjectData = {
-      title: document.getElementById('video-title')?.value || 'Untitled',
-      script: scriptText,
-      scenes: scenes,
-      settings: settings,
-      timestamp: new Date().toISOString()
-    };
+    loading.classList.remove('hidden');
   }
-  
-  // =====================================================================
-  // GENERATE REMAINING IMAGES - MIGRATED TO src/components/ImageGenerator.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Generate ALL remaining images at once
-  async function generateRemainingImages() {
-    if (window.generateRemainingImagesNew && typeof window.generateRemainingImagesNew === 'function') {
-      return window.generateRemainingImagesNew();
-    }
-    // Fallback to old implementation
-    console.log('🎬 generateRemainingImages called');
-    console.log('   generatedScenes:', generatedScenes);
-    console.log('   currentImageIndex:', currentImageIndex);
-    console.log('   totalImagesToGenerate:', totalImagesToGenerate);
-    
-    if (!generatedScenes || currentImageIndex >= totalImagesToGenerate) {
-      console.error('❌ Cannot generate: No scenes or already at end');
-      alert('No more images to generate!');
-      return;
-    }
-    
-    const loading = document.getElementById('scenesLoading');
-    const settings = currentProjectData.settings;
-    const remainingCount = totalImagesToGenerate - currentImageIndex;
-    
-    console.log(`✅ Starting generation of ${remainingCount} remaining images...`);
-    
-    // Hide the button immediately
-    hideGenerateNextButton();
-    
-    // Show loading (with null check)
-    if (loading) {
-      loading.innerHTML = `
+
+  // Generate ONLY the first image
+  try {
+    console.log(`\n🎨 Generating first image (1/${scenes.length})...`);
+    const imageUrl = await callOpenAIAPI(scenes[0].prompt, settings);
+    scenes[0].imageUrl = imageUrl;
+    console.log(`✅ First image completed`);
+
+    // Update display after first image
+    displayGeneratedScenes(scenes);
+    currentImageIndex = 1; // Move to next
+
+  } catch (error) {
+    console.error(`❌ Error generating first image:`, error);
+    scenes[0].imageUrl = 'error';
+    scenes[0].error = error.message;
+    displayGeneratedScenes(scenes);
+  }
+
+  // Hide loading (with null check)
+  if (loading) {
+    loading.classList.add('hidden');
+  }
+
+  // Show "Generate Next" button if more images to generate
+  if (currentImageIndex < totalImagesToGenerate) {
+    showGenerateNextButton();
+  }
+
+  // Store project data
+  currentProjectData = {
+    title: document.getElementById('video-title')?.value || 'Untitled',
+    script: scriptText,
+    scenes: scenes,
+    settings: settings,
+    timestamp: new Date().toISOString()
+  };
+}
+
+// =====================================================================
+// GENERATE REMAINING IMAGES - MIGRATED TO src/components/ImageGenerator.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Generate ALL remaining images at once
+async function generateRemainingImages() {
+  if (window.generateRemainingImagesNew && typeof window.generateRemainingImagesNew === 'function') {
+    return window.generateRemainingImagesNew();
+  }
+  // Fallback to old implementation
+  console.log('🎬 generateRemainingImages called');
+  console.log('   generatedScenes:', generatedScenes);
+  console.log('   currentImageIndex:', currentImageIndex);
+  console.log('   totalImagesToGenerate:', totalImagesToGenerate);
+
+  if (!generatedScenes || currentImageIndex >= totalImagesToGenerate) {
+    console.error('❌ Cannot generate: No scenes or already at end');
+    alert('No more images to generate!');
+    return;
+  }
+
+  const loading = document.getElementById('scenesLoading');
+  const settings = currentProjectData.settings;
+  const remainingCount = totalImagesToGenerate - currentImageIndex;
+
+  console.log(`✅ Starting generation of ${remainingCount} remaining images...`);
+
+  // Hide the button immediately
+  hideGenerateNextButton();
+
+  // Show loading (with null check)
+  if (loading) {
+    loading.innerHTML = `
         <div class="text-center mb-6">
           <div class="inline-block w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <p class="text-gray-600 dark:text-gray-400 font-semibold text-lg">Generating ${remainingCount} images...</p>
@@ -2059,72 +2053,72 @@ function extractAndSaveCharacters(sceneText, generatedPrompt) {
           </div>
         </div>
       `;
-      loading.classList.remove('hidden');
-    }
-    
-    // Generate all remaining images
-    let completed = 0;
-    const progressElement = document.getElementById('generationProgress');
-    
-    for (let i = currentImageIndex; i < totalImagesToGenerate; i++) {
-      try {
-        console.log(`
-🎨 Generating image ${i + 1}/${totalImagesToGenerate}...`);
-        const imageUrl = await callOpenAIAPI(generatedScenes[i].prompt, settings);
-        generatedScenes[i].imageUrl = imageUrl;
-        console.log(`✅ Image ${i + 1} completed`);
-        
-        completed++;
-        if (progressElement) {
-          progressElement.innerHTML = `<span class="font-semibold">${completed}</span> / ${remainingCount} completed`;
-        }
-        
-        // Update display after each image so user can see progress
-        displayGeneratedScenes(generatedScenes);
-        
-      } catch (error) {
-        console.error(`❌ Error generating image ${i + 1}:`, error);
-        generatedScenes[i].imageUrl = 'error';
-        generatedScenes[i].error = error.message;
-        
-        completed++;
-        if (progressElement) {
-          progressElement.innerHTML = `<span class="font-semibold">${completed}</span> / ${remainingCount} completed (1 failed)`;
-        }
-        
-        displayGeneratedScenes(generatedScenes);
-      }
-    }
-    
-    // Hide loading (with null check)
-    if (loading) {
-      loading.classList.add('hidden');
-    }
-    currentImageIndex = totalImagesToGenerate;
-    
-    alert(`🎉 All ${remainingCount} images generated!`);
+    loading.classList.remove('hidden');
   }
-  
-  // Show "Generate X More Images" button
-  function showGenerateNextButton() {
-    const remainingCount = totalImagesToGenerate - currentImageIndex;
-    
-    // Find the main container
-    const container = document.getElementById('generatedScenesContainer');
-    
-    if (!container) return;
-    
-    // Check if button already exists
-    let btn = document.getElementById('generateNextBtn');
-    
-    if (!btn) {
-      // Create button as separate element in the main container
-      btn = document.createElement('div');
-      btn.id = 'generateNextBtn';
-      btn = document.createElement('div');
-btn.id = 'generateNextBtn';
-btn.className = 'py-1 pr-5 text-right';  // ✅ Changed py-6 to py-3
-btn.innerHTML = `
+
+  // Generate all remaining images
+  let completed = 0;
+  const progressElement = document.getElementById('generationProgress');
+
+  for (let i = currentImageIndex; i < totalImagesToGenerate; i++) {
+    try {
+      console.log(`
+🎨 Generating image ${i + 1}/${totalImagesToGenerate}...`);
+      const imageUrl = await callOpenAIAPI(generatedScenes[i].prompt, settings);
+      generatedScenes[i].imageUrl = imageUrl;
+      console.log(`✅ Image ${i + 1} completed`);
+
+      completed++;
+      if (progressElement) {
+        progressElement.innerHTML = `<span class="font-semibold">${completed}</span> / ${remainingCount} completed`;
+      }
+
+      // Update display after each image so user can see progress
+      displayGeneratedScenes(generatedScenes);
+
+    } catch (error) {
+      console.error(`❌ Error generating image ${i + 1}:`, error);
+      generatedScenes[i].imageUrl = 'error';
+      generatedScenes[i].error = error.message;
+
+      completed++;
+      if (progressElement) {
+        progressElement.innerHTML = `<span class="font-semibold">${completed}</span> / ${remainingCount} completed (1 failed)`;
+      }
+
+      displayGeneratedScenes(generatedScenes);
+    }
+  }
+
+  // Hide loading (with null check)
+  if (loading) {
+    loading.classList.add('hidden');
+  }
+  currentImageIndex = totalImagesToGenerate;
+
+  alert(`🎉 All ${remainingCount} images generated!`);
+}
+
+// Show "Generate X More Images" button
+function showGenerateNextButton() {
+  const remainingCount = totalImagesToGenerate - currentImageIndex;
+
+  // Find the main container
+  const container = document.getElementById('generatedScenesContainer');
+
+  if (!container) return;
+
+  // Check if button already exists
+  let btn = document.getElementById('generateNextBtn');
+
+  if (!btn) {
+    // Create button as separate element in the main container
+    btn = document.createElement('div');
+    btn.id = 'generateNextBtn';
+    btn = document.createElement('div');
+    btn.id = 'generateNextBtn';
+    btn.className = 'py-1 pr-5 text-right';  // ✅ Changed py-6 to py-3
+    btn.innerHTML = `
   <button onclick="generateRemainingImages()" 
           class="px-6 py-2 bg-amber-700 hover:bg-amber-800 
                  text-white font-semibold text-base rounded-lg shadow-lg hover:shadow-xl 
@@ -2139,224 +2133,224 @@ btn.innerHTML = `
     Click to generate all remaining images at once
   </p>
 `;
-      
-      // Append to the main container (after all scenes)
-      container.appendChild(btn);
-    } else {
-      // Update existing button
-      btn.classList.remove('hidden');
-      const buttonEl = btn.querySelector('button');
-      if (buttonEl) {
-        buttonEl.innerHTML = `
+
+    // Append to the main container (after all scenes)
+    container.appendChild(btn);
+  } else {
+    // Update existing button
+    btn.classList.remove('hidden');
+    const buttonEl = btn.querySelector('button');
+    if (buttonEl) {
+      buttonEl.innerHTML = `
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
           </svg>
           Generate ${remainingCount} More Image${remainingCount > 1 ? 's' : ''}
         `;
-      }
     }
   }
-  
-  // Hide "Generate More Images" button
-  function hideGenerateNextButton() {
-    if (window.hideGenerateNextButtonNew && typeof window.hideGenerateNextButtonNew === 'function') {
-      return window.hideGenerateNextButtonNew();
-    }
-    // Fallback to old implementation
-    const btn = document.getElementById('generateNextBtn');
-    if (btn) btn.classList.add('hidden');
-  }
-
-  
-  // Call AI33.pro Image Generation API
-  // =====================================================================
-  // IDEogram API CALL - MIGRATED TO src/components/ImageGenerator.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
- async function callOpenAIAPI(prompt, settings) {
-   if (window.callIdeogramAPINew && typeof window.callIdeogramAPINew === 'function') {
-     return window.callIdeogramAPINew(prompt, settings);
-   }
-   // Fallback to old implementation
- 
-   // ✅ V3 Optimization: Use the detailed prompt as-is
-   // The new Claude-generated prompts are already complete with all details
-   let fullPrompt = prompt;
-   
-   console.log('🎨 Generating image with Ideogram V3 API...');
-   console.log('Detailed Prompt (first 200 chars):', prompt.substring(0, 200) + '...');
-   console.log('Style:', settings.style.name || 'Realistic');
-   console.log('Quality:', settings.quality);
-   console.log('Aspect Ratio:', settings.aspectRatio);
- 
-   // ✅ Map quality to Ideogram V3 rendering speeds with CORRECT PRICES
-   // Standard → V3 TURBO ($0.06/image - fast)
-   // Better → V3 DEFAULT ($0.12/image - balanced) 
-   // Best → V3 QUALITY ($0.18/image - best quality)
-   let renderingSpeed = 'TURBO'; // Default: Fast generation
-   
-   if (settings.quality === 'standard') {
-     renderingSpeed = 'TURBO'; // Fast - $0.06
-   } else if (settings.quality === 'better') {
-     renderingSpeed = 'DEFAULT'; // Balanced - $0.12
-   } else if (settings.quality === 'best') {
-     renderingSpeed = 'QUALITY'; // Best quality - $0.18
-   }
-   
-   console.log(`📊 Using Ideogram V3 with Speed: ${renderingSpeed}`);
-
-   // Ideogram V3 API call via backend WITH RETRY LOGIC
-   let retryCount = 0;
-   const maxRetries = 3;
-   let lastError = null;
-   
-   while (retryCount < maxRetries) {
-     try {
-       const backendUrl = `${API_BASE_URL}/api/generate-image`;
-       console.log(`🌐 Backend URL: ${backendUrl} (Attempt ${retryCount + 1}/${maxRetries})`);
-       console.log('📤 Sending request to BACKEND → Ideogram V3');
-       
-       const response = await fetch(backendUrl, {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json'
-         },
-         body: JSON.stringify({
-           prompt: fullPrompt,
-           aspectRatio: settings.aspectRatio || '16:9',
-           renderingSpeed: renderingSpeed,
-           styleType: settings.imageStyle === 'realistic' ? 'REALISTIC' : 
-                      settings.imageStyle === '3d model' ? 'RENDER_3D' : 
-                      settings.imageStyle === 'oil painting' || settings.imageStyle === 'naruto anime' || settings.imageStyle === 'game of thrones' ? 'DESIGN' : 
-                      'REALISTIC'
-         })
-       });
-   
-       if (!response.ok) {
-         const errorData = await response.json();
-         console.error('❌ Ideogram V3 API error:', response.status, errorData);
-         throw new Error(`Ideogram API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
-       }
-   
-       const data = await response.json();
-       console.log('✅ Ideogram V3 Full Response:', JSON.stringify(data, null, 2));
-       console.log('🔍 Response keys:', Object.keys(data));
-       console.log('🔍 Has data property?', 'data' in data);
-       
-       // Process the data to extract image URL
-       if (data.data) {
-         console.log('🔍 data.data is array?', Array.isArray(data.data));
-         console.log('🔍 data.data length:', data.data.length);
-         if (data.data[0]) {
-           console.log('🔍 First item keys:', Object.keys(data.data[0]));
-           console.log('🔍 First item:', JSON.stringify(data.data[0]));
-         }
-       }
-       
-       // Ideogram V3 returns image URL in data array
-       if (data.data && data.data[0] && data.data[0].url) {
-         console.log('✅ Image generated successfully:', data.data[0].url);
-         return data.data[0].url;
-       } else {
-         console.error('❌ Unexpected response format:', data);
-         console.error('❌ Expected: data.data[0].url');
-         console.error('❌ Got:', {
-           hasData: !!data.data,
-           hasFirstItem: !!(data.data && data.data[0]),
-           hasUrl: !!(data.data && data.data[0] && data.data[0].url)
-         });
-         throw new Error('No image URL found in Ideogram response');
-       }
-       
-     } catch (error) {
-       lastError = error;
-       retryCount++;
-       
-       // Check if it's an SSL error
-       if (error.message && error.message.includes('SSL') || error.message.includes('ECONNRESET')) {
-         console.warn(`⚠️ SSL/Connection error (attempt ${retryCount}/${maxRetries}):`, error.message);
-         
-         if (retryCount < maxRetries) {
-           // Wait before retrying (exponential backoff)
-           const waitTime = 1000 * Math.pow(2, retryCount - 1); // 1s, 2s, 4s
-           console.log(`⏳ Waiting ${waitTime}ms before retry...`);
-           await new Promise(resolve => setTimeout(resolve, waitTime));
-           continue; // Try again
-         }
-       }
-       
-       // If not SSL error or max retries reached, throw
-       throw error;
-     }
-   }
-   
-   // If we get here, all retries failed
-   throw lastError || new Error('Image generation failed after retries');
 }
- 
- // Map style names to Ideogram style types
- function getIdeogramStyleType(styleName) {
-   const styleMap = {
-     'realistic': 'REALISTIC',
-     'cinematic': 'REALISTIC',
-     'black & white': 'REALISTIC',
-     'oil painting': 'GENERAL',
-     '3d model': 'RENDER_3D',
-     'drawing': 'GENERAL',
-     'comic book': 'GENERAL',
-     'anime': 'ANIME',
-     'pixel art': 'GENERAL',
-     'pop art': 'GENERAL',
-     'watercolor': 'GENERAL',
-     'stick-style': 'DESIGN',
-     'stick style': 'DESIGN',
-     'naruto anime': 'ANIME',
-     'naruto-anime': 'ANIME',
-     'game of thrones': 'REALISTIC',
-     'game-of-thrones': 'REALISTIC'
-   };
-   
-   const lowerStyle = styleName.toLowerCase();
-   return styleMap[lowerStyle] || 'GENERAL';
- }
- 
- // Poll for image generation result (NOT NEEDED for Ideogram - it returns immediately)
- // NOTE: This function is deprecated - OpenAI DALL-E returns images immediately
- async function pollForImageResult(taskId, maxAttempts = 30) {
-   console.log('📊 Polling for image result, task_id:', taskId);
-   console.warn('This polling function is deprecated and not used with OpenAI DALL-E');
-   return null;
- }
-  
-  // Display generated scenes
-  function displayGeneratedScenes(scenes) {
-    const container = document.getElementById('generatedScenesContainer');
-    const loading = document.getElementById('scenesLoading');
-    
-    // ✅ NULL CHECK - Don't try to access classList if element doesn't exist
-    if (!container) {
-      console.error('❌ generatedScenesContainer element not found in HTML!');
-      return;
+
+// Hide "Generate More Images" button
+function hideGenerateNextButton() {
+  if (window.hideGenerateNextButtonNew && typeof window.hideGenerateNextButtonNew === 'function') {
+    return window.hideGenerateNextButtonNew();
+  }
+  // Fallback to old implementation
+  const btn = document.getElementById('generateNextBtn');
+  if (btn) btn.classList.add('hidden');
+}
+
+
+// Call AI33.pro Image Generation API
+// =====================================================================
+// IDEogram API CALL - MIGRATED TO src/components/ImageGenerator.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+async function callOpenAIAPI(prompt, settings) {
+  if (window.callIdeogramAPINew && typeof window.callIdeogramAPINew === 'function') {
+    return window.callIdeogramAPINew(prompt, settings);
+  }
+  // Fallback to old implementation
+
+  // ✅ V3 Optimization: Use the detailed prompt as-is
+  // The new Claude-generated prompts are already complete with all details
+  let fullPrompt = prompt;
+
+  console.log('🎨 Generating image with Ideogram V3 API...');
+  console.log('Detailed Prompt (first 200 chars):', prompt.substring(0, 200) + '...');
+  console.log('Style:', settings.style.name || 'Realistic');
+  console.log('Quality:', settings.quality);
+  console.log('Aspect Ratio:', settings.aspectRatio);
+
+  // ✅ Map quality to Ideogram V3 rendering speeds with CORRECT PRICES
+  // Standard → V3 TURBO ($0.06/image - fast)
+  // Better → V3 DEFAULT ($0.12/image - balanced) 
+  // Best → V3 QUALITY ($0.18/image - best quality)
+  let renderingSpeed = 'TURBO'; // Default: Fast generation
+
+  if (settings.quality === 'standard') {
+    renderingSpeed = 'TURBO'; // Fast - $0.06
+  } else if (settings.quality === 'better') {
+    renderingSpeed = 'DEFAULT'; // Balanced - $0.12
+  } else if (settings.quality === 'best') {
+    renderingSpeed = 'QUALITY'; // Best quality - $0.18
+  }
+
+  console.log(`📊 Using Ideogram V3 with Speed: ${renderingSpeed}`);
+
+  // Ideogram V3 API call via backend WITH RETRY LOGIC
+  let retryCount = 0;
+  const maxRetries = 3;
+  let lastError = null;
+
+  while (retryCount < maxRetries) {
+    try {
+      const backendUrl = `${API_BASE_URL}/api/generate-image`;
+      console.log(`🌐 Backend URL: ${backendUrl} (Attempt ${retryCount + 1}/${maxRetries})`);
+      console.log('📤 Sending request to BACKEND → Ideogram V3');
+
+      const response = await fetch(backendUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: fullPrompt,
+          aspectRatio: settings.aspectRatio || '16:9',
+          renderingSpeed: renderingSpeed,
+          styleType: settings.imageStyle === 'realistic' ? 'REALISTIC' :
+            settings.imageStyle === '3d model' ? 'RENDER_3D' :
+              settings.imageStyle === 'oil painting' || settings.imageStyle === 'naruto anime' || settings.imageStyle === 'game of thrones' ? 'DESIGN' :
+                'REALISTIC'
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ Ideogram V3 API error:', response.status, errorData);
+        throw new Error(`Ideogram API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ Ideogram V3 Full Response:', JSON.stringify(data, null, 2));
+      console.log('🔍 Response keys:', Object.keys(data));
+      console.log('🔍 Has data property?', 'data' in data);
+
+      // Process the data to extract image URL
+      if (data.data) {
+        console.log('🔍 data.data is array?', Array.isArray(data.data));
+        console.log('🔍 data.data length:', data.data.length);
+        if (data.data[0]) {
+          console.log('🔍 First item keys:', Object.keys(data.data[0]));
+          console.log('🔍 First item:', JSON.stringify(data.data[0]));
+        }
+      }
+
+      // Ideogram V3 returns image URL in data array
+      if (data.data && data.data[0] && data.data[0].url) {
+        console.log('✅ Image generated successfully:', data.data[0].url);
+        return data.data[0].url;
+      } else {
+        console.error('❌ Unexpected response format:', data);
+        console.error('❌ Expected: data.data[0].url');
+        console.error('❌ Got:', {
+          hasData: !!data.data,
+          hasFirstItem: !!(data.data && data.data[0]),
+          hasUrl: !!(data.data && data.data[0] && data.data[0].url)
+        });
+        throw new Error('No image URL found in Ideogram response');
+      }
+
+    } catch (error) {
+      lastError = error;
+      retryCount++;
+
+      // Check if it's an SSL error
+      if (error.message && error.message.includes('SSL') || error.message.includes('ECONNRESET')) {
+        console.warn(`⚠️ SSL/Connection error (attempt ${retryCount}/${maxRetries}):`, error.message);
+
+        if (retryCount < maxRetries) {
+          // Wait before retrying (exponential backoff)
+          const waitTime = 1000 * Math.pow(2, retryCount - 1); // 1s, 2s, 4s
+          console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue; // Try again
+        }
+      }
+
+      // If not SSL error or max retries reached, throw
+      throw error;
     }
-    
-    if (loading) {
-      loading.classList.add('hidden');
-    } else {
-      console.warn('⚠️ scenesLoading element not found - skipping hide');
-    }
-    
-    // Separate first scene and remaining scenes
-    const firstScene = scenes[0];
-    const remainingScenes = scenes.slice(1);
-    
-    let html = '';
-    
-    // === SCRIPT + AUDIO SECTION (Like Reference Screenshots) ===
-    if (currentProjectData) {
-      const wordCount = currentProjectData.script ? currentProjectData.script.split(/\s+/).length : 0;
-      const hasAudio = generatedAudioUrl && generatedAudioUrl !== '';
-      
-      html += `
+  }
+
+  // If we get here, all retries failed
+  throw lastError || new Error('Image generation failed after retries');
+}
+
+// Map style names to Ideogram style types
+function getIdeogramStyleType(styleName) {
+  const styleMap = {
+    'realistic': 'REALISTIC',
+    'cinematic': 'REALISTIC',
+    'black & white': 'REALISTIC',
+    'oil painting': 'GENERAL',
+    '3d model': 'RENDER_3D',
+    'drawing': 'GENERAL',
+    'comic book': 'GENERAL',
+    'anime': 'ANIME',
+    'pixel art': 'GENERAL',
+    'pop art': 'GENERAL',
+    'watercolor': 'GENERAL',
+    'stick-style': 'DESIGN',
+    'stick style': 'DESIGN',
+    'naruto anime': 'ANIME',
+    'naruto-anime': 'ANIME',
+    'game of thrones': 'REALISTIC',
+    'game-of-thrones': 'REALISTIC'
+  };
+
+  const lowerStyle = styleName.toLowerCase();
+  return styleMap[lowerStyle] || 'GENERAL';
+}
+
+// Poll for image generation result (NOT NEEDED for Ideogram - it returns immediately)
+// NOTE: This function is deprecated - OpenAI DALL-E returns images immediately
+async function pollForImageResult(taskId, maxAttempts = 30) {
+  console.log('📊 Polling for image result, task_id:', taskId);
+  console.warn('This polling function is deprecated and not used with OpenAI DALL-E');
+  return null;
+}
+
+// Display generated scenes
+function displayGeneratedScenes(scenes) {
+  const container = document.getElementById('generatedScenesContainer');
+  const loading = document.getElementById('scenesLoading');
+
+  // ✅ NULL CHECK - Don't try to access classList if element doesn't exist
+  if (!container) {
+    console.error('❌ generatedScenesContainer element not found in HTML!');
+    return;
+  }
+
+  if (loading) {
+    loading.classList.add('hidden');
+  } else {
+    console.warn('⚠️ scenesLoading element not found - skipping hide');
+  }
+
+  // Separate first scene and remaining scenes
+  const firstScene = scenes[0];
+  const remainingScenes = scenes.slice(1);
+
+  let html = '';
+
+  // === SCRIPT + AUDIO SECTION (Like Reference Screenshots) ===
+  if (currentProjectData) {
+    const wordCount = currentProjectData.script ? currentProjectData.script.split(/\s+/).length : 0;
+    const hasAudio = generatedAudioUrl && generatedAudioUrl !== '';
+
+    html += `
         <div class="mb-8">
           <div class="border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 overflow-hidden">
             <!-- Header with Icons -->
@@ -2415,11 +2409,11 @@ btn.innerHTML = `
           </div>
         </div>
       `;
-    }
-    
-    // === FIRST IMAGE PREVIEW (Medium Size, Side-by-Side) ===
-    if (firstScene) {
-      html += `
+  }
+
+  // === FIRST IMAGE PREVIEW (Medium Size, Side-by-Side) ===
+  if (firstScene) {
+    html += `
         <div class="mb-8">
           <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">First Image Preview</h2>
           <div class="border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 p-4">
@@ -2427,23 +2421,23 @@ btn.innerHTML = `
             <div class="flex flex-col lg:flex-row gap-4">
               <!-- Image Container (Left Side, Compact Size) -->
               <div class="relative flex-shrink-0 w-full lg:w-2/5 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden" style="aspect-ratio: 16/9;">
-                ${firstScene.imageUrl && firstScene.imageUrl !== 'error' 
-                  ? `<img src="${firstScene.imageUrl}" 
+                ${firstScene.imageUrl && firstScene.imageUrl !== 'error'
+        ? `<img src="${firstScene.imageUrl}" 
                           alt="Scene ${firstScene.number}" 
                           class="w-full h-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
                           onclick="viewSceneDetail(0)">`
-                  : firstScene.imageUrl === 'error'
-                  ? `<div class="w-full h-full flex flex-col items-center justify-center text-red-500">
+        : firstScene.imageUrl === 'error'
+          ? `<div class="w-full h-full flex flex-col items-center justify-center text-red-500">
                        <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                        </svg>
                        <p class="text-sm font-semibold">Failed to generate</p>
                      </div>`
-                  : `<div class="w-full h-full flex flex-col items-center justify-center">
+          : `<div class="w-full h-full flex flex-col items-center justify-center">
                        <div class="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-2"></div>
                        <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Generating...</p>
                      </div>`
-                }
+      }
               </div>
               
               <!-- Content (Right Side) -->
@@ -2499,37 +2493,37 @@ btn.innerHTML = `
           </div>
         </div>
       `;
-    }
-    
-    // === ALL OTHER SCENES (Same Layout as Scene 1) ===
-    if (remainingScenes.length > 0) {
-      remainingScenes.forEach((scene, idx) => {
-        const sceneIndex = idx + 1; // Actual index in full array
-        
-        html += `
+  }
+
+  // === ALL OTHER SCENES (Same Layout as Scene 1) ===
+  if (remainingScenes.length > 0) {
+    remainingScenes.forEach((scene, idx) => {
+      const sceneIndex = idx + 1; // Actual index in full array
+
+      html += `
           <div class="mb-8">
             <div class="border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 p-4">
               <!-- Side-by-Side Layout (Same as Scene 1) -->
               <div class="flex flex-col lg:flex-row gap-4">
                 <!-- Image Container (Left Side) -->
                 <div class="relative flex-shrink-0 w-full lg:w-2/5 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden" style="aspect-ratio: 16/9;">
-                  ${scene.imageUrl && scene.imageUrl !== 'error' 
-                    ? `<img src="${scene.imageUrl}" 
+                  ${scene.imageUrl && scene.imageUrl !== 'error'
+          ? `<img src="${scene.imageUrl}" 
                             alt="Scene ${scene.number}" 
                             class="w-full h-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
                             onclick="viewSceneDetail(${sceneIndex})">`
-                    : scene.imageUrl === 'error'
-                    ? `<div class="w-full h-full flex flex-col items-center justify-center text-red-500">
+          : scene.imageUrl === 'error'
+            ? `<div class="w-full h-full flex flex-col items-center justify-center text-red-500">
                          <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                          </svg>
                          <p class="text-sm font-semibold">Failed to generate</p>
                        </div>`
-                    : `<div class="w-full h-full flex flex-col items-center justify-center">
+            : `<div class="w-full h-full flex flex-col items-center justify-center">
                          <div class="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-2"></div>
                          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Generating...</p>
                        </div>`
-                  }
+        }
                 </div>
                 
                 <!-- Content (Right Side) -->
@@ -2585,280 +2579,280 @@ btn.innerHTML = `
             </div>
           </div>
         `;
-      });
-    }
-    
-    container.innerHTML = html;
-  }
-  
-  // Toggle all remaining scenes at once (Expand All / Collapse All)
-  function toggleAllRemainingScenes() {
-    const scenes = document.querySelectorAll('[id^="sceneDetails"]');
-    const icons = document.querySelectorAll('[id^="sceneToggleIcon"]');
-    const expandText = document.getElementById('expandAllText');
-    
-    // Check if any are hidden
-    const anyHidden = Array.from(scenes).some(s => s.classList.contains('hidden'));
-    
-    scenes.forEach((scene, idx) => {
-      if (anyHidden) {
-        scene.classList.remove('hidden');
-        if (icons[idx]) icons[idx].style.transform = 'rotate(180deg)';
-      } else {
-        scene.classList.add('hidden');
-        if (icons[idx]) icons[idx].style.transform = 'rotate(0deg)';
-      }
     });
-    
-    expandText.textContent = anyHidden ? 'Collapse All' : 'Expand All';
-  }
-  
-  // Toggle individual scene details
-  function toggleScene(index) {
-    const details = document.getElementById(`sceneDetails${index}`);
-    const icon = document.getElementById(`sceneToggleIcon${index}`);
-    
-    if (details.classList.contains('hidden')) {
-      details.classList.remove('hidden');
-      icon.style.transform = 'rotate(180deg)';
-    } else {
-      details.classList.add('hidden');
-      icon.style.transform = 'rotate(0deg)';
-    }
   }
 
-  
-  // Regenerate a single scene
-  // =====================================================================
-  // TOGGLE SCRIPT VISIBILITY - MIGRATED TO src/components/ImageModal.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Toggle script visibility
-  function toggleScriptVisibility() {
-    if (window.toggleScriptVisibilityNew && typeof window.toggleScriptVisibilityNew === 'function') {
-      return window.toggleScriptVisibilityNew();
+  container.innerHTML = html;
+}
+
+// Toggle all remaining scenes at once (Expand All / Collapse All)
+function toggleAllRemainingScenes() {
+  const scenes = document.querySelectorAll('[id^="sceneDetails"]');
+  const icons = document.querySelectorAll('[id^="sceneToggleIcon"]');
+  const expandText = document.getElementById('expandAllText');
+
+  // Check if any are hidden
+  const anyHidden = Array.from(scenes).some(s => s.classList.contains('hidden'));
+
+  scenes.forEach((scene, idx) => {
+    if (anyHidden) {
+      scene.classList.remove('hidden');
+      if (icons[idx]) icons[idx].style.transform = 'rotate(180deg)';
+    } else {
+      scene.classList.add('hidden');
+      if (icons[idx]) icons[idx].style.transform = 'rotate(0deg)';
     }
-    // Fallback to old implementation
-    const scriptContent = document.getElementById('scriptContentCollapse');
-    const toggleIcon = document.getElementById('scriptToggleIcon');
-    const toggleText = document.getElementById('scriptToggleText');
-    
-    if (scriptContent && toggleIcon && toggleText) {
-      if (scriptContent.classList.contains('hidden')) {
-        // Show script
-        scriptContent.classList.remove('hidden');
-        toggleIcon.style.transform = 'rotate(180deg)';
-        toggleText.textContent = 'Hide Full Script';
-      } else {
-        // Hide script
-        scriptContent.classList.add('hidden');
-        toggleIcon.style.transform = 'rotate(0deg)';
-        toggleText.textContent = 'Show Full Script';
-      }
+  });
+
+  expandText.textContent = anyHidden ? 'Collapse All' : 'Expand All';
+}
+
+// Toggle individual scene details
+function toggleScene(index) {
+  const details = document.getElementById(`sceneDetails${index}`);
+  const icon = document.getElementById(`sceneToggleIcon${index}`);
+
+  if (details.classList.contains('hidden')) {
+    details.classList.remove('hidden');
+    icon.style.transform = 'rotate(180deg)';
+  } else {
+    details.classList.add('hidden');
+    icon.style.transform = 'rotate(0deg)';
+  }
+}
+
+
+// Regenerate a single scene
+// =====================================================================
+// TOGGLE SCRIPT VISIBILITY - MIGRATED TO src/components/ImageModal.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Toggle script visibility
+function toggleScriptVisibility() {
+  if (window.toggleScriptVisibilityNew && typeof window.toggleScriptVisibilityNew === 'function') {
+    return window.toggleScriptVisibilityNew();
+  }
+  // Fallback to old implementation
+  const scriptContent = document.getElementById('scriptContentCollapse');
+  const toggleIcon = document.getElementById('scriptToggleIcon');
+  const toggleText = document.getElementById('scriptToggleText');
+
+  if (scriptContent && toggleIcon && toggleText) {
+    if (scriptContent.classList.contains('hidden')) {
+      // Show script
+      scriptContent.classList.remove('hidden');
+      toggleIcon.style.transform = 'rotate(180deg)';
+      toggleText.textContent = 'Hide Full Script';
+    } else {
+      // Hide script
+      scriptContent.classList.add('hidden');
+      toggleIcon.style.transform = 'rotate(0deg)';
+      toggleText.textContent = 'Show Full Script';
     }
   }
-  
-  // =====================================================================
-  // TOGGLE FIRST SCENE TEXT - MIGRATED TO src/components/ImageModal.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Toggle first scene text visibility
-  function toggleFirstSceneText() {
-    if (window.toggleFirstSceneTextNew && typeof window.toggleFirstSceneTextNew === 'function') {
-      return window.toggleFirstSceneTextNew();
-    }
-    // Fallback to old implementation
-    const textContent = document.getElementById('firstSceneTextContent');
-    const toggleIcon = document.getElementById('firstSceneTextIcon');
-    const toggleText = document.getElementById('firstSceneTextToggle');
-    
-    if (textContent && toggleIcon && toggleText) {
-      if (textContent.classList.contains('hidden')) {
-        // Show text
-        textContent.classList.remove('hidden');
-        toggleIcon.style.transform = 'rotate(180deg)';
-        toggleText.textContent = 'Hide Scene Text';
-      } else {
-        // Hide text
-        textContent.classList.add('hidden');
-        toggleIcon.style.transform = 'rotate(0deg)';
-        toggleText.textContent = 'Show Scene Text';
-      }
+}
+
+// =====================================================================
+// TOGGLE FIRST SCENE TEXT - MIGRATED TO src/components/ImageModal.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Toggle first scene text visibility
+function toggleFirstSceneText() {
+  if (window.toggleFirstSceneTextNew && typeof window.toggleFirstSceneTextNew === 'function') {
+    return window.toggleFirstSceneTextNew();
+  }
+  // Fallback to old implementation
+  const textContent = document.getElementById('firstSceneTextContent');
+  const toggleIcon = document.getElementById('firstSceneTextIcon');
+  const toggleText = document.getElementById('firstSceneTextToggle');
+
+  if (textContent && toggleIcon && toggleText) {
+    if (textContent.classList.contains('hidden')) {
+      // Show text
+      textContent.classList.remove('hidden');
+      toggleIcon.style.transform = 'rotate(180deg)';
+      toggleText.textContent = 'Hide Scene Text';
+    } else {
+      // Hide text
+      textContent.classList.add('hidden');
+      toggleIcon.style.transform = 'rotate(0deg)';
+      toggleText.textContent = 'Show Scene Text';
     }
   }
-  
-  // Toggle Scene Text for Scene 2+ (same logic as Scene 1)
-  function toggleSceneText(index) {
-    const textContent = document.getElementById(`sceneTextContent${index}`);
-    const toggleIcon = document.getElementById(`sceneTextIcon${index}`);
-    const toggleText = document.getElementById(`sceneTextToggle${index}`);
-    
-    if (textContent && toggleIcon && toggleText) {
-      if (textContent.classList.contains('hidden')) {
-        // Show text
-        textContent.classList.remove('hidden');
-        toggleIcon.style.transform = 'rotate(180deg)';
-        toggleText.textContent = 'Hide Scene Text';
-      } else {
-        // Hide text
-        textContent.classList.add('hidden');
-        toggleIcon.style.transform = 'rotate(0deg)';
-        toggleText.textContent = 'Show Scene Text';
-      }
+}
+
+// Toggle Scene Text for Scene 2+ (same logic as Scene 1)
+function toggleSceneText(index) {
+  const textContent = document.getElementById(`sceneTextContent${index}`);
+  const toggleIcon = document.getElementById(`sceneTextIcon${index}`);
+  const toggleText = document.getElementById(`sceneTextToggle${index}`);
+
+  if (textContent && toggleIcon && toggleText) {
+    if (textContent.classList.contains('hidden')) {
+      // Show text
+      textContent.classList.remove('hidden');
+      toggleIcon.style.transform = 'rotate(180deg)';
+      toggleText.textContent = 'Hide Scene Text';
+    } else {
+      // Hide text
+      textContent.classList.add('hidden');
+      toggleIcon.style.transform = 'rotate(0deg)';
+      toggleText.textContent = 'Show Scene Text';
     }
   }
-  
-  // =====================================================================
-  // IMAGE REGENERATION - MIGRATED TO src/components/ImageModal.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  async function regenerateScene(index) {
-    if (window.regenerateSceneNew && typeof window.regenerateSceneNew === 'function') {
-      return window.regenerateSceneNew(index);
-    }
-    // Fallback to old implementation
-    // 🚨 FIX #3: Better error messages for regenerate
-    console.log('🔍 DEBUG regenerateScene called with index:', index);
-    console.log('🔍 DEBUG generatedScenes:', generatedScenes);
-    console.log('🔍 DEBUG generatedScenes length:', generatedScenes ? generatedScenes.length : 'null/undefined');
-    
-    if (!generatedScenes) {
-      console.error('❌ Cannot regenerate: generatedScenes array is null/undefined');
-      alert('⚠️ No scenes available. Please generate images first before trying to regenerate.');
-      return;
-    }
-    
-    // 🔧 FIX: Check if index is within bounds (not if scene is truthy)
-    if (index < 0 || index >= generatedScenes.length) {
-      console.error(`❌ Cannot regenerate: Index ${index} out of bounds (array length: ${generatedScenes.length})`);
-      alert(`⚠️ Scene ${index + 1} not found. Available scenes: ${generatedScenes.length}`);
-      return;
-    }
-    
-    const scene = generatedScenes[index];
-    if (!scene || typeof scene !== 'object') {
-      console.error(`❌ Cannot regenerate: Scene at index ${index} is null/undefined or not an object`);
-      console.error('Scene value:', scene);
-      console.error('Array contents:', JSON.stringify(generatedScenes, null, 2));
-      alert(`⚠️ Scene ${index + 1} data is missing. Please try regenerating all images.`);
-      return;
-    }
-    
-    if (!scene.prompt) {
-      console.error(`❌ Cannot regenerate: Scene at index ${index} has no prompt`);
-      alert(`⚠️ Scene ${index + 1} has no prompt. Please try regenerating all images.`);
-      return;
-    }
-    
-    console.log(`🔄 Regenerating scene ${index + 1}/${generatedScenes.length}...`);
-    
-    // ✅ FIX: Get settings from current project or use defaults
-    const settings = currentProjectData?.settings || { 
-      aspectRatio: '16:9', 
-      quality: 'better',
-      style: selectedStyle || { name: 'realistic' }
-    };
-    
-    console.log('📊 Using settings for regeneration:', JSON.stringify(settings, null, 2));
-    
-    // Show loading state with spinner
-    scene.imageUrl = null; // This will show the loading spinner
-    scene.error = null; // Clear any previous errors
+}
+
+// =====================================================================
+// IMAGE REGENERATION - MIGRATED TO src/components/ImageModal.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+async function regenerateScene(index) {
+  if (window.regenerateSceneNew && typeof window.regenerateSceneNew === 'function') {
+    return window.regenerateSceneNew(index);
+  }
+  // Fallback to old implementation
+  // 🚨 FIX #3: Better error messages for regenerate
+  console.log('🔍 DEBUG regenerateScene called with index:', index);
+  console.log('🔍 DEBUG generatedScenes:', generatedScenes);
+  console.log('🔍 DEBUG generatedScenes length:', generatedScenes ? generatedScenes.length : 'null/undefined');
+
+  if (!generatedScenes) {
+    console.error('❌ Cannot regenerate: generatedScenes array is null/undefined');
+    alert('⚠️ No scenes available. Please generate images first before trying to regenerate.');
+    return;
+  }
+
+  // 🔧 FIX: Check if index is within bounds (not if scene is truthy)
+  if (index < 0 || index >= generatedScenes.length) {
+    console.error(`❌ Cannot regenerate: Index ${index} out of bounds (array length: ${generatedScenes.length})`);
+    alert(`⚠️ Scene ${index + 1} not found. Available scenes: ${generatedScenes.length}`);
+    return;
+  }
+
+  const scene = generatedScenes[index];
+  if (!scene || typeof scene !== 'object') {
+    console.error(`❌ Cannot regenerate: Scene at index ${index} is null/undefined or not an object`);
+    console.error('Scene value:', scene);
+    console.error('Array contents:', JSON.stringify(generatedScenes, null, 2));
+    alert(`⚠️ Scene ${index + 1} data is missing. Please try regenerating all images.`);
+    return;
+  }
+
+  if (!scene.prompt) {
+    console.error(`❌ Cannot regenerate: Scene at index ${index} has no prompt`);
+    alert(`⚠️ Scene ${index + 1} has no prompt. Please try regenerating all images.`);
+    return;
+  }
+
+  console.log(`🔄 Regenerating scene ${index + 1}/${generatedScenes.length}...`);
+
+  // ✅ FIX: Get settings from current project or use defaults
+  const settings = currentProjectData?.settings || {
+    aspectRatio: '16:9',
+    quality: 'better',
+    style: selectedStyle || { name: 'realistic' }
+  };
+
+  console.log('📊 Using settings for regeneration:', JSON.stringify(settings, null, 2));
+
+  // Show loading state with spinner
+  scene.imageUrl = null; // This will show the loading spinner
+  scene.error = null; // Clear any previous errors
+  displayGeneratedScenes(generatedScenes);
+
+  console.log(`🎨 Using prompt: ${scene.prompt}`);
+  console.log(`📊 Quality: ${settings.quality}, Aspect: ${settings.aspectRatio}`);
+
+  try {
+    const imageUrl = await callOpenAIAPI(scene.prompt, settings);
+    console.log(`✅ Scene ${index + 1} regenerated successfully`);
+
+    generatedScenes[index].imageUrl = imageUrl;
+    generatedScenes[index].error = null;
     displayGeneratedScenes(generatedScenes);
-    
-    console.log(`🎨 Using prompt: ${scene.prompt}`);
-    console.log(`📊 Quality: ${settings.quality}, Aspect: ${settings.aspectRatio}`);
-    
-    try {
-      const imageUrl = await callOpenAIAPI(scene.prompt, settings);
-      console.log(`✅ Scene ${index + 1} regenerated successfully`);
-      
-      generatedScenes[index].imageUrl = imageUrl;
-      generatedScenes[index].error = null;
-      displayGeneratedScenes(generatedScenes);
-      
-      // Update stored project data
-      if (currentProjectData) {
-        currentProjectData.scenes = generatedScenes;
-      }
-      
-      // Show success message
-      alert(`✅ Scene ${index + 1} regenerated successfully!`);
-      
-    } catch (error) {
-      console.error(`❌ Error regenerating scene ${index + 1}:`, error);
-      generatedScenes[index].imageUrl = 'error';
-      generatedScenes[index].error = error.message;
-      displayGeneratedScenes(generatedScenes);
-      alert(`❌ Failed to regenerate scene ${index + 1}: ${error.message}`);
+
+    // Update stored project data
+    if (currentProjectData) {
+      currentProjectData.scenes = generatedScenes;
     }
+
+    // Show success message
+    alert(`✅ Scene ${index + 1} regenerated successfully!`);
+
+  } catch (error) {
+    console.error(`❌ Error regenerating scene ${index + 1}:`, error);
+    generatedScenes[index].imageUrl = 'error';
+    generatedScenes[index].error = error.message;
+    displayGeneratedScenes(generatedScenes);
+    alert(`❌ Failed to regenerate scene ${index + 1}: ${error.message}`);
   }
-  
-  // Download a single scene image
-  // =====================================================================
-  // IMAGE DOWNLOAD - MIGRATED TO src/components/ImageModal.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  async function downloadScene(index) {
-    if (window.downloadSceneNew && typeof window.downloadSceneNew === 'function') {
-      return window.downloadSceneNew(index);
-    }
-    // Fallback to old implementation
-    if (!generatedScenes || !generatedScenes[index]) return;
-    
-    const scene = generatedScenes[index];
-    if (!scene.imageUrl || scene.imageUrl === 'error') return;
-    
-    try {
-      console.log(`📥 Downloading scene ${scene.number}...`);
-      
-      // Use server proxy to avoid CORS issues
-      const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(scene.imageUrl)}`;
-      
-      // Create download link
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = proxyUrl;
-      a.download = `scene-${scene.number}.jpg`;
-      
-      document.body.appendChild(a);
-      a.click();
-      
-      // Cleanup
-      setTimeout(() => {
-        document.body.removeChild(a);
-      }, 100);
-      
-      console.log(`✅ Scene ${scene.number} download started`);
-      
-    } catch (error) {
-      console.error('Download failed:', error);
-      alert('Download failed. Please try again or contact support.');
-    }
+}
+
+// Download a single scene image
+// =====================================================================
+// IMAGE DOWNLOAD - MIGRATED TO src/components/ImageModal.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+async function downloadScene(index) {
+  if (window.downloadSceneNew && typeof window.downloadSceneNew === 'function') {
+    return window.downloadSceneNew(index);
   }
-  
-  // View scene detail in modal
-  // =====================================================================
-  // VIEW SCENE DETAIL - MIGRATED TO src/components/ImageModal.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  function viewSceneDetail(index) {
-    if (window.viewSceneDetailNew && typeof window.viewSceneDetailNew === 'function') {
-      return window.viewSceneDetailNew(index);
-    }
-    // Fallback to old implementation
-    if (!generatedScenes || !generatedScenes[index]) return;
-    
-    const scene = generatedScenes[index];
-    if (!scene.imageUrl || scene.imageUrl === 'error') return;
-    
-    // Create modal if it doesn't exist
-    let modal = document.getElementById('sceneDetailModal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'sceneDetailModal';
-      modal.className = 'fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center p-4';
-      modal.innerHTML = `
+  // Fallback to old implementation
+  if (!generatedScenes || !generatedScenes[index]) return;
+
+  const scene = generatedScenes[index];
+  if (!scene.imageUrl || scene.imageUrl === 'error') return;
+
+  try {
+    console.log(`📥 Downloading scene ${scene.number}...`);
+
+    // Use server proxy to avoid CORS issues
+    const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(scene.imageUrl)}`;
+
+    // Create download link
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = proxyUrl;
+    a.download = `scene-${scene.number}.jpg`;
+
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    setTimeout(() => {
+      document.body.removeChild(a);
+    }, 100);
+
+    console.log(`✅ Scene ${scene.number} download started`);
+
+  } catch (error) {
+    console.error('Download failed:', error);
+    alert('Download failed. Please try again or contact support.');
+  }
+}
+
+// View scene detail in modal
+// =====================================================================
+// VIEW SCENE DETAIL - MIGRATED TO src/components/ImageModal.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+function viewSceneDetail(index) {
+  if (window.viewSceneDetailNew && typeof window.viewSceneDetailNew === 'function') {
+    return window.viewSceneDetailNew(index);
+  }
+  // Fallback to old implementation
+  if (!generatedScenes || !generatedScenes[index]) return;
+
+  const scene = generatedScenes[index];
+  if (!scene.imageUrl || scene.imageUrl === 'error') return;
+
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('sceneDetailModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'sceneDetailModal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center p-4';
+    modal.innerHTML = `
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
           <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white" id="sceneDetailTitle"></h2>
@@ -2877,401 +2871,401 @@ btn.innerHTML = `
           </div>
         </div>
       `;
-      document.body.appendChild(modal);
-      
-      // Close on background click
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeSceneDetailModal();
-      });
-    }
-    
-    // Update modal content
-    document.getElementById('sceneDetailTitle').textContent = `Scene ${scene.number} (${scene.startTime} - ${scene.endTime})`;
-    document.getElementById('sceneDetailImage').src = scene.imageUrl;
-    document.getElementById('sceneDetailText').textContent = scene.text;
-    
-    // Show modal
+    document.body.appendChild(modal);
+
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeSceneDetailModal();
+    });
+  }
+
+  // Update modal content
+  document.getElementById('sceneDetailTitle').textContent = `Scene ${scene.number} (${scene.startTime} - ${scene.endTime})`;
+  document.getElementById('sceneDetailImage').src = scene.imageUrl;
+  document.getElementById('sceneDetailText').textContent = scene.text;
+
+  // Show modal
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeSceneDetailModal() {
+  const modal = document.getElementById('sceneDetailModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+// Open generated media modal
+function openGeneratedMediaModal() {
+  const modal = document.getElementById('generatedMediaModal');
+  if (modal) {
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
-  
-  function closeSceneDetailModal() {
-    const modal = document.getElementById('sceneDetailModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
+}
+
+function closeGeneratedMediaModal() {
+  const modal = document.getElementById('generatedMediaModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
   }
-  
-  // Open generated media modal
-  function openGeneratedMediaModal() {
-    const modal = document.getElementById('generatedMediaModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
+}
+
+// Download all media as ZIP
+async function downloadAllMedia() {
+  if (!currentProjectData) {
+    alert('No media to download!');
+    return;
   }
-  
-  function closeGeneratedMediaModal() {
-    const modal = document.getElementById('generatedMediaModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+
+  const btn = document.getElementById('downloadAllMediaBtn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Preparing...';
+  btn.disabled = true;
+
+  try {
+    // Load JSZip library
+    if (typeof JSZip === 'undefined') {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
     }
-  }
-  
-  // Download all media as ZIP
-  async function downloadAllMedia() {
-    if (!currentProjectData) {
-      alert('No media to download!');
-      return;
-    }
-    
-    const btn = document.getElementById('downloadAllMediaBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Preparing...';
-    btn.disabled = true;
-    
-    try {
-      // Load JSZip library
-      if (typeof JSZip === 'undefined') {
-        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
-      }
-      
-      const zip = new JSZip();
-      
-      // Create folder name from first 3 words of SCRIPT (not title)
-      const scriptWords = currentProjectData.script.trim().split(/\s+/);
-      const displayName = scriptWords.slice(0, 3)
-        .map(word => word.replace(/[^a-z0-9]/gi, ''))
-        .filter(word => word.length > 0)
-        .join(' ') || 'story';
-      const folderName = displayName.replace(/\s+/g, '_'); // For internal use
-      const folder = zip.folder(folderName + '_media');
-      
-      // Add script
-      folder.file('script.txt', currentProjectData.script);
-      
-      // Add timestamps
-      const timestamps = currentProjectData.scenes.map(s => 
-        `Scene ${s.number}: ${s.startTime} - ${s.endTime}`
-      ).join('\n');
-      folder.file('timestamps.txt', timestamps);
-      
-      // Add images folder
-      const imagesFolder = folder.folder('images');
-      let successCount = 0;
-      let failCount = 0;
-      
-      for (const scene of currentProjectData.scenes) {
-        if (scene.imageUrl && scene.imageUrl !== 'error') {
-          try {
-            // Use server proxy to avoid CORS issues
-            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(scene.imageUrl)}`;
-            const response = await fetch(proxyUrl);
-            
-            if (!response.ok) throw new Error('Fetch failed');
-            
-            const imageBlob = await response.blob();
-            imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}.jpg`, imageBlob);
-            successCount++;
-          } catch (error) {
-            console.warn(`Failed to download scene ${scene.number} image:`, error);
-            failCount++;
-            // Add a text file explaining the issue
-            imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}_URL.txt`, 
-              `Image URL (download manually if needed):\n${scene.imageUrl}`);
-          }
-        }
-      }
-      
-      // Add audio if available
-      if (generatedAudioUrl) {
+
+    const zip = new JSZip();
+
+    // Create folder name from first 3 words of SCRIPT (not title)
+    const scriptWords = currentProjectData.script.trim().split(/\s+/);
+    const displayName = scriptWords.slice(0, 3)
+      .map(word => word.replace(/[^a-z0-9]/gi, ''))
+      .filter(word => word.length > 0)
+      .join(' ') || 'story';
+    const folderName = displayName.replace(/\s+/g, '_'); // For internal use
+    const folder = zip.folder(folderName + '_media');
+
+    // Add script
+    folder.file('script.txt', currentProjectData.script);
+
+    // Add timestamps
+    const timestamps = currentProjectData.scenes.map(s =>
+      `Scene ${s.number}: ${s.startTime} - ${s.endTime}`
+    ).join('\n');
+    folder.file('timestamps.txt', timestamps);
+
+    // Add images folder
+    const imagesFolder = folder.folder('images');
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const scene of currentProjectData.scenes) {
+      if (scene.imageUrl && scene.imageUrl !== 'error') {
         try {
-          const audioFolder = folder.folder('audio');
-          const audioBlob = await fetch(generatedAudioUrl).then(r => r.blob());
-          audioFolder.file(displayName + ' voiceover.mp3', audioBlob);
+          // Use server proxy to avoid CORS issues
+          const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(scene.imageUrl)}`;
+          const response = await fetch(proxyUrl);
+
+          if (!response.ok) throw new Error('Fetch failed');
+
+          const imageBlob = await response.blob();
+          imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}.jpg`, imageBlob);
+          successCount++;
         } catch (error) {
-          console.warn('Failed to download audio:', error);
-          // Add audio URL as text file
-          folder.file('audio_URL.txt', `Audio URL:\n${generatedAudioUrl}`);
+          console.warn(`Failed to download scene ${scene.number} image:`, error);
+          failCount++;
+          // Add a text file explaining the issue
+          imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}_URL.txt`,
+            `Image URL (download manually if needed):\n${scene.imageUrl}`);
         }
       }
-      
-      // Add download info
-      if (failCount > 0) {
-        folder.file('DOWNLOAD_INFO.txt', 
-          `Download Summary:\n` +
-          `✅ Successfully downloaded: ${successCount} images\n` +
-          `❌ Failed to download: ${failCount} images\n\n` +
-          `Failed images have been saved as URL text files.\n` +
-          `You can download them manually by opening the URLs in your browser.`
-        );
+    }
+
+    // Add audio if available
+    if (generatedAudioUrl) {
+      try {
+        const audioFolder = folder.folder('audio');
+        const audioBlob = await fetch(generatedAudioUrl).then(r => r.blob());
+        audioFolder.file(displayName + ' voiceover.mp3', audioBlob);
+      } catch (error) {
+        console.warn('Failed to download audio:', error);
+        // Add audio URL as text file
+        folder.file('audio_URL.txt', `Audio URL:\n${generatedAudioUrl}`);
       }
-      
-      // Generate and download zip
-      btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Creating ZIP...';
-      const content = await zip.generateAsync({ type: 'blob' });
-      
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = displayName + ' media.zip'; // Use displayName with space
-      link.click();
-      
-      URL.revokeObjectURL(link.href);
-      
-      // Show success message
-      if (failCount > 0) {
-        alert(`✅ Download Complete!\n\n` +
-              `Successfully downloaded: ${successCount} images\n` +
-              `Failed: ${failCount} images (URLs saved as text files)\n\n` +
-              `Check the ZIP file for details.`);
-      } else {
-        alert('✅ Download Complete!\n\nAll media files have been packaged successfully.');
+    }
+
+    // Add download info
+    if (failCount > 0) {
+      folder.file('DOWNLOAD_INFO.txt',
+        `Download Summary:\n` +
+        `✅ Successfully downloaded: ${successCount} images\n` +
+        `❌ Failed to download: ${failCount} images\n\n` +
+        `Failed images have been saved as URL text files.\n` +
+        `You can download them manually by opening the URLs in your browser.`
+      );
+    }
+
+    // Generate and download zip
+    btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Creating ZIP...';
+    const content = await zip.generateAsync({ type: 'blob' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = displayName + ' media.zip'; // Use displayName with space
+    link.click();
+
+    URL.revokeObjectURL(link.href);
+
+    // Show success message
+    if (failCount > 0) {
+      alert(`✅ Download Complete!\n\n` +
+        `Successfully downloaded: ${successCount} images\n` +
+        `Failed: ${failCount} images (URLs saved as text files)\n\n` +
+        `Check the ZIP file for details.`);
+    } else {
+      alert('✅ Download Complete!\n\nAll media files have been packaged successfully.');
+    }
+  } catch (error) {
+    alert('Error creating download: ' + error.message);
+    console.error(error);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+// =====================================================================
+// VIDEO RENDERING - MIGRATED TO src/components/VideoRenderer.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Render videos with FFmpeg (automatic MP4 generation)
+async function renderVideos() {
+  if (window.renderVideosNew && typeof window.renderVideosNew === 'function' && currentProjectData) {
+    try {
+      const renderData = await window.renderVideosNew(currentProjectData);
+      if (renderData) {
+        // Show download modal
+        if (window.showVideoDownloadModalNew && typeof window.showVideoDownloadModalNew === 'function') {
+          window.showVideoDownloadModalNew(renderData, currentProjectData);
+        }
+
+        // Save full video to library (if rendered)
+        if (renderData.renderFullVideo && renderData.finalVideo) {
+          const styles = JSON.parse(localStorage.getItem('styles') || '[]');
+          const currentStyleIdx = parseInt(localStorage.getItem('currentStyleIdx') || '0');
+          const currentStyle = styles[currentStyleIdx];
+
+          // Smart title: use input, or first 3 words from script, or default
+          let videoTitle = document.getElementById('video-title')?.value?.trim() || '';
+          if (!videoTitle) {
+            const scriptEl = document.getElementById('scriptContent');
+            const scriptText = scriptEl?.textContent || scriptEl?.innerText || '';
+            if (scriptText) {
+              const words = scriptText.trim().split(/\s+/);
+              videoTitle = words.slice(0, 3).join(' ');
+              if (words.length > 3) videoTitle += '...';
+            }
+          }
+          if (!videoTitle) {
+            videoTitle = 'Untitled Video';
+          }
+
+          const videoData = {
+            id: renderData.sessionId,
+            title: videoTitle,
+            createdAt: new Date().toISOString(),
+            duration: 'N/A',
+            videoUrl: renderData.finalVideo,
+            audioUrl: renderData.audio || null,
+            script: renderData.script || '',
+            images: renderData.images || [],
+            wordCount: currentStyle?.wordCount || 0,
+            styleId: currentStyleIdx,
+            styleName: currentStyle?.name || 'Unknown Style',
+            sessionId: renderData.sessionId,
+            uploadedToYouTube: false,
+            youtubeUrl: null
+          };
+
+          if (window.saveVideoToLibraryNew && typeof window.saveVideoToLibraryNew === 'function') {
+            window.saveVideoToLibraryNew(videoData);
+          }
+        }
       }
+      return;
     } catch (error) {
-      alert('Error creating download: ' + error.message);
-      console.error(error);
-    } finally {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
+      console.error('Error in new renderVideos:', error);
+      alert('❌ Error Rendering Videos\n\n' + error.message + '\n\nPlease try again or contact support.');
+      return;
     }
   }
-  
-  // =====================================================================
-  // VIDEO RENDERING - MIGRATED TO src/components/VideoRenderer.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Render videos with FFmpeg (automatic MP4 generation)
-  async function renderVideos() {
-    if (window.renderVideosNew && typeof window.renderVideosNew === 'function' && currentProjectData) {
-      try {
-        const renderData = await window.renderVideosNew(currentProjectData);
-        if (renderData) {
-          // Show download modal
-          if (window.showVideoDownloadModalNew && typeof window.showVideoDownloadModalNew === 'function') {
-            window.showVideoDownloadModalNew(renderData, currentProjectData);
-          }
-          
-          // Save full video to library (if rendered)
-          if (renderData.renderFullVideo && renderData.finalVideo) {
-            const styles = JSON.parse(localStorage.getItem('styles') || '[]');
-            const currentStyleIdx = parseInt(localStorage.getItem('currentStyleIdx') || '0');
-            const currentStyle = styles[currentStyleIdx];
-            
-            // Smart title: use input, or first 3 words from script, or default
-            let videoTitle = document.getElementById('video-title')?.value?.trim() || '';
-            if (!videoTitle) {
-              const scriptEl = document.getElementById('scriptContent');
-              const scriptText = scriptEl?.textContent || scriptEl?.innerText || '';
-              if (scriptText) {
-                const words = scriptText.trim().split(/\s+/);
-                videoTitle = words.slice(0, 3).join(' ');
-                if (words.length > 3) videoTitle += '...';
-              }
-            }
-            if (!videoTitle) {
-              videoTitle = 'Untitled Video';
-            }
-            
-            const videoData = {
-              id: renderData.sessionId,
-              title: videoTitle,
-              createdAt: new Date().toISOString(),
-              duration: 'N/A',
-              videoUrl: renderData.finalVideo,
-              audioUrl: renderData.audio || null,
-              script: renderData.script || '',
-              images: renderData.images || [],
-              wordCount: currentStyle?.wordCount || 0,
-              styleId: currentStyleIdx,
-              styleName: currentStyle?.name || 'Unknown Style',
-              sessionId: renderData.sessionId,
-              uploadedToYouTube: false,
-              youtubeUrl: null
-            };
-            
-            if (window.saveVideoToLibraryNew && typeof window.saveVideoToLibraryNew === 'function') {
-              window.saveVideoToLibraryNew(videoData);
-            }
-          }
-        }
-        return;
-      } catch (error) {
-        console.error('Error in new renderVideos:', error);
-        alert('❌ Error Rendering Videos\n\n' + error.message + '\n\nPlease try again or contact support.');
-        return;
+  // Fallback to old implementation
+  if (!currentProjectData || !currentProjectData.scenes) {
+    alert('⚠️ No media to render! Please generate images first.');
+    return;
+  }
+
+  // Validate all scenes have images
+  const missingImages = currentProjectData.scenes.filter(s => !s.imageUrl || s.imageUrl === 'error');
+  if (missingImages.length > 0) {
+    alert(`⚠️ Cannot render videos: ${missingImages.length} scene(s) are missing images.\n\nPlease regenerate missing images first.`);
+    return;
+  }
+
+  const btn = document.getElementById('renderVideosBtn');
+  const originalText = btn.innerHTML;
+
+  try {
+    // Step 1: Check if FFmpeg is available on server
+    btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Checking FFmpeg...';
+    btn.disabled = true;
+
+    const statusResponse = await fetch(`${API_BASE_URL}/api/ffmpeg-status`);
+    const statusData = await statusResponse.json();
+
+    if (!statusData.installed) {
+      // FFmpeg not available - offer manual download
+      const userChoice = confirm(
+        '⚠️ Automatic Video Rendering Not Available\n\n' +
+        'FFmpeg is not installed on the server. You have two options:\n\n' +
+        '1. Click OK to download images + audio + instructions for manual editing\n' +
+        '2. Click Cancel and contact support to enable automatic rendering\n\n' +
+        'Would you like to download the manual rendering package?'
+      );
+
+      if (userChoice) {
+        await renderVideosManual(); // Fallback to old method
       }
-    }
-    // Fallback to old implementation
-    if (!currentProjectData || !currentProjectData.scenes) {
-      alert('⚠️ No media to render! Please generate images first.');
       return;
     }
-    
-    // Validate all scenes have images
-    const missingImages = currentProjectData.scenes.filter(s => !s.imageUrl || s.imageUrl === 'error');
-    if (missingImages.length > 0) {
-      alert(`⚠️ Cannot render videos: ${missingImages.length} scene(s) are missing images.\n\nPlease regenerate missing images first.`);
-      return;
+
+    // Step 2: Send render request with accurate scene data
+    btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Rendering Videos...';
+
+    console.log('🎬 Sending render request to server...');
+    console.log('   Scenes:', currentProjectData.scenes.length);
+    console.log('   Audio URL:', generatedAudioUrl ? 'Available' : 'None');
+
+    // Validate all scene image URLs before sending
+    console.log('🔍 Validating scene image URLs...');
+    for (let i = 0; i < currentProjectData.scenes.length; i++) {
+      const scene = currentProjectData.scenes[i];
+      console.log(`   Scene ${i + 1}: imageUrl = ${scene.imageUrl ? scene.imageUrl.substring(0, 60) + '...' : 'MISSING'}`);
+
+      if (!scene.imageUrl || scene.imageUrl === 'error' || scene.imageUrl === '') {
+        throw new Error(`Scene ${i + 1} is missing a valid image URL. Please regenerate that scene's image.`);
+      }
+
+      if (!scene.imageUrl.startsWith('http://') && !scene.imageUrl.startsWith('https://')) {
+        throw new Error(`Scene ${i + 1} has invalid image URL: ${scene.imageUrl.substring(0, 50)}`);
+      }
     }
-    
-    const btn = document.getElementById('renderVideosBtn');
-    const originalText = btn.innerHTML;
-    
-    try {
-      // Step 1: Check if FFmpeg is available on server
-      btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Checking FFmpeg...';
-      btn.disabled = true;
-      
-      const statusResponse = await fetch(`${API_BASE_URL}/api/ffmpeg-status`);
-      const statusData = await statusResponse.json();
-      
-      if (!statusData.installed) {
-        // FFmpeg not available - offer manual download
-        const userChoice = confirm(
-          '⚠️ Automatic Video Rendering Not Available\n\n' +
-          'FFmpeg is not installed on the server. You have two options:\n\n' +
-          '1. Click OK to download images + audio + instructions for manual editing\n' +
-          '2. Click Cancel and contact support to enable automatic rendering\n\n' +
-          'Would you like to download the manual rendering package?'
-        );
-        
-        if (userChoice) {
-          await renderVideosManual(); // Fallback to old method
+    console.log('✅ All scene images validated');
+
+    // Get transition settings from localStorage (default: fade, 0.5s)
+    const transitionType = localStorage.getItem('transitionType') || 'fade';
+    const transitionDuration = parseFloat(localStorage.getItem('transitionDuration') || '0.5');
+
+    // ✅ Read from localStorage (saved in Transition Settings modal)
+    const enableTransitionsValue = localStorage.getItem('enableTransitions');
+    console.log('🔍 DEBUG - localStorage enableTransitions:', enableTransitionsValue, typeof enableTransitionsValue);
+
+    const enableTransitions = enableTransitionsValue === 'true';
+    const renderFullVideo = enableTransitions; // Use transition checkbox state for full video
+
+    console.log('🎬 Transition settings:', { type: transitionType, duration: transitionDuration });
+    console.log('🎬 Render full merged video:', renderFullVideo ? '✅ YES' : '❌ NO (individual scenes only)');
+    console.log('🔍 DEBUG - Project name being sent:', currentProjectData.title);
+
+    if (renderFullVideo) {
+      console.log('✨ You will get: Individual scenes + 1 merged video with transitions');
+    } else {
+      console.log('📹 You will get: Individual scenes only (no merged video)');
+    }
+
+    const renderResponse = await fetch(`${API_BASE_URL}/api/render-videos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scenes: currentProjectData.scenes.map(s => ({
+          number: s.number,
+          imageUrl: s.imageUrl,
+          startTime: s.startTime,
+          endTime: s.endTime,
+          startSeconds: s.startSeconds,
+          endSeconds: s.endSeconds,
+          duration: (s.endSeconds - s.startSeconds).toFixed(3),
+          text: s.text || '' // Include scene text for script.txt
+        })),
+        audioUrl: generatedAudioUrl,
+        projectName: currentProjectData.title,
+        renderFullVideo: renderFullVideo, // ✅ NEW: Send flag to backend
+        transition: {
+          type: transitionType,
+          duration: transitionDuration
         }
-        return;
-      }
-      
-      // Step 2: Send render request with accurate scene data
-      btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Rendering Videos...';
-      
-      console.log('🎬 Sending render request to server...');
-      console.log('   Scenes:', currentProjectData.scenes.length);
-      console.log('   Audio URL:', generatedAudioUrl ? 'Available' : 'None');
-      
-      // Validate all scene image URLs before sending
-      console.log('🔍 Validating scene image URLs...');
-      for (let i = 0; i < currentProjectData.scenes.length; i++) {
-        const scene = currentProjectData.scenes[i];
-        console.log(`   Scene ${i + 1}: imageUrl = ${scene.imageUrl ? scene.imageUrl.substring(0, 60) + '...' : 'MISSING'}`);
-        
-        if (!scene.imageUrl || scene.imageUrl === 'error' || scene.imageUrl === '') {
-          throw new Error(`Scene ${i + 1} is missing a valid image URL. Please regenerate that scene's image.`);
+      })
+    });
+
+    if (!renderResponse.ok) {
+      const errorData = await renderResponse.json();
+      throw new Error(errorData.message || 'Rendering failed');
+    }
+
+    const renderData = await renderResponse.json();
+
+    if (!renderData.success) {
+      throw new Error(renderData.message || 'Rendering failed');
+    }
+
+    console.log('✅ Videos rendered successfully!');
+    console.log('   Session ID:', renderData.sessionId);
+
+    // Save full video to library (if rendered)
+    if (renderData.renderFullVideo && renderData.finalVideo) {
+      const currentStyle = styles[currentStyleIdx];
+
+      // Smart title: use input, or first 3 words from script, or default
+      let videoTitle = document.getElementById('video-title')?.value?.trim() || '';
+      if (!videoTitle) {
+        // Get actual script text from DOM
+        const scriptEl = document.getElementById('scriptContent');
+        const scriptText = scriptEl?.textContent || scriptEl?.innerText || '';
+
+        if (scriptText) {
+          // Get first 3 words from script
+          const words = scriptText.trim().split(/\s+/);
+          videoTitle = words.slice(0, 3).join(' ');
+          if (words.length > 3) videoTitle += '...';
         }
-        
-        if (!scene.imageUrl.startsWith('http://') && !scene.imageUrl.startsWith('https://')) {
-          throw new Error(`Scene ${i + 1} has invalid image URL: ${scene.imageUrl.substring(0, 50)}`);
-        }
       }
-      console.log('✅ All scene images validated');
-      
-      // Get transition settings from localStorage (default: fade, 0.5s)
-      const transitionType = localStorage.getItem('transitionType') || 'fade';
-      const transitionDuration = parseFloat(localStorage.getItem('transitionDuration') || '0.5');
-      
-      // ✅ Read from localStorage (saved in Transition Settings modal)
-      const enableTransitionsValue = localStorage.getItem('enableTransitions');
-      console.log('🔍 DEBUG - localStorage enableTransitions:', enableTransitionsValue, typeof enableTransitionsValue);
-      
-      const enableTransitions = enableTransitionsValue === 'true';
-      const renderFullVideo = enableTransitions; // Use transition checkbox state for full video
-      
-      console.log('🎬 Transition settings:', { type: transitionType, duration: transitionDuration });
-      console.log('🎬 Render full merged video:', renderFullVideo ? '✅ YES' : '❌ NO (individual scenes only)');
-      console.log('🔍 DEBUG - Project name being sent:', currentProjectData.title);
-      
-      if (renderFullVideo) {
-        console.log('✨ You will get: Individual scenes + 1 merged video with transitions');
-      } else {
-        console.log('📹 You will get: Individual scenes only (no merged video)');
+      if (!videoTitle) {
+        videoTitle = 'Untitled Video';
       }
-      
-      const renderResponse = await fetch(`${API_BASE_URL}/api/render-videos`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scenes: currentProjectData.scenes.map(s => ({
-            number: s.number,
-            imageUrl: s.imageUrl,
-            startTime: s.startTime,
-            endTime: s.endTime,
-            startSeconds: s.startSeconds,
-            endSeconds: s.endSeconds,
-            duration: (s.endSeconds - s.startSeconds).toFixed(3),
-            text: s.text || '' // Include scene text for script.txt
-          })),
-          audioUrl: generatedAudioUrl,
-          projectName: currentProjectData.title,
-          renderFullVideo: renderFullVideo, // ✅ NEW: Send flag to backend
-          transition: {
-            type: transitionType,
-            duration: transitionDuration
-          }
-        })
-      });
-      
-      if (!renderResponse.ok) {
-        const errorData = await renderResponse.json();
-        throw new Error(errorData.message || 'Rendering failed');
-      }
-      
-      const renderData = await renderResponse.json();
-      
-      if (!renderData.success) {
-        throw new Error(renderData.message || 'Rendering failed');
-      }
-      
-      console.log('✅ Videos rendered successfully!');
-      console.log('   Session ID:', renderData.sessionId);
-      
-      // Save full video to library (if rendered)
-      if (renderData.renderFullVideo && renderData.finalVideo) {
-        const currentStyle = styles[currentStyleIdx];
-        
-        // Smart title: use input, or first 3 words from script, or default
-        let videoTitle = document.getElementById('video-title')?.value?.trim() || '';
-        if (!videoTitle) {
-          // Get actual script text from DOM
-          const scriptEl = document.getElementById('scriptContent');
-          const scriptText = scriptEl?.textContent || scriptEl?.innerText || '';
-          
-          if (scriptText) {
-            // Get first 3 words from script
-            const words = scriptText.trim().split(/\s+/);
-            videoTitle = words.slice(0, 3).join(' ');
-            if (words.length > 3) videoTitle += '...';
-          }
-        }
-        if (!videoTitle) {
-          videoTitle = 'Untitled Video';
-        }
-        
-        const videoData = {
-          id: renderData.sessionId,
-          title: videoTitle,
-          createdAt: new Date().toISOString(),
-          duration: 'N/A',
-          videoUrl: renderData.finalVideo,
-          audioUrl: renderData.audio || null,
-          script: renderData.script || '',
-          images: renderData.images || [],
-          wordCount: currentStyle?.wordCount || 0,
-          styleId: currentStyleIdx,
-          styleName: currentStyle?.name || 'Unknown Style',
-          sessionId: renderData.sessionId,
-          uploadedToYouTube: false,
-          youtubeUrl: null
-        };
-        saveVideoToLibrary(videoData);
-        console.log('💾 Video saved to library:', videoData.title);
-      }
-      
-      // Step 3: Show download modal
-      btn.innerHTML = 'Complete!';
-      
-      // Build full video section conditionally
-      const fullVideoSection = renderData.renderFullVideo && renderData.finalVideo ? `
+
+      const videoData = {
+        id: renderData.sessionId,
+        title: videoTitle,
+        createdAt: new Date().toISOString(),
+        duration: 'N/A',
+        videoUrl: renderData.finalVideo,
+        audioUrl: renderData.audio || null,
+        script: renderData.script || '',
+        images: renderData.images || [],
+        wordCount: currentStyle?.wordCount || 0,
+        styleId: currentStyleIdx,
+        styleName: currentStyle?.name || 'Unknown Style',
+        sessionId: renderData.sessionId,
+        uploadedToYouTube: false,
+        youtubeUrl: null
+      };
+      saveVideoToLibrary(videoData);
+      console.log('💾 Video saved to library:', videoData.title);
+    }
+
+    // Step 3: Show download modal
+    btn.innerHTML = 'Complete!';
+
+    // Build full video section conditionally
+    const fullVideoSection = renderData.renderFullVideo && renderData.finalVideo ? `
         <div class="mb-6 p-4 bg-gradient-to-r from-[#5B7FFF]/5 to-[#5B7FFF]/10 dark:from-gray-700 dark:to-gray-600 rounded-lg border-2 border-[#5B7FFF]/20 dark:border-[#5B7FFF]/30">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -3299,9 +3293,9 @@ btn.innerHTML = `
           </div>
         </div>
       ` : '';
-      
-      // Build audio link if available
-      const audioSection = renderData.audio ? `
+
+    // Build audio link if available
+    const audioSection = renderData.audio ? `
         <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mb-3">
           <div class="flex items-center gap-2">
             <svg class="w-5 h-5 text-[#5B7FFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3318,9 +3312,9 @@ btn.innerHTML = `
           </a>
         </div>
       ` : '';
-      
-      // Create download modal
-      const modalHTML = `
+
+    // Create download modal
+    const modalHTML = `
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" id="videoDownloadModal">
           <div class="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -3409,587 +3403,587 @@ btn.innerHTML = `
           </div>
         </div>
       `;
-      
-      document.body.insertAdjacentHTML('beforeend', modalHTML);
-      
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-      }, 2000);
-      
-    } catch (error) {
-      console.error('❌ Error rendering videos:', error);
-      alert('❌ Error Rendering Videos\n\n' + error.message + '\n\nPlease try again or contact support.');
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    setTimeout(() => {
       btn.innerHTML = originalText;
-    } finally {
-      btn.disabled = false;
-    }
+    }, 2000);
+
+  } catch (error) {
+    console.error('❌ Error rendering videos:', error);
+    alert('❌ Error Rendering Videos\n\n' + error.message + '\n\nPlease try again or contact support.');
+    btn.innerHTML = originalText;
+  } finally {
+    btn.disabled = false;
   }
-  
-  // Fallback: Manual rendering package (when FFmpeg not available)
-  async function renderVideosManual() {
-    const btn = document.getElementById('renderVideosBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Creating Package...';
-    btn.disabled = true;
-    
-    try {
-      // Load JSZip library
-      if (typeof JSZip === 'undefined') {
-        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
-      }
-      
-      const zip = new JSZip();
-      
-      // Create folder name from first 3 words of title
-      const titleWords = currentProjectData.title.trim().split(/\s+/);
-      const folderName = titleWords.slice(0, 3).join('_').replace(/[^a-z0-9_]/gi, '').toLowerCase() || 'story';
-      const folder = zip.folder(folderName + '_manual_render');
-      
-      // Add all media
-      folder.file('script.txt', currentProjectData.script);
-      folder.file('timestamps.txt', currentProjectData.scenes.map(s => 
-        `Scene ${s.number}: ${s.startTime} - ${s.endTime} (Duration: ${(s.endSeconds - s.startSeconds).toFixed(2)}s)`
-      ).join('\n'));
-      
-      // Add images
-      const imagesFolder = folder.folder('images');
-      let successCount = 0;
-      let failCount = 0;
-      
-      for (const scene of currentProjectData.scenes) {
-        if (scene.imageUrl && scene.imageUrl !== 'error') {
-          try {
-            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(scene.imageUrl)}`;
-            const response = await fetch(proxyUrl);
-            
-            if (!response.ok) throw new Error('Fetch failed');
-            
-            const imageBlob = await response.blob();
-            imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}.jpg`, imageBlob);
-            successCount++;
-          } catch (error) {
-            console.warn(`Failed to download scene ${scene.number} image:`, error);
-            failCount++;
-            imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}_URL.txt`, 
-              `Image URL:\n${scene.imageUrl}`);
-          }
-        }
-      }
-      
-      // Add rendering guide
-      const videosFolder = folder.folder('videos');
-      let renderGuide = '═══════════════════════════════════════════════════════\n';
-      renderGuide += '   MANUAL VIDEO RENDERING INSTRUCTIONS\n';
-      renderGuide += '═══════════════════════════════════════════════════════\n\n';
-      renderGuide += 'Use CapCut, DaVinci Resolve, or Adobe Premiere:\n\n';
-      
-      currentProjectData.scenes.forEach(s => {
-        const duration = (s.endSeconds - s.startSeconds).toFixed(2);
-        renderGuide += `Scene ${s.number}: ${duration}s (${s.startTime} - ${s.endTime})\n`;
-      });
-      
-      videosFolder.file('RENDERING_GUIDE.txt', renderGuide);
-      
-      // Add audio
-      if (generatedAudioUrl) {
+}
+
+// Fallback: Manual rendering package (when FFmpeg not available)
+async function renderVideosManual() {
+  const btn = document.getElementById('renderVideosBtn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<div class="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Creating Package...';
+  btn.disabled = true;
+
+  try {
+    // Load JSZip library
+    if (typeof JSZip === 'undefined') {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    }
+
+    const zip = new JSZip();
+
+    // Create folder name from first 3 words of title
+    const titleWords = currentProjectData.title.trim().split(/\s+/);
+    const folderName = titleWords.slice(0, 3).join('_').replace(/[^a-z0-9_]/gi, '').toLowerCase() || 'story';
+    const folder = zip.folder(folderName + '_manual_render');
+
+    // Add all media
+    folder.file('script.txt', currentProjectData.script);
+    folder.file('timestamps.txt', currentProjectData.scenes.map(s =>
+      `Scene ${s.number}: ${s.startTime} - ${s.endTime} (Duration: ${(s.endSeconds - s.startSeconds).toFixed(2)}s)`
+    ).join('\n'));
+
+    // Add images
+    const imagesFolder = folder.folder('images');
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const scene of currentProjectData.scenes) {
+      if (scene.imageUrl && scene.imageUrl !== 'error') {
         try {
-          const audioBlob = await fetch(generatedAudioUrl).then(r => r.blob());
-          folder.file(folderName + '_voiceover.mp3', audioBlob);
+          const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(scene.imageUrl)}`;
+          const response = await fetch(proxyUrl);
+
+          if (!response.ok) throw new Error('Fetch failed');
+
+          const imageBlob = await response.blob();
+          imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}.jpg`, imageBlob);
+          successCount++;
         } catch (error) {
-          console.warn('Failed to download audio:', error);
-          folder.file('audio_URL.txt', `Audio URL:\n${generatedAudioUrl}`);
+          console.warn(`Failed to download scene ${scene.number} image:`, error);
+          failCount++;
+          imagesFolder.file(`scene_${String(scene.number).padStart(3, '0')}_URL.txt`,
+            `Image URL:\n${scene.imageUrl}`);
         }
       }
-      
-      // Generate and download
-      const content = await zip.generateAsync({ type: 'blob' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = folderName + '_manual_render.zip';
-      link.click();
-      URL.revokeObjectURL(link.href);
-      
-      alert('✅ Manual Render Package Downloaded!\n\nFollow the instructions in RENDERING_GUIDE.txt');
-    } catch (error) {
-      alert('Error creating package: ' + error.message);
-      console.error(error);
-    } finally {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
     }
-  }
-  
-  function restartGeneration() {
-    if (confirm('Are you sure you want to restart? This will clear all generated media.')) {
-      generatedScenes = [];
-      currentProjectData = null;
-      closeGeneratedMediaModal();
-      openImageModal();
-    }
-  }
-  
-  // Helper to load external scripts
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
+
+    // Add rendering guide
+    const videosFolder = folder.folder('videos');
+    let renderGuide = '═══════════════════════════════════════════════════════\n';
+    renderGuide += '   MANUAL VIDEO RENDERING INSTRUCTIONS\n';
+    renderGuide += '═══════════════════════════════════════════════════════\n\n';
+    renderGuide += 'Use CapCut, DaVinci Resolve, or Adobe Premiere:\n\n';
+
+    currentProjectData.scenes.forEach(s => {
+      const duration = (s.endSeconds - s.startSeconds).toFixed(2);
+      renderGuide += `Scene ${s.number}: ${duration}s (${s.startTime} - ${s.endTime})\n`;
     });
-  }
 
+    videosFolder.file('RENDERING_GUIDE.txt', renderGuide);
 
-
-  // =====================================================================
-  // UI INITIALIZATION - MIGRATED TO src/components/AppInitializer.js
-  // These functions are kept here for backward compatibility
-  // They will use the new AppInitializer if available, otherwise fallback to old implementation
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-
-  // Initialize UI after DOM is loaded
-  // Note: This is now handled by src/app.js, but kept here for backward compatibility
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      // New UI initializer will handle this, but we keep this as fallback
-      if (!window.initializeUI || typeof window.initializeUI !== 'function') {
-        initializeUI();
+    // Add audio
+    if (generatedAudioUrl) {
+      try {
+        const audioBlob = await fetch(generatedAudioUrl).then(r => r.blob());
+        folder.file(folderName + '_voiceover.mp3', audioBlob);
+      } catch (error) {
+        console.warn('Failed to download audio:', error);
+        folder.file('audio_URL.txt', `Audio URL:\n${generatedAudioUrl}`);
       }
-    });
-  } else {
-    // DOM already loaded
+    }
+
+    // Generate and download
+    const content = await zip.generateAsync({ type: 'blob' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = folderName + '_manual_render.zip';
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    alert('✅ Manual Render Package Downloaded!\n\nFollow the instructions in RENDERING_GUIDE.txt');
+  } catch (error) {
+    alert('Error creating package: ' + error.message);
+    console.error(error);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+function restartGeneration() {
+  if (confirm('Are you sure you want to restart? This will clear all generated media.')) {
+    generatedScenes = [];
+    currentProjectData = null;
+    closeGeneratedMediaModal();
+    openImageModal();
+  }
+}
+
+// Helper to load external scripts
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+
+
+// =====================================================================
+// UI INITIALIZATION - MIGRATED TO src/components/AppInitializer.js
+// These functions are kept here for backward compatibility
+// They will use the new AppInitializer if available, otherwise fallback to old implementation
+// TODO: Remove after full migration to new structure
+// =====================================================================
+
+// Initialize UI after DOM is loaded
+// Note: This is now handled by src/app.js, but kept here for backward compatibility
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // New UI initializer will handle this, but we keep this as fallback
     if (!window.initializeUI || typeof window.initializeUI !== 'function') {
       initializeUI();
     }
-  }
-
-  function initializeUI() {
-    // Use new initializer if available
-    if (window.initializeUI && typeof window.initializeUI === 'function' && window.initializeUI !== initializeUI) {
-      return window.initializeUI();
-    }
-    
-    // Fallback to old implementation
-    // Dark mode
-    if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
-    updateDarkIcon();
-
-    // Profile dropdown
-    const profileBtn = document.getElementById('profileBtn');
-    const profileDropdown = document.getElementById('profileDropdown');
-    if (profileBtn && profileDropdown) {
-      profileBtn.addEventListener('click', () => {
-        profileDropdown.classList.toggle('hidden');
-      });
-      document.addEventListener('click', (e) => {
-        if (!profileDropdown.contains(e.target) && !profileBtn.contains(e.target)) {
-          profileDropdown.classList.add('hidden');
-        }
-      });
-    }
-
-    // Features dropdown
-    const featuresBtn = document.getElementById('featuresBtn');
-    const featuresDropdown = document.getElementById('featuresDropdown');
-    if (featuresBtn && featuresDropdown) {
-      featuresBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        featuresDropdown.classList.toggle('hidden');
-        // Close profile dropdown if open
-        if (profileDropdown) profileDropdown.classList.add('hidden');
-      });
-      document.addEventListener('click', (e) => {
-        if (!featuresDropdown.contains(e.target) && !featuresBtn.contains(e.target)) {
-          featuresDropdown.classList.add('hidden');
-        }
-      });
-    }
-
-    // Enable Generate when title has text
-    const videoTitleInput = document.getElementById('video-title');
-    const generateBtn = document.getElementById('generate-btn');
-    if (videoTitleInput && generateBtn) {
-      videoTitleInput.addEventListener('input', () => {
-        generateBtn.disabled = videoTitleInput.value.trim() === '';
-      });
-      console.log('✅ Generate button listener attached');
-    } else {
-      console.error('❌ Could not find video-title or generate-btn elements');
-    }
-
-    // Credits from localStorage
-    const creditBalanceEl = document.getElementById("creditBalance");
-    if (creditBalanceEl) {
-      const currentUserEmail = localStorage.getItem("currentUser");
-      const userKey = `user_${currentUserEmail}`;
-      const userData = JSON.parse(localStorage.getItem(userKey));
-      creditBalanceEl.textContent = (userData && userData.credits !== undefined) ? userData.credits : 198;
-    }
-  }
-
-  // Dark mode functions
-  function toggleDarkMode() {
-    // Use new function if available
-    if (window.toggleDarkMode && typeof window.toggleDarkMode === 'function' && window.toggleDarkMode !== toggleDarkMode) {
-      return window.toggleDarkMode();
-    }
-    
-    // Fallback to old implementation
-    const html = document.documentElement;
-    html.classList.toggle('dark');
-    localStorage.setItem('darkMode', html.classList.contains('dark') ? 'true' : 'false');
-    updateDarkIcon();
-  }
-  
-  function updateDarkIcon() {
-    // Use new function if available
-    if (window.updateDarkIcon && typeof window.updateDarkIcon === 'function' && window.updateDarkIcon !== updateDarkIcon) {
-      return window.updateDarkIcon();
-    }
-    
-    // Fallback to old implementation
-    const icon = document.getElementById('darkIcon');
-    if (!icon) return;
-    icon.innerHTML = document.documentElement.classList.contains('dark')
-      ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
-  }
-
-  // =====================================================================
-  // CREDIT BALANCE - MIGRATED TO src/utils/storage.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  function updateCreditBalance(newBalance) {
-    if (window.creditStorage && window.creditStorage.updateBalance) {
-      return window.creditStorage.updateBalance(newBalance);
-    }
-    // Fallback to old implementation
-    if (isNaN(newBalance) || newBalance < 0) newBalance = 0;
-    document.getElementById("creditBalance").textContent = newBalance;
-    const cu = localStorage.getItem("currentUser");
-    const uk = `user_${cu}`;
-    const ud = JSON.parse(localStorage.getItem(uk));
-    if (ud) {
-      ud.credits = newBalance;
-      localStorage.setItem(uk, JSON.stringify(ud));
-    }
-  }
-
-  // Live estimate for script credits
-  const wcInput = document.getElementById('mainWordCount');
-  const estimate = document.getElementById('estimate');
-  wcInput.addEventListener('input', () => {
-    const wc = parseInt(wcInput.value.trim()) || 0;
-    estimate.textContent = Math.round(wc / 100);
   });
+} else {
+  // DOM already loaded
+  if (!window.initializeUI || typeof window.initializeUI !== 'function') {
+    initializeUI();
+  }
+}
 
-  // Word count helpers
-  const wcDisplay = document.getElementById('wordCount');
-  function countWords(str){ return str.trim().split(/\s+/).filter(w => w.length).length; }
-  function updateScriptWordCount(){
-    if (window.updateScriptWordCountNew && typeof window.updateScriptWordCountNew === 'function') {
-      return window.updateScriptWordCountNew();
-    }
-    // Fallback to old implementation
-    const text = document.getElementById('scriptContent').innerText;
-    if (wcDisplay) {
-      wcDisplay.textContent = countWords(text);
-    }
+function initializeUI() {
+  // Use new initializer if available
+  if (window.initializeUI && typeof window.initializeUI === 'function' && window.initializeUI !== initializeUI) {
+    return window.initializeUI();
   }
 
-  // =====================================================================
-  // WORD COUNT MODAL - MIGRATED TO src/components/Modals.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Word count modal with 8000 word limit
-  function handleIconClick() {
-    if (window.handleIconClickNew && typeof window.handleIconClickNew === 'function') {
-      return window.handleIconClickNew();
-    }
-    // Fallback to old implementation
-    showWordCountModal();
-  }
-  
-  function showWordCountModal() {
-    if (window.showWordCountModalNew && typeof window.showWordCountModalNew === 'function') {
-      return window.showWordCountModalNew();
-    }
-    // Fallback to old implementation
-    document.getElementById('word-count-modal').classList.remove('hidden');
-    document.getElementById('modal-overlay').classList.remove('hidden');
-    const currentCount = document.getElementById('mainWordCount').value || '500';
-    const input = document.getElementById('word-count-input');
-    if (input) {
-      input.value = currentCount;
-      input.focus();
-      input.select();
-      input.addEventListener('input', liveUpdateWordCount);
-    }
-  }
-  
-  function hideWordCountModal() {
-    if (window.hideWordCountModalNew && typeof window.hideWordCountModalNew === 'function') {
-      return window.hideWordCountModalNew();
-    }
-    // Fallback to old implementation
-    document.getElementById('word-count-modal').classList.add('hidden');
-    document.getElementById('modal-overlay').classList.add('hidden');
-    const input = document.getElementById('word-count-input');
-    if (input) {
-      input.removeEventListener('input', liveUpdateWordCount);
-    }
-  }
+  // Fallback to old implementation
+  // Dark mode
+  if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+  updateDarkIcon();
 
-  // =====================================================================
-  // SCRIPT MANAGEMENT - MIGRATED TO src/components/ScriptManager.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  function setCopyDownloadEnabled(enabled) {
-    if (window.setCopyDownloadEnabledNew && typeof window.setCopyDownloadEnabledNew === 'function') {
-      return window.setCopyDownloadEnabledNew(enabled);
-    }
-    // Fallback to old implementation
-    const copyBtn = document.getElementById('copyBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    [copyBtn, downloadBtn].forEach(btn => {
-      if (!btn) return;
-      btn.disabled = !enabled;
-      btn.setAttribute('aria-disabled', String(!enabled));
+  // Profile dropdown
+  const profileBtn = document.getElementById('profileBtn');
+  const profileDropdown = document.getElementById('profileDropdown');
+  if (profileBtn && profileDropdown) {
+    profileBtn.addEventListener('click', () => {
+      profileDropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', (e) => {
+      if (!profileDropdown.contains(e.target) && !profileBtn.contains(e.target)) {
+        profileDropdown.classList.add('hidden');
+      }
     });
   }
-  document.addEventListener('DOMContentLoaded', () => setCopyDownloadEnabled(false));
 
-  // Copy script to clipboard
-  function copyScript() {
-    if (window.copyScriptNew && typeof window.copyScriptNew === 'function') {
-      return window.copyScriptNew();
-    }
-    // Fallback to old implementation
-    const scriptContent = document.getElementById('scriptContent');
-    if (!scriptContent) return;
-    
-    const text = scriptContent.innerText || scriptContent.textContent;
-    
-    if (!text || text.trim() === '') {
-      alert('No script to copy!');
-      return;
-    }
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(text).then(() => {
-      // Visual feedback
-      const copyBtn = document.getElementById('copyBtn');
-      const originalHTML = copyBtn.innerHTML;
-      
-      copyBtn.innerHTML = `
+  // Features dropdown
+  const featuresBtn = document.getElementById('featuresBtn');
+  const featuresDropdown = document.getElementById('featuresDropdown');
+  if (featuresBtn && featuresDropdown) {
+    featuresBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      featuresDropdown.classList.toggle('hidden');
+      // Close profile dropdown if open
+      if (profileDropdown) profileDropdown.classList.add('hidden');
+    });
+    document.addEventListener('click', (e) => {
+      if (!featuresDropdown.contains(e.target) && !featuresBtn.contains(e.target)) {
+        featuresDropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  // Enable Generate when title has text
+  const videoTitleInput = document.getElementById('video-title');
+  const generateBtn = document.getElementById('generate-btn');
+  if (videoTitleInput && generateBtn) {
+    videoTitleInput.addEventListener('input', () => {
+      generateBtn.disabled = videoTitleInput.value.trim() === '';
+    });
+    console.log('✅ Generate button listener attached');
+  } else {
+    console.error('❌ Could not find video-title or generate-btn elements');
+  }
+
+  // Credits from localStorage
+  const creditBalanceEl = document.getElementById("creditBalance");
+  if (creditBalanceEl) {
+    const currentUserEmail = localStorage.getItem("currentUser");
+    const userKey = `user_${currentUserEmail}`;
+    const userData = JSON.parse(localStorage.getItem(userKey));
+    creditBalanceEl.textContent = (userData && userData.credits !== undefined) ? userData.credits : 198;
+  }
+}
+
+// Dark mode functions
+function toggleDarkMode() {
+  // Use new function if available
+  if (window.toggleDarkMode && typeof window.toggleDarkMode === 'function' && window.toggleDarkMode !== toggleDarkMode) {
+    return window.toggleDarkMode();
+  }
+
+  // Fallback to old implementation
+  const html = document.documentElement;
+  html.classList.toggle('dark');
+  localStorage.setItem('darkMode', html.classList.contains('dark') ? 'true' : 'false');
+  updateDarkIcon();
+}
+
+function updateDarkIcon() {
+  // Use new function if available
+  if (window.updateDarkIcon && typeof window.updateDarkIcon === 'function' && window.updateDarkIcon !== updateDarkIcon) {
+    return window.updateDarkIcon();
+  }
+
+  // Fallback to old implementation
+  const icon = document.getElementById('darkIcon');
+  if (!icon) return;
+  icon.innerHTML = document.documentElement.classList.contains('dark')
+    ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
+}
+
+// =====================================================================
+// CREDIT BALANCE - MIGRATED TO src/utils/storage.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+function updateCreditBalance(newBalance) {
+  if (window.creditStorage && window.creditStorage.updateBalance) {
+    return window.creditStorage.updateBalance(newBalance);
+  }
+  // Fallback to old implementation
+  if (isNaN(newBalance) || newBalance < 0) newBalance = 0;
+  document.getElementById("creditBalance").textContent = newBalance;
+  const cu = localStorage.getItem("currentUser");
+  const uk = `user_${cu}`;
+  const ud = JSON.parse(localStorage.getItem(uk));
+  if (ud) {
+    ud.credits = newBalance;
+    localStorage.setItem(uk, JSON.stringify(ud));
+  }
+}
+
+// Live estimate for script credits
+const wcInput = document.getElementById('mainWordCount');
+const estimate = document.getElementById('estimate');
+wcInput.addEventListener('input', () => {
+  const wc = parseInt(wcInput.value.trim()) || 0;
+  estimate.textContent = Math.round(wc / 100);
+});
+
+// Word count helpers
+const wcDisplay = document.getElementById('wordCount');
+function countWords(str) { return str.trim().split(/\s+/).filter(w => w.length).length; }
+function updateScriptWordCount() {
+  if (window.updateScriptWordCountNew && typeof window.updateScriptWordCountNew === 'function') {
+    return window.updateScriptWordCountNew();
+  }
+  // Fallback to old implementation
+  const text = document.getElementById('scriptContent').innerText;
+  if (wcDisplay) {
+    wcDisplay.textContent = countWords(text);
+  }
+}
+
+// =====================================================================
+// WORD COUNT MODAL - MIGRATED TO src/components/Modals.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Word count modal with 8000 word limit
+function handleIconClick() {
+  if (window.handleIconClickNew && typeof window.handleIconClickNew === 'function') {
+    return window.handleIconClickNew();
+  }
+  // Fallback to old implementation
+  showWordCountModal();
+}
+
+function showWordCountModal() {
+  if (window.showWordCountModalNew && typeof window.showWordCountModalNew === 'function') {
+    return window.showWordCountModalNew();
+  }
+  // Fallback to old implementation
+  document.getElementById('word-count-modal').classList.remove('hidden');
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  const currentCount = document.getElementById('mainWordCount').value || '500';
+  const input = document.getElementById('word-count-input');
+  if (input) {
+    input.value = currentCount;
+    input.focus();
+    input.select();
+    input.addEventListener('input', liveUpdateWordCount);
+  }
+}
+
+function hideWordCountModal() {
+  if (window.hideWordCountModalNew && typeof window.hideWordCountModalNew === 'function') {
+    return window.hideWordCountModalNew();
+  }
+  // Fallback to old implementation
+  document.getElementById('word-count-modal').classList.add('hidden');
+  document.getElementById('modal-overlay').classList.add('hidden');
+  const input = document.getElementById('word-count-input');
+  if (input) {
+    input.removeEventListener('input', liveUpdateWordCount);
+  }
+}
+
+// =====================================================================
+// SCRIPT MANAGEMENT - MIGRATED TO src/components/ScriptManager.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+function setCopyDownloadEnabled(enabled) {
+  if (window.setCopyDownloadEnabledNew && typeof window.setCopyDownloadEnabledNew === 'function') {
+    return window.setCopyDownloadEnabledNew(enabled);
+  }
+  // Fallback to old implementation
+  const copyBtn = document.getElementById('copyBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  [copyBtn, downloadBtn].forEach(btn => {
+    if (!btn) return;
+    btn.disabled = !enabled;
+    btn.setAttribute('aria-disabled', String(!enabled));
+  });
+}
+document.addEventListener('DOMContentLoaded', () => setCopyDownloadEnabled(false));
+
+// Copy script to clipboard
+function copyScript() {
+  if (window.copyScriptNew && typeof window.copyScriptNew === 'function') {
+    return window.copyScriptNew();
+  }
+  // Fallback to old implementation
+  const scriptContent = document.getElementById('scriptContent');
+  if (!scriptContent) return;
+
+  const text = scriptContent.innerText || scriptContent.textContent;
+
+  if (!text || text.trim() === '') {
+    alert('No script to copy!');
+    return;
+  }
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(text).then(() => {
+    // Visual feedback
+    const copyBtn = document.getElementById('copyBtn');
+    const originalHTML = copyBtn.innerHTML;
+
+    copyBtn.innerHTML = `
         <svg class="w-6 h-6 stroke-green-600 dark:stroke-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       `;
-      
-      setTimeout(() => {
-        copyBtn.innerHTML = originalHTML;
-      }, 2000);
-      
-      console.log('✅ Script copied to clipboard!');
-    }).catch(err => {
-      console.error('Failed to copy:', err);
-      alert('Failed to copy script. Please try selecting and copying manually.');
-    });
-  }
 
-  // Download script as text file
-  function downloadScript() {
-    if (window.downloadScriptNew && typeof window.downloadScriptNew === 'function') {
-      return window.downloadScriptNew();
-    }
-    // Fallback to old implementation
-    const scriptContent = document.getElementById('scriptContent');
-    const videoTitle = document.getElementById('video-title')?.value || 'script';
-    
-    if (!scriptContent) return;
-    
-    const text = scriptContent.innerText || scriptContent.textContent;
-    
-    if (!text || text.trim() === '') {
-      alert('No script to download!');
-      return;
-    }
-    
-    // Create blob and download
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    
-    a.href = url;
-    a.download = `${videoTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_script.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    console.log('✅ Script downloaded!');
-  }
+    setTimeout(() => {
+      copyBtn.innerHTML = originalHTML;
+    }, 2000);
 
-  // =====================================================================
-  // LIVE UPDATE WORD COUNT - MIGRATED TO src/components/Modals.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  function liveUpdateWordCount(e) {
-    if (window.liveUpdateWordCountNew && typeof window.liveUpdateWordCountNew === 'function') {
-      return window.liveUpdateWordCountNew(e);
-    }
-    // Fallback to old implementation
-    let val = parseInt(e.target.value, 10);
-    // Enforce 8000 word maximum
-    if (val > 8000) {
-      val = 8000;
-      e.target.value = 8000;
-      alert('Maximum word count is 8000 words.');
-    }
-    if (val && val > 0) {
-      document.getElementById('mainWordCount').value = val;
-      document.getElementById('count-text').textContent = val;
-      document.getElementById('mainWordCount').dispatchEvent(new Event('input'));
-    }
-  }
-  
-  // Event listeners are now handled by initializeModals() in src/components/Modals.js
-  // These are kept for backward compatibility
-  const modalOverlay = document.getElementById('modal-overlay');
-  const wordCountModal = document.getElementById('word-count-modal');
-  if (modalOverlay && !modalOverlay.hasAttribute('data-listener-added')) {
-    modalOverlay.addEventListener('click', hideWordCountModal);
-    modalOverlay.setAttribute('data-listener-added', 'true');
-  }
-  if (wordCountModal && !wordCountModal.hasAttribute('data-listener-added')) {
-    wordCountModal.addEventListener('click', (e) => e.stopPropagation());
-    wordCountModal.setAttribute('data-listener-added', 'true');
-  }
-
-  // =====================================================================
-  // CONTEXT MODAL INITIALIZATION - MIGRATED TO src/components/Modals.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // Context modal initialization
-  // This is now handled by initializeModals() in src/components/Modals.js
-  // Kept here for backward compatibility
-  document.addEventListener('DOMContentLoaded', () => {
-    // Only run if new modals haven't been initialized
-    if (!window.modalsInitialized) {
-      const savedContext = document.getElementById('additionalContextHidden')?.value?.trim() || '';
-      const icon = document.getElementById('icon');
-      if (icon) {
-        if (savedContext.length > 0) {
-          icon.classList.add('icon-active');
-        } else {
-          icon.classList.remove('icon-active');
-        }
-      }
-    }
+    console.log('✅ Script copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+    alert('Failed to copy script. Please try selecting and copying manually.');
   });
-  function showContextModal() {
-    document.getElementById('context-modal').classList.remove('hidden');
-    document.getElementById('context-modal-overlay').classList.remove('hidden');
-    const textarea = document.getElementById('additional-context-input');
-    textarea.focus(); textarea.select();
+}
+
+// Download script as text file
+function downloadScript() {
+  if (window.downloadScriptNew && typeof window.downloadScriptNew === 'function') {
+    return window.downloadScriptNew();
   }
-  function hideContextModal() {
-    document.getElementById('context-modal').classList.add('hidden');
-    document.getElementById('context-modal-overlay').classList.add('hidden');
+  // Fallback to old implementation
+  const scriptContent = document.getElementById('scriptContent');
+  const videoTitle = document.getElementById('video-title')?.value || 'script';
+
+  if (!scriptContent) return;
+
+  const text = scriptContent.innerText || scriptContent.textContent;
+
+  if (!text || text.trim() === '') {
+    alert('No script to download!');
+    return;
   }
-  function saveAdditionalContext() {
-    const input = document.getElementById('additional-context-input').value.trim();
-    const hiddenInput = document.getElementById('additionalContextHidden');
+
+  // Create blob and download
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+
+  a.href = url;
+  a.download = `${videoTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_script.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  console.log('✅ Script downloaded!');
+}
+
+// =====================================================================
+// LIVE UPDATE WORD COUNT - MIGRATED TO src/components/Modals.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+function liveUpdateWordCount(e) {
+  if (window.liveUpdateWordCountNew && typeof window.liveUpdateWordCountNew === 'function') {
+    return window.liveUpdateWordCountNew(e);
+  }
+  // Fallback to old implementation
+  let val = parseInt(e.target.value, 10);
+  // Enforce 8000 word maximum
+  if (val > 8000) {
+    val = 8000;
+    e.target.value = 8000;
+    alert('Maximum word count is 8000 words.');
+  }
+  if (val && val > 0) {
+    document.getElementById('mainWordCount').value = val;
+    document.getElementById('count-text').textContent = val;
+    document.getElementById('mainWordCount').dispatchEvent(new Event('input'));
+  }
+}
+
+// Event listeners are now handled by initializeModals() in src/components/Modals.js
+// These are kept for backward compatibility
+const modalOverlay = document.getElementById('modal-overlay');
+const wordCountModal = document.getElementById('word-count-modal');
+if (modalOverlay && !modalOverlay.hasAttribute('data-listener-added')) {
+  modalOverlay.addEventListener('click', hideWordCountModal);
+  modalOverlay.setAttribute('data-listener-added', 'true');
+}
+if (wordCountModal && !wordCountModal.hasAttribute('data-listener-added')) {
+  wordCountModal.addEventListener('click', (e) => e.stopPropagation());
+  wordCountModal.setAttribute('data-listener-added', 'true');
+}
+
+// =====================================================================
+// CONTEXT MODAL INITIALIZATION - MIGRATED TO src/components/Modals.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// Context modal initialization
+// This is now handled by initializeModals() in src/components/Modals.js
+// Kept here for backward compatibility
+document.addEventListener('DOMContentLoaded', () => {
+  // Only run if new modals haven't been initialized
+  if (!window.modalsInitialized) {
+    const savedContext = document.getElementById('additionalContextHidden')?.value?.trim() || '';
     const icon = document.getElementById('icon');
-    if (hiddenInput) hiddenInput.value = input; else window.additionalContext = input;
-    if (input.length > 0) icon.classList.add('icon-active'); else icon.classList.remove('icon-active');
-    hideContextModal();
-  }
-
-  // Handle text file upload
-  function handleTextFileUpload(event) {
-    const file = event.target.files[0];
-    
-    if (!file) return;
-    
-    // Validate file type
-    if (!file.name.endsWith('.txt')) {
-      alert('Please upload only .txt files');
-      event.target.value = ''; // Reset input
-      return;
-    }
-    
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-      const textContent = e.target.result;
-      
-      // Show the script wrapper if hidden
-      const scriptWrapper = document.getElementById('scriptWrapper');
-      if (scriptWrapper && scriptWrapper.classList.contains('hidden')) {
-        scriptWrapper.classList.remove('hidden');
-      }
-      
-      // Populate the script content (no word limit)
-      const scriptContent = document.getElementById('scriptContent');
-      if (scriptContent) {
-        scriptContent.textContent = textContent;
-      }
-      
-      // Update word count
-      const wordCount = textContent.trim().split(/\s+/).filter(word => word.length > 0).length;
-      const wordCountElem = document.getElementById('wordCount');
-      if (wordCountElem) {
-        wordCountElem.textContent = wordCount;
-      }
-      
-      // Set isGenerating to false so voice icon becomes enabled
-      window.isGenerating = false;
-      
-      // Enable copy and download buttons
-      setCopyDownloadEnabled(true);
-      
-      // ✅ FIX: Call onScriptGenerationComplete to properly enable voice icon
-      if (typeof onScriptGenerationComplete === 'function') {
-        onScriptGenerationComplete();
+    if (icon) {
+      if (savedContext.length > 0) {
+        icon.classList.add('icon-active');
       } else {
-        // Fallback if onScriptGenerationComplete isn't available yet
-        if (typeof refreshVoiceIcon === 'function') refreshVoiceIcon();
+        icon.classList.remove('icon-active');
       }
-      
-      // Enable image icon
-      if (typeof refreshImageIcon === 'function') refreshImageIcon();
-      
-      // Scroll to the script output
-      const scriptOutput = document.getElementById('scriptOutput');
-      if (scriptOutput) {
-        scriptOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      
-      console.log('Text file uploaded successfully - Word count:', wordCount);
-    };
-    
-    reader.onerror = function() {
-      alert('Error reading file. Please try again.');
-    };
-    
-    reader.readAsText(file);
-    
-    // Reset file input so same file can be uploaded again
-    event.target.value = '';
+    }
+  }
+});
+function showContextModal() {
+  document.getElementById('context-modal').classList.remove('hidden');
+  document.getElementById('context-modal-overlay').classList.remove('hidden');
+  const textarea = document.getElementById('additional-context-input');
+  textarea.focus(); textarea.select();
+}
+function hideContextModal() {
+  document.getElementById('context-modal').classList.add('hidden');
+  document.getElementById('context-modal-overlay').classList.add('hidden');
+}
+function saveAdditionalContext() {
+  const input = document.getElementById('additional-context-input').value.trim();
+  const hiddenInput = document.getElementById('additionalContextHidden');
+  const icon = document.getElementById('icon');
+  if (hiddenInput) hiddenInput.value = input; else window.additionalContext = input;
+  if (input.length > 0) icon.classList.add('icon-active'); else icon.classList.remove('icon-active');
+  hideContextModal();
+}
+
+// Handle text file upload
+function handleTextFileUpload(event) {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  // Validate file type
+  if (!file.name.endsWith('.txt')) {
+    alert('Please upload only .txt files');
+    event.target.value = ''; // Reset input
+    return;
   }
 
-  // =====================================================================
-  // SCRIPT GENERATION - MIGRATED TO src/components/ScriptGenerator.js
-  // This function is kept here for backward compatibility
-  // It will use the new ScriptGenerator if available, otherwise fallback to old implementation
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  
-  // Generate script using Claude AI
- async function generateFullScript() {
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    const textContent = e.target.result;
+
+    // Show the script wrapper if hidden
+    const scriptWrapper = document.getElementById('scriptWrapper');
+    if (scriptWrapper && scriptWrapper.classList.contains('hidden')) {
+      scriptWrapper.classList.remove('hidden');
+    }
+
+    // Populate the script content (no word limit)
+    const scriptContent = document.getElementById('scriptContent');
+    if (scriptContent) {
+      scriptContent.textContent = textContent;
+    }
+
+    // Update word count
+    const wordCount = textContent.trim().split(/\s+/).filter(word => word.length > 0).length;
+    const wordCountElem = document.getElementById('wordCount');
+    if (wordCountElem) {
+      wordCountElem.textContent = wordCount;
+    }
+
+    // Set isGenerating to false so voice icon becomes enabled
+    window.isGenerating = false;
+
+    // Enable copy and download buttons
+    setCopyDownloadEnabled(true);
+
+    // ✅ FIX: Call onScriptGenerationComplete to properly enable voice icon
+    if (typeof onScriptGenerationComplete === 'function') {
+      onScriptGenerationComplete();
+    } else {
+      // Fallback if onScriptGenerationComplete isn't available yet
+      if (typeof refreshVoiceIcon === 'function') refreshVoiceIcon();
+    }
+
+    // Enable image icon
+    if (typeof refreshImageIcon === 'function') refreshImageIcon();
+
+    // Scroll to the script output
+    const scriptOutput = document.getElementById('scriptOutput');
+    if (scriptOutput) {
+      scriptOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    console.log('Text file uploaded successfully - Word count:', wordCount);
+  };
+
+  reader.onerror = function () {
+    alert('Error reading file. Please try again.');
+  };
+
+  reader.readAsText(file);
+
+  // Reset file input so same file can be uploaded again
+  event.target.value = '';
+}
+
+// =====================================================================
+// SCRIPT GENERATION - MIGRATED TO src/components/ScriptGenerator.js
+// This function is kept here for backward compatibility
+// It will use the new ScriptGenerator if available, otherwise fallback to old implementation
+// TODO: Remove after full migration to new structure
+// =====================================================================
+
+// Generate script using Claude AI
+async function generateFullScript() {
   // Try to use new component if available
   if (window.generateFullScriptNew && typeof window.generateFullScriptNew === 'function') {
     try {
@@ -4000,10 +3994,10 @@ btn.innerHTML = `
       const title = document.getElementById('video-title').value.trim();
       const inputWordCount = parseInt(document.getElementById('mainWordCount').value) || 500;
       const additionalContext = document.getElementById('additionalContextHidden')?.value || window.additionalContext || '';
-      
+
       let currentStyleIdx = localStorage.getItem('currentStyleIdx');
       let styles = JSON.parse(localStorage.getItem('styles') || '[]');
-      
+
       const button = document.querySelector('button[onclick="generateFullScript()"]');
       const originalText = button.innerHTML;
       button.innerHTML = '⏳ Generating...';
@@ -4012,7 +4006,7 @@ btn.innerHTML = `
       const scriptOutput = document.getElementById("scriptOutput");
       const scriptContent = document.getElementById("scriptContent");
       const scriptWrapper = document.getElementById("scriptWrapper");
-      
+
       scriptWrapper.classList.remove("hidden");
       scriptOutput.classList.remove("hidden");
       scriptContent.textContent = "✍️ Generating your video script…";
@@ -4066,7 +4060,7 @@ btn.innerHTML = `
       return;
     }
   }
-  
+
   // Fallback to old implementation
   setCopyDownloadEnabled(false);
   window.isGenerating = true;
@@ -4074,31 +4068,31 @@ btn.innerHTML = `
 
   const title = document.getElementById('video-title').value.trim();
   const inputWordCount = parseInt(document.getElementById('mainWordCount').value) || 500;
-  
+
   let mainWordCount = inputWordCount;
   let styleLang = "English";
-  
+
   let currentStyleIdx = localStorage.getItem('currentStyleIdx');
   let styles = JSON.parse(localStorage.getItem('styles') || '[]');
-  
+
   if (styles.length && currentStyleIdx !== null && styles[currentStyleIdx] && styles[currentStyleIdx].wordCount) {
     styleLang = styles[currentStyleIdx].lang || "English";
     mainWordCount = Math.min(styles[currentStyleIdx].wordCount, 8000);
   }
-  
-  if (!title || !mainWordCount) { 
-    alert('Please enter both a title and word count.'); 
+
+  if (!title || !mainWordCount) {
+    alert('Please enter both a title and word count.');
     window.isGenerating = false;
-    return; 
+    return;
   }
 
   const cost = Math.round(mainWordCount / 100);
   const currentCredits = parseInt(document.getElementById('creditBalance').textContent);
-  
-  if (currentCredits < cost) { 
-    alert("Not enough credits to generate this script."); 
+
+  if (currentCredits < cost) {
+    alert("Not enough credits to generate this script.");
     window.isGenerating = false;
-    return; 
+    return;
   }
 
   const button = document.querySelector('button[onclick="generateFullScript()"]');
@@ -4110,7 +4104,7 @@ btn.innerHTML = `
   const scriptOutput = document.getElementById("scriptOutput");
   const scriptContent = document.getElementById("scriptContent");
   const scriptWrapper = document.getElementById("scriptWrapper");
-  
+
   scriptWrapper.classList.remove("hidden");
   scriptOutput.classList.remove("hidden");
   scriptContent.textContent = "✍️ Generating your video script…";
@@ -4120,14 +4114,14 @@ btn.innerHTML = `
   try {
     const additionalContext = document.getElementById('additionalContextHidden')?.value || window.additionalContext || '';
     let userPrompt = `Write a ${mainWordCount}-word story in ${styleLang} for this title: "${title}".`;
-    
+
     // Add competitor video analysis if available
     if (styles.length && currentStyleIdx !== null && styles[currentStyleIdx]?.competitorUrl) {
       const compUrl = styles[currentStyleIdx].competitorUrl;
       userPrompt += `\n\nIMPORTANT: Analyze the structure and pacing style from this competitor video: ${compUrl}
 Use similar narrative techniques, chapter flow, and emotional beats, but create completely original content. DO NOT copy any text word-for-word.`;
     }
-    
+
     if (additionalContext.length > 0) {
       userPrompt += ` Additional context: ${additionalContext}`;
     }
@@ -4140,7 +4134,7 @@ Use similar narrative techniques, chapter flow, and emotional beats, but create 
     // Using CORS proxy for Claude API (required for browser access)
     const proxyUrl = 'https://corsproxy.io/?';
     const apiUrl = 'https://api.anthropic.com/v1/messages';
-    
+
     const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
       method: "POST",
       headers: {
@@ -4189,18 +4183,18 @@ ${userPrompt}`
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.error?.message || "Claude API error");
     }
-    
+
     const scriptText = data.content[0].text;
 
     // ⚡ FASTER TYPEWRITER EFFECT (2ms per character instead of 5ms)
     scriptContent.textContent = "";
     scriptContent.style.opacity = "1";
     let i = 0;
-    
+
     function typeWriter() {
       if (i < scriptText.length) {
         scriptContent.textContent += scriptText.charAt(i++);
@@ -4217,7 +4211,7 @@ ${userPrompt}`
         window.isGenerating = false;
         if (typeof refreshVoiceIcon === 'function') refreshVoiceIcon();
         if (typeof onScriptGenerationComplete === 'function') onScriptGenerationComplete();
-        
+
         // Save session for recovery
         saveCurrentSession({
           title: title,
@@ -4228,21 +4222,21 @@ ${userPrompt}`
         });
       }
     }
-    
+
     typeWriter();
 
     // Deduct credits
     updateCreditBalance(currentCredits - cost);
-    
+
     button.classList.remove('loading');
     button.innerHTML = '✅ Generated';
     button.disabled = false;
-    
+
     // Reset to original text after 2 seconds
     setTimeout(() => {
       button.innerHTML = originalText;
     }, 2000);
-    
+
   } catch (error) {
     console.error('Error:', error);
     alert("Failed to generate script: " + error.message);
@@ -4257,286 +4251,286 @@ ${userPrompt}`
 
 
 
-  function openStyleModal() {
-    const modal = document.getElementById('styleModal');
-    if (!modal) return;
-    modal.classList.remove('hidden');
-    showCreateStyle();
-    initReferenceVideos();
-    document.documentElement.classList.add('scroll-locked');
-    document.body.classList.add('scroll-locked');
-  }
-  const _origClose = closeStyleModal;
-  window.closeStyleModal = function () {
-    _origClose && _origClose();
-    document.documentElement.classList.remove('scroll-locked');
-    document.body.classList.remove('scroll-locked');
-  }
+function openStyleModal() {
+  const modal = document.getElementById('styleModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  showCreateStyle();
+  initReferenceVideos();
+  document.documentElement.classList.add('scroll-locked');
+  document.body.classList.add('scroll-locked');
+}
+const _origClose = closeStyleModal;
+window.closeStyleModal = function () {
+  _origClose && _origClose();
+  document.documentElement.classList.remove('scroll-locked');
+  document.body.classList.remove('scroll-locked');
+}
 
 
 
-  // Voice dropdown state
-  let selectedVoiceIdx = 0; // Juniper (safest default that always works)
-  let selectedVoiceId = 'aMSt68OGf4xUZAnLpTU8'; // Juniper default - ALWAYS WORKS
-  let currentVoiceProvider = 'premium'; // 'premium' (ElevenLabs) or 'non-premium' (Speechify)
-  
-  // Toggle voice dropdown modal
-  function toggleVoiceDropdownModal() {
-    const modal = document.getElementById('voiceDropdownModal');
-    if (!modal) return;
-    modal.classList.toggle('hidden');
+// Voice dropdown state
+let selectedVoiceIdx = 0; // Juniper (safest default that always works)
+let selectedVoiceId = 'aMSt68OGf4xUZAnLpTU8'; // Juniper default - ALWAYS WORKS
+let currentVoiceProvider = 'premium'; // 'premium' (ElevenLabs) or 'non-premium' (Speechify)
+
+// Toggle voice dropdown modal
+function toggleVoiceDropdownModal() {
+  const modal = document.getElementById('voiceDropdownModal');
+  if (!modal) return;
+  modal.classList.toggle('hidden');
+}
+
+// Close voice dropdown modal
+function closeVoiceDropdownModal() {
+  if (window.closeVoiceDropdownModalNew && typeof window.closeVoiceDropdownModalNew === 'function') {
+    return window.closeVoiceDropdownModalNew();
   }
-  
-  // Close voice dropdown modal
-  function closeVoiceDropdownModal() {
-    if (window.closeVoiceDropdownModalNew && typeof window.closeVoiceDropdownModalNew === 'function') {
-      return window.closeVoiceDropdownModalNew();
-    }
-    // Fallback to old implementation
-    const modal = document.getElementById('voiceDropdownModal');
-    if (modal) modal.classList.add('hidden');
+  // Fallback to old implementation
+  const modal = document.getElementById('voiceDropdownModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+// Select voice from modal
+function selectVoiceFromModal(voiceId, voiceName, voiceStyle) {
+  if (window.selectVoiceFromModalNew && typeof window.selectVoiceFromModalNew === 'function') {
+    return window.selectVoiceFromModalNew(voiceId, voiceName, voiceStyle);
   }
-  
-  // Select voice from modal
-  function selectVoiceFromModal(voiceId, voiceName, voiceStyle) {
-    if (window.selectVoiceFromModalNew && typeof window.selectVoiceFromModalNew === 'function') {
-      return window.selectVoiceFromModalNew(voiceId, voiceName, voiceStyle);
-    }
-    // Fallback to old implementation
-    selectedVoiceId = voiceId;
-    
-    // Update display
-    const display = document.getElementById('selectedVoiceDisplay');
-    if (display) {
-      display.textContent = `${voiceName} - ${voiceStyle}`;
-    }
-    
-    // Update hidden select if it exists
-    const select = document.getElementById('styleVoiceSelect');
-    if (select) {
-      select.value = voiceId;
-    }
-    
-    // Close modal
-    closeVoiceDropdownModal();
-    
-    console.log(`✅ Selected voice: ${voiceName} (${voiceId})`);
+  // Fallback to old implementation
+  selectedVoiceId = voiceId;
+
+  // Update display
+  const display = document.getElementById('selectedVoiceDisplay');
+  if (display) {
+    display.textContent = `${voiceName} - ${voiceStyle}`;
   }
-  
-  // Play voice preview using ElevenLabs samples
-  function playVoicePreview(voiceId, voiceName) {
-    if (window.playVoicePreviewNew && typeof window.playVoicePreviewNew === 'function') {
-      return window.playVoicePreviewNew(voiceId, voiceName);
-    }
-    // Fallback to old implementation
-    // ElevenLabs preview URLs (you'll need to add your API key for actual previews)
-    // For now, we'll show an alert with preview info
-    console.log(`🔊 Playing preview for: ${voiceName} (${voiceId})`);
-    
-    // You can replace this with actual ElevenLabs API call or sample URLs
-    const previewUrl = `https://api.elevenlabs.io/v1/voices/${voiceId}/preview`;
-    
-    // Create audio element and play
-    const audio = new Audio();
-    audio.src = previewUrl;
-    audio.play().catch(err => {
-      console.log('Preview not available, showing voice info instead');
-      alert(`Voice Preview:\n\nName: ${voiceName}\nID: ${voiceId}\n\nNote: To enable voice previews, add your ElevenLabs API key.`);
-    });
+
+  // Update hidden select if it exists
+  const select = document.getElementById('styleVoiceSelect');
+  if (select) {
+    select.value = voiceId;
   }
-  
-  // Voice Provider Switching Functions
-  function switchVoiceProvider() {
-    if (window.switchVoiceProviderNew && typeof window.switchVoiceProviderNew === 'function') {
-      const select = document.getElementById('voiceProvider');
-      if (select) {
-        return window.switchVoiceProviderNew(select.value);
-      }
-      return;
-    }
-    // Fallback to old implementation
+
+  // Close modal
+  closeVoiceDropdownModal();
+
+  console.log(`✅ Selected voice: ${voiceName} (${voiceId})`);
+}
+
+// Play voice preview using ElevenLabs samples
+function playVoicePreview(voiceId, voiceName) {
+  if (window.playVoicePreviewNew && typeof window.playVoicePreviewNew === 'function') {
+    return window.playVoicePreviewNew(voiceId, voiceName);
+  }
+  // Fallback to old implementation
+  // ElevenLabs preview URLs (you'll need to add your API key for actual previews)
+  // For now, we'll show an alert with preview info
+  console.log(`🔊 Playing preview for: ${voiceName} (${voiceId})`);
+
+  // You can replace this with actual ElevenLabs API call or sample URLs
+  const previewUrl = `https://api.elevenlabs.io/v1/voices/${voiceId}/preview`;
+
+  // Create audio element and play
+  const audio = new Audio();
+  audio.src = previewUrl;
+  audio.play().catch(err => {
+    console.log('Preview not available, showing voice info instead');
+    alert(`Voice Preview:\n\nName: ${voiceName}\nID: ${voiceId}\n\nNote: To enable voice previews, add your ElevenLabs API key.`);
+  });
+}
+
+// Voice Provider Switching Functions
+function switchVoiceProvider() {
+  if (window.switchVoiceProviderNew && typeof window.switchVoiceProviderNew === 'function') {
     const select = document.getElementById('voiceProvider');
-    if (!select) return;
-    
-    currentVoiceProvider = select.value;
-    console.log('🔄 Switching to:', currentVoiceProvider);
-    
-    const voiceLabel = document.getElementById('voiceLabel');
-    if (voiceLabel) {
-      voiceLabel.textContent = currentVoiceProvider === 'premium' 
-        ? 'Voice (21 ElevenLabs Voices)' 
-        : 'Voice (Speechify Voices)';
+    if (select) {
+      return window.switchVoiceProviderNew(select.value);
     }
-    
-    // Toggle voice selection controls
-    const elevenlabsControls = document.getElementById('elevenlabsVoiceControls');
-    const speechifyControls = document.getElementById('speechifyVoiceControls');
-    
-    if (currentVoiceProvider === 'premium') {
-      if (elevenlabsControls) elevenlabsControls.classList.remove('hidden');
-      if (speechifyControls) speechifyControls.classList.add('hidden');
-    } else {
-      if (elevenlabsControls) elevenlabsControls.classList.add('hidden');
-      if (speechifyControls) speechifyControls.classList.remove('hidden');
-    }
-    
-    // Toggle advanced controls
-    const elevenlabsAdvanced = document.getElementById('elevenlabsAdvancedControls');
-    const speechifyAdvanced = document.getElementById('speechifyAdvancedControls');
-    
-    if (currentVoiceProvider === 'premium') {
-      if (elevenlabsAdvanced) elevenlabsAdvanced.classList.remove('hidden');
-      if (speechifyAdvanced) speechifyAdvanced.classList.add('hidden');
-    } else {
-      if (elevenlabsAdvanced) elevenlabsAdvanced.classList.add('hidden');
-      if (speechifyAdvanced) speechifyAdvanced.classList.remove('hidden');
-    }
-    
-    updateVoiceDisplay();
+    return;
+  }
+  // Fallback to old implementation
+  const select = document.getElementById('voiceProvider');
+  if (!select) return;
+
+  currentVoiceProvider = select.value;
+  console.log('🔄 Switching to:', currentVoiceProvider);
+
+  const voiceLabel = document.getElementById('voiceLabel');
+  if (voiceLabel) {
+    voiceLabel.textContent = currentVoiceProvider === 'premium'
+      ? 'Voice (21 ElevenLabs Voices)'
+      : 'Voice (Speechify Voices)';
   }
 
-  function updateVoiceDisplay() {
-    const display = document.getElementById('selectedVoiceDisplay');
-    if (!display) return;
-    
-    if (currentVoiceProvider === 'premium') {
-      const selectedVoice = ELEVENLABS_VOICES.find(v => v.id === selectedVoiceId) || ELEVENLABS_VOICES[0];
-      display.textContent = `${selectedVoice.name} - ${selectedVoice.style}`;
-    } else {
-      display.textContent = `${SPEECHIFY_VOICES[0].name} - ${SPEECHIFY_VOICES[0].style}`;
-    }
+  // Toggle voice selection controls
+  const elevenlabsControls = document.getElementById('elevenlabsVoiceControls');
+  const speechifyControls = document.getElementById('speechifyVoiceControls');
+
+  if (currentVoiceProvider === 'premium') {
+    if (elevenlabsControls) elevenlabsControls.classList.remove('hidden');
+    if (speechifyControls) speechifyControls.classList.add('hidden');
+  } else {
+    if (elevenlabsControls) elevenlabsControls.classList.add('hidden');
+    if (speechifyControls) speechifyControls.classList.remove('hidden');
   }
 
-  function selectSpeechifyVoice(voiceId, voiceName, voiceStyle) {
-    if (window.selectSpeechifyVoiceNew && typeof window.selectSpeechifyVoiceNew === 'function') {
-      return window.selectSpeechifyVoiceNew(voiceId, voiceName, voiceStyle);
-    }
-    // Fallback to old implementation
-    selectedVoiceId = voiceId;
-    const display = document.getElementById('selectedVoiceDisplay');
-    if (display) {
-      display.textContent = `${voiceName} - ${voiceStyle}`;
-    }
-    closeSpeechifyVoiceModal();
-    console.log(`✅ Selected Speechify voice: ${voiceName} (${voiceId})`);
+  // Toggle advanced controls
+  const elevenlabsAdvanced = document.getElementById('elevenlabsAdvancedControls');
+  const speechifyAdvanced = document.getElementById('speechifyAdvancedControls');
+
+  if (currentVoiceProvider === 'premium') {
+    if (elevenlabsAdvanced) elevenlabsAdvanced.classList.remove('hidden');
+    if (speechifyAdvanced) speechifyAdvanced.classList.add('hidden');
+  } else {
+    if (elevenlabsAdvanced) elevenlabsAdvanced.classList.add('hidden');
+    if (speechifyAdvanced) speechifyAdvanced.classList.remove('hidden');
   }
 
-  function toggleSpeechifyVoiceModal() {
-    if (window.toggleSpeechifyVoiceModalNew && typeof window.toggleSpeechifyVoiceModalNew === 'function') {
-      return window.toggleSpeechifyVoiceModalNew();
-    }
-    // Fallback to old implementation
-    const modal = document.getElementById('speechifyVoiceModal');
-    if (!modal) return;
-    modal.classList.toggle('hidden');
-  }
+  updateVoiceDisplay();
+}
 
-  function closeSpeechifyVoiceModal() {
-    if (window.closeSpeechifyVoiceModalNew && typeof window.closeSpeechifyVoiceModalNew === 'function') {
-      return window.closeSpeechifyVoiceModalNew();
-    }
-    // Fallback to old implementation
-    const modal = document.getElementById('speechifyVoiceModal');
-    if (modal) modal.classList.add('hidden');
-  }
+function updateVoiceDisplay() {
+  const display = document.getElementById('selectedVoiceDisplay');
+  if (!display) return;
 
-  function toggleAdvancedSettings() {
-    const panel = document.getElementById('advancedSettingsPanel');
-    const arrow = document.getElementById('advancedArrow');
-    
-    if (!panel || !arrow) return;
-    
-    if (panel.classList.contains('hidden')) {
-      panel.classList.remove('hidden');
-      arrow.style.transform = 'rotate(180deg)';
-    } else {
-      panel.classList.add('hidden');
-      arrow.style.transform = 'rotate(0deg)';
+  if (currentVoiceProvider === 'premium') {
+    const selectedVoice = ELEVENLABS_VOICES.find(v => v.id === selectedVoiceId) || ELEVENLABS_VOICES[0];
+    display.textContent = `${selectedVoice.name} - ${selectedVoice.style}`;
+  } else {
+    display.textContent = `${SPEECHIFY_VOICES[0].name} - ${SPEECHIFY_VOICES[0].style}`;
+  }
+}
+
+function selectSpeechifyVoice(voiceId, voiceName, voiceStyle) {
+  if (window.selectSpeechifyVoiceNew && typeof window.selectSpeechifyVoiceNew === 'function') {
+    return window.selectSpeechifyVoiceNew(voiceId, voiceName, voiceStyle);
+  }
+  // Fallback to old implementation
+  selectedVoiceId = voiceId;
+  const display = document.getElementById('selectedVoiceDisplay');
+  if (display) {
+    display.textContent = `${voiceName} - ${voiceStyle}`;
+  }
+  closeSpeechifyVoiceModal();
+  console.log(`✅ Selected Speechify voice: ${voiceName} (${voiceId})`);
+}
+
+function toggleSpeechifyVoiceModal() {
+  if (window.toggleSpeechifyVoiceModalNew && typeof window.toggleSpeechifyVoiceModalNew === 'function') {
+    return window.toggleSpeechifyVoiceModalNew();
+  }
+  // Fallback to old implementation
+  const modal = document.getElementById('speechifyVoiceModal');
+  if (!modal) return;
+  modal.classList.toggle('hidden');
+}
+
+function closeSpeechifyVoiceModal() {
+  if (window.closeSpeechifyVoiceModalNew && typeof window.closeSpeechifyVoiceModalNew === 'function') {
+    return window.closeSpeechifyVoiceModalNew();
+  }
+  // Fallback to old implementation
+  const modal = document.getElementById('speechifyVoiceModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function toggleAdvancedSettings() {
+  const panel = document.getElementById('advancedSettingsPanel');
+  const arrow = document.getElementById('advancedArrow');
+
+  if (!panel || !arrow) return;
+
+  if (panel.classList.contains('hidden')) {
+    panel.classList.remove('hidden');
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    panel.classList.add('hidden');
+    arrow.style.transform = 'rotate(0deg)';
+  }
+}
+
+// =====================================================================
+// YOUTUBE INTEGRATION - MIGRATED TO src/components/YouTubeIntegration.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+// YouTube OAuth Connection Functions
+function connectYouTube(styleId) {
+  if (window.connectYouTubeNew && typeof window.connectYouTubeNew === 'function') {
+    return window.connectYouTubeNew(styleId);
+  }
+  // Fallback to old implementation
+  console.log('🎥 Initiating YouTube OAuth connection for style:', styleId);
+
+  // Open OAuth popup
+  const width = 600;
+  const height = 700;
+  const left = (screen.width / 2) - (width / 2);
+  const top = (screen.height / 2) - (height / 2);
+
+  const popup = window.open(
+    '/api/youtube/auth',
+    'youtube-oauth',
+    `width=${width},height=${height},left=${left},top=${top}`
+  );
+
+  // Listen for OAuth callback
+  window.addEventListener('message', function (event) {
+    if (event.data.type === 'youtube-oauth-success') {
+      const { channelId, channelName, channelAvatar, subscribers, accessToken, refreshToken } = event.data;
+
+      console.log('✅ YouTube connected:', channelName);
+
+      // Update UI
+      const connectBtn = document.getElementById(`youtubeConnectBtn-${styleId}`);
+      const connectedDisplay = document.getElementById(`youtubeConnectedDisplay-${styleId}`);
+      const avatarImg = document.getElementById(`youtubeChannelAvatar-${styleId}`);
+      const nameEl = document.getElementById(`youtubeChannelName-${styleId}`);
+      const subsEl = document.getElementById(`youtubeChannelSubs-${styleId}`);
+
+      if (connectBtn) connectBtn.classList.add('hidden');
+      if (connectedDisplay) connectedDisplay.classList.remove('hidden');
+      if (avatarImg) avatarImg.src = channelAvatar;
+      if (nameEl) nameEl.textContent = channelName;
+      if (subsEl) subsEl.textContent = `${subscribers} subscribers`;
+
+      // Update hidden inputs
+      document.getElementById(`youtubeConnected-${styleId}`).value = 'true';
+      document.getElementById(`youtubeChannelId-${styleId}`).value = channelId;
+      document.getElementById(`youtubeAccessToken-${styleId}`).value = accessToken;
+      document.getElementById(`youtubeRefreshToken-${styleId}`).value = refreshToken;
+
+      popup.close();
     }
-  }
-  
-  // =====================================================================
-  // YOUTUBE INTEGRATION - MIGRATED TO src/components/YouTubeIntegration.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  // YouTube OAuth Connection Functions
-  function connectYouTube(styleId) {
-    if (window.connectYouTubeNew && typeof window.connectYouTubeNew === 'function') {
-      return window.connectYouTubeNew(styleId);
-    }
-    // Fallback to old implementation
-    console.log('🎥 Initiating YouTube OAuth connection for style:', styleId);
-    
-    // Open OAuth popup
-    const width = 600;
-    const height = 700;
-    const left = (screen.width / 2) - (width / 2);
-    const top = (screen.height / 2) - (height / 2);
-    
-    const popup = window.open(
-      '/api/youtube/auth', 
-      'youtube-oauth',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-    
-    // Listen for OAuth callback
-    window.addEventListener('message', function(event) {
-      if (event.data.type === 'youtube-oauth-success') {
-        const { channelId, channelName, channelAvatar, subscribers, accessToken, refreshToken } = event.data;
-        
-        console.log('✅ YouTube connected:', channelName);
-        
-        // Update UI
-        const connectBtn = document.getElementById(`youtubeConnectBtn-${styleId}`);
-        const connectedDisplay = document.getElementById(`youtubeConnectedDisplay-${styleId}`);
-        const avatarImg = document.getElementById(`youtubeChannelAvatar-${styleId}`);
-        const nameEl = document.getElementById(`youtubeChannelName-${styleId}`);
-        const subsEl = document.getElementById(`youtubeChannelSubs-${styleId}`);
-        
-        if (connectBtn) connectBtn.classList.add('hidden');
-        if (connectedDisplay) connectedDisplay.classList.remove('hidden');
-        if (avatarImg) avatarImg.src = channelAvatar;
-        if (nameEl) nameEl.textContent = channelName;
-        if (subsEl) subsEl.textContent = `${subscribers} subscribers`;
-        
-        // Update hidden inputs
-        document.getElementById(`youtubeConnected-${styleId}`).value = 'true';
-        document.getElementById(`youtubeChannelId-${styleId}`).value = channelId;
-        document.getElementById(`youtubeAccessToken-${styleId}`).value = accessToken;
-        document.getElementById(`youtubeRefreshToken-${styleId}`).value = refreshToken;
-        
-        popup.close();
-      }
-    });
-  }
-  
-  function disconnectYouTube(styleId) {
-    console.log('🔌 Disconnecting YouTube for style:', styleId);
-    
-    const connectBtn = document.getElementById(`youtubeConnectBtn-${styleId}`);
-    const connectedDisplay = document.getElementById(`youtubeConnectedDisplay-${styleId}`);
-    
-    if (connectBtn) connectBtn.classList.remove('hidden');
-    if (connectedDisplay) connectedDisplay.classList.add('hidden');
-    
-    // Clear hidden inputs
-    document.getElementById(`youtubeConnected-${styleId}`).value = '';
-    document.getElementById(`youtubeChannelId-${styleId}`).value = '';
-    document.getElementById(`youtubeAccessToken-${styleId}`).value = '';
-    document.getElementById(`youtubeRefreshToken-${styleId}`).value = '';
-  }
-  
-  function toggleVoiceDropdown() {
-    const dropdown = document.getElementById('voiceDropdownList');
-    if (!dropdown) return;
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    setTimeout(() => { document.addEventListener('click', closeVoiceDropdown, { once: true }); });
-  }
-  function closeVoiceDropdown() {
-    const dropdown = document.getElementById('voiceDropdownList');
-    if (dropdown) dropdown.style.display = 'none';
-  }
-  const PLAY_SVG = `
+  });
+}
+
+function disconnectYouTube(styleId) {
+  console.log('🔌 Disconnecting YouTube for style:', styleId);
+
+  const connectBtn = document.getElementById(`youtubeConnectBtn-${styleId}`);
+  const connectedDisplay = document.getElementById(`youtubeConnectedDisplay-${styleId}`);
+
+  if (connectBtn) connectBtn.classList.remove('hidden');
+  if (connectedDisplay) connectedDisplay.classList.add('hidden');
+
+  // Clear hidden inputs
+  document.getElementById(`youtubeConnected-${styleId}`).value = '';
+  document.getElementById(`youtubeChannelId-${styleId}`).value = '';
+  document.getElementById(`youtubeAccessToken-${styleId}`).value = '';
+  document.getElementById(`youtubeRefreshToken-${styleId}`).value = '';
+}
+
+function toggleVoiceDropdown() {
+  const dropdown = document.getElementById('voiceDropdownList');
+  if (!dropdown) return;
+  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  setTimeout(() => { document.addEventListener('click', closeVoiceDropdown, { once: true }); });
+}
+function closeVoiceDropdown() {
+  const dropdown = document.getElementById('voiceDropdownList');
+  if (dropdown) dropdown.style.display = 'none';
+}
+const PLAY_SVG = `
 <svg id="fi_702132" viewBox="0 0 397.2 397.2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
   <g>
     <path fill="currentColor" d="M284.2,178l-58-33.6l-57.6-33.2c-5.6-3.2-12-4-17.6-2.4c-5.6,1.6-10.8,5.2-14,10.8
@@ -4553,141 +4547,141 @@ ${userPrompt}`
   </g>
 </svg>`;
 
-  function selectVoice(idx) { selectedVoiceIdx = idx; renderCreateStyle(); }
+function selectVoice(idx) { selectedVoiceIdx = idx; renderCreateStyle(); }
 
-  let styles = JSON.parse(localStorage.getItem('styles')||'[]');
-  let currentStyleIdx = localStorage.getItem('currentStyleIdx') ? parseInt(localStorage.getItem('currentStyleIdx')) : null;
-  let styleModalTab = 'create';
-  let editingIdx = null;
+let styles = JSON.parse(localStorage.getItem('styles') || '[]');
+let currentStyleIdx = localStorage.getItem('currentStyleIdx') ? parseInt(localStorage.getItem('currentStyleIdx')) : null;
+let styleModalTab = 'create';
+let editingIdx = null;
 
-  function closeStyleModal() { document.getElementById('styleModal').classList.add('hidden'); }
-  function showCreateStyle() {
-    styleModalTab = 'create';
-    document.getElementById('tabCreateStyle').classList.add('active');
-    document.getElementById('tabStyleList').classList.remove('active');
-    document.getElementById('createStyleView').classList.remove('hidden');
-    document.getElementById('styleListView').classList.add('hidden');
-    renderCreateStyle();
-    initReferenceVideos();
-  }
+function closeStyleModal() { document.getElementById('styleModal').classList.add('hidden'); }
+function showCreateStyle() {
+  styleModalTab = 'create';
+  document.getElementById('tabCreateStyle').classList.add('active');
+  document.getElementById('tabStyleList').classList.remove('active');
+  document.getElementById('createStyleView').classList.remove('hidden');
+  document.getElementById('styleListView').classList.add('hidden');
+  renderCreateStyle();
+  initReferenceVideos();
+}
 
-  function showStyleList() {
-    styleModalTab = 'list';
-    document.getElementById('tabCreateStyle').classList.remove('active');
-    document.getElementById('tabStyleList').classList.add('active');
-    document.getElementById('createStyleView').classList.add('hidden');
-    document.getElementById('styleListView').classList.remove('hidden');
-    document.getElementById('styleListView').innerHTML = renderStyles();
+function showStyleList() {
+  styleModalTab = 'list';
+  document.getElementById('tabCreateStyle').classList.remove('active');
+  document.getElementById('tabStyleList').classList.add('active');
+  document.getElementById('createStyleView').classList.add('hidden');
+  document.getElementById('styleListView').classList.remove('hidden');
+  document.getElementById('styleListView').innerHTML = renderStyles();
+}
+// =====================================================================
+// STYLE STORAGE - MIGRATED TO src/utils/storage.js
+// TODO: Remove after full migration to new structure
+// =====================================================================
+function saveStyles() {
+  if (window.appStorage && window.appStorage.saveStyles) {
+    return window.appStorage.saveStyles(styles);
   }
-  // =====================================================================
-  // STYLE STORAGE - MIGRATED TO src/utils/storage.js
-  // TODO: Remove after full migration to new structure
-  // =====================================================================
-  function saveStyles() {
-    if (window.appStorage && window.appStorage.saveStyles) {
-      return window.appStorage.saveStyles(styles);
-    }
-    // Fallback to old implementation
-    localStorage.setItem('styles', JSON.stringify(styles));
-  }
+  // Fallback to old implementation
+  localStorage.setItem('styles', JSON.stringify(styles));
+}
 
-  let previewPlayer = new Audio();
-  function driveToStream(url) {
-    try {
-      if (url.includes('docs.google.com/uc?export=open&id=')) return url;
-      const m = url.match(/\/d\/([A-Za-z0-9_-]+)/);
-      if (m && m[1]) return `https://docs.google.com/uc?export=open&id=${m[1]}`;
-      const id = new URL(url).searchParams.get('id');
-      if (id) return `https://docs.google.com/uc?export=open&id=${id}`;
-    } catch (e) {}
-    return url;
-  }
-  function playPreview(url) {
-    const stream = driveToStream(url);
-    previewPlayer.pause(); previewPlayer.currentTime = 0; previewPlayer.src = stream;
-    previewPlayer.play().catch(() => {
-      alert('Could not play preview. Make sure the file is public and streams (docs.google.com/uc?export=open&id=...).');
-    });
-  }
-  
-  // YouTube video preview functions
-  function getYouTubeVideoId(url) {
-    if (!url) return null;
-    
-    // Match various YouTube URL formats
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-      /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/
-    ];
-    
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return match[1];
-      }
-    }
-    
-    return null;
-  }
-  
-  function updateYouTubePreview(url) {
-    const previewDiv = document.getElementById('youtubePreview');
-    const embedIframe = document.getElementById('youtubeEmbed');
-    
-    if (!previewDiv || !embedIframe) return;
-    
-    const videoId = getYouTubeVideoId(url);
-    
-    if (videoId) {
-      embedIframe.src = `https://www.youtube.com/embed/${videoId}`;
-      previewDiv.classList.remove('hidden');
-      console.log('✅ YouTube video loaded:', videoId);
-    } else {
-      previewDiv.classList.add('hidden');
-      embedIframe.src = '';
+let previewPlayer = new Audio();
+function driveToStream(url) {
+  try {
+    if (url.includes('docs.google.com/uc?export=open&id=')) return url;
+    const m = url.match(/\/d\/([A-Za-z0-9_-]+)/);
+    if (m && m[1]) return `https://docs.google.com/uc?export=open&id=${m[1]}`;
+    const id = new URL(url).searchParams.get('id');
+    if (id) return `https://docs.google.com/uc?export=open&id=${id}`;
+  } catch (e) { }
+  return url;
+}
+function playPreview(url) {
+  const stream = driveToStream(url);
+  previewPlayer.pause(); previewPlayer.currentTime = 0; previewPlayer.src = stream;
+  previewPlayer.play().catch(() => {
+    alert('Could not play preview. Make sure the file is public and streams (docs.google.com/uc?export=open&id=...).');
+  });
+}
+
+// YouTube video preview functions
+function getYouTubeVideoId(url) {
+  if (!url) return null;
+
+  // Match various YouTube URL formats
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
     }
   }
-  
-  function clearYouTubePreview() {
-    const input = document.getElementById('competitorVideoUrl');
-    const previewDiv = document.getElementById('youtubePreview');
-    const embedIframe = document.getElementById('youtubeEmbed');
-    
-    if (input) input.value = '';
-    if (embedIframe) embedIframe.src = '';
-    if (previewDiv) previewDiv.classList.add('hidden');
+
+  return null;
+}
+
+function updateYouTubePreview(url) {
+  const previewDiv = document.getElementById('youtubePreview');
+  const embedIframe = document.getElementById('youtubeEmbed');
+
+  if (!previewDiv || !embedIframe) return;
+
+  const videoId = getYouTubeVideoId(url);
+
+  if (videoId) {
+    embedIframe.src = `https://www.youtube.com/embed/${videoId}`;
+    previewDiv.classList.remove('hidden');
+    console.log('✅ YouTube video loaded:', videoId);
+  } else {
+    previewDiv.classList.add('hidden');
+    embedIframe.src = '';
   }
+}
 
-  function renderCreateStyle(editing = false) {
-    let style = { 
-      name: '', 
-      wordCount: 2000, 
-      lang: 'English', 
-      voice: 'aMSt68OGf4xUZAnLpTU8', 
-      voiceSpeed: 1,
-      voiceProvider: 'premium',
-      similarity: 100,
-      stability: 100,
-      exaggeration: 0,
-      speechifySpeed: 1,
-      speechifyPitch: 0,
-      speechifyVolume: 100,
-      youtubeConnected: false,
-      youtubeChannelId: '',
-      youtubeChannelName: '',
-      youtubeChannelAvatar: '',
-      youtubeChannelSubs: '',
-      youtubeAccessToken: '',
-      youtubeRefreshToken: ''
-    }; // Juniper - Works with AI33.pro
-    if (editing && editingIdx !== null) style = styles[editingIdx];
+function clearYouTubePreview() {
+  const input = document.getElementById('competitorVideoUrl');
+  const previewDiv = document.getElementById('youtubePreview');
+  const embedIframe = document.getElementById('youtubeEmbed');
 
-    // Use the global ELEVENLABS_VOICES array (20 voices)
-    let voices = ELEVENLABS_VOICES;
+  if (input) input.value = '';
+  if (embedIframe) embedIframe.src = '';
+  if (previewDiv) previewDiv.classList.add('hidden');
+}
 
-    let langs = ['English', 'Spanish', 'French', 'German'];
+function renderCreateStyle(editing = false) {
+  let style = {
+    name: '',
+    wordCount: 2000,
+    lang: 'English',
+    voice: 'aMSt68OGf4xUZAnLpTU8',
+    voiceSpeed: 1,
+    voiceProvider: 'premium',
+    similarity: 100,
+    stability: 100,
+    exaggeration: 0,
+    speechifySpeed: 1,
+    speechifyPitch: 0,
+    speechifyVolume: 100,
+    youtubeConnected: false,
+    youtubeChannelId: '',
+    youtubeChannelName: '',
+    youtubeChannelAvatar: '',
+    youtubeChannelSubs: '',
+    youtubeAccessToken: '',
+    youtubeRefreshToken: ''
+  }; // Juniper - Works with AI33.pro
+  if (editing && editingIdx !== null) style = styles[editingIdx];
 
-    document.getElementById('createStyleView').innerHTML = `
+  // Use the global ELEVENLABS_VOICES array (20 voices)
+  let voices = ELEVENLABS_VOICES;
+
+  let langs = ['English', 'Spanish', 'French', 'German'];
+
+  document.getElementById('createStyleView').innerHTML = `
 <form onsubmit="event.preventDefault();${editing ? 'submitEditStyle()' : 'submitCreateStyle()'}" class="flex flex-col gap-6">
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
     <div>
@@ -5139,101 +5133,101 @@ ${userPrompt}`
     ${editing ? 'Save Changes' : 'Create Style'}
   </button>
 </form>`;
-    
-    // Add voice preview functionality after form is rendered
-    setTimeout(() => {
-      const voiceSelect = document.getElementById('styleVoiceSelect');
-      const previewBtn = document.getElementById('previewVoiceBtn');
-      
-      if (previewBtn && voiceSelect) {
-        // ElevenLabs voice sample URLs
-        const voiceSamples = {
-          "21m00Tcm4TlvDq8ikWAM": "https://storage.googleapis.com/eleven-public-prod/premade/voices/21m00Tcm4TlvDq8ikWAM/51827e1e-fe28-40bb-9677-54a5196b7ff7.mp3",
-          "AZnzlk1XvdvUeBnXmlld": "https://storage.googleapis.com/eleven-public-prod/premade/voices/AZnzlk1XvdvUeBnXmlld/5d0e8272-10de-4508-8f0e-aa98936b5db8.mp3",
-          "EXAVITQu4vr4xnSDxMaL": "https://storage.googleapis.com/eleven-public-prod/premade/voices/EXAVITQu4vr4xnSDxMaL/5e5d36f0-6e08-4f6d-94f4-e18b85c1b13d.mp3",
-          "ErXwobaYiN019PkySvjV": "https://storage.googleapis.com/eleven-public-prod/premade/voices/ErXwobaYiN019PkySvjV/b554c2c1-dd66-4fe0-9e6e-2ee7b0c991a8.mp3",
-          "MF3mGyEYCl7XYWbV9V6O": "https://storage.googleapis.com/eleven-public-prod/premade/voices/MF3mGyEYCl7XYWbV9V6O/cb78816b-9d2d-4478-b2a8-b69dec13e04c.mp3",
-          "TxGEqnHWrfWFTfGW9XjX": "https://storage.googleapis.com/eleven-public-prod/premade/voices/TxGEqnHWrfWFTfGW9XjX/c6c80e1e-c725-43b0-a368-db21b9278a7f.mp3",
-          "VR6AewLTigWG4xSOukaG": "https://storage.googleapis.com/eleven-public-prod/premade/voices/VR6AewLTigWG4xSOukaG/0db23d41-ad0d-4247-a3db-d21c42ff9c66.mp3",
-          "pNInz6obpgDQGcFmaJgB": "https://storage.googleapis.com/eleven-public-prod/premade/voices/pNInz6obpgDQGcFmaJgB/98a34ef2-5c3d-4d4c-9a7a-b78cdc3e2a05.mp3",
-          "yoZ06aMxZJJ28mfd3POQ": "https://storage.googleapis.com/eleven-public-prod/premade/voices/yoZ06aMxZJJ28mfd3POQ/6c311dd8-d05d-48d8-b386-a2cf5e0d03ba.mp3",
-          "CwhRBWXzGAHq8TQ4Fs17": "https://storage.googleapis.com/eleven-public-prod/premade/voices/CwhRBWXzGAHq8TQ4Fs17/64e24c7a-bd17-4b45-ab8e-d45d3e466bd8.mp3",
-          "ODq5zmih8GrVes37Dizd": "https://storage.googleapis.com/eleven-public-prod/premade/voices/ODq5zmih8GrVes37Dizd/a502ae24-8b8d-4109-ae18-bbe6e9c4e9f8.mp3",
-          "IKne3meq5aSn9XLyUdCD": "https://storage.googleapis.com/eleven-public-prod/premade/voices/IKne3meq5aSn9XLyUdCD/102de6f2-22ed-43e0-a1f1-111fa75c5481.mp3",
-          "onwK4e9ZLuTAKqWW03F9": "https://storage.googleapis.com/eleven-public-prod/premade/voices/onwK4e9ZLuTAKqWW03F9/f998500f-6266-4274-a8de-b3d6f0e7407e.mp3",
-          "pFZP5JQG7iQjIQuC4Bku": "https://storage.googleapis.com/eleven-public-prod/premade/voices/pFZP5JQG7iQjIQuC4Bku/89b68b35-e0ad-4889-8c38-733f73f593de.mp3",
-          "XB0fDUnXU5powFXDhCwa": "https://storage.googleapis.com/eleven-public-prod/premade/voices/XB0fDUnXU5powFXDhCwa/942356dc-f10d-4d89-bda5-4f8505ee038b.mp3",
-          "iP95p4xoKVk53GoZ742B": "https://storage.googleapis.com/eleven-public-prod/premade/voices/iP95p4xoKVk53GoZ742B/c170d297-64fb-43e5-ad47-4009561f6c1d.mp3",
-          "nPczCjzI2devNBz1zQrb": "https://storage.googleapis.com/eleven-public-prod/premade/voices/nPczCjzI2devNBz1zQrb/65d80f52-703f-4cae-a91d-75d4e200ed02.mp3",
-          "N2lVS1w4EtoT3dr4eOWO": "https://storage.googleapis.com/eleven-public-prod/premade/voices/N2lVS1w4EtoT3dr4eOWO/ac833bd8-ffda-4938-9ebc-b0f99ca25481.mp3",
-          "Zlb1dXrM653N07WRdFW3": "https://storage.googleapis.com/eleven-public-prod/premade/voices/Zlb1dXrM653N07WRdFW3/bb0de50c-84c7-40cd-a09b-6ff7e1713d86.mp3",
-          "ThT5KcBeYPX3keUQqHPh": "https://storage.googleapis.com/eleven-public-prod/premade/voices/ThT5KcBeYPX3keUQqHPh/28b5aa82-7ec9-4a70-a552-fdb17285b97a.mp3"
-        };
-        
-        let currentAudio = null;
-        
-        previewBtn.onclick = function(e) {
-          e.preventDefault();
-          const selectedVoiceId = voiceSelect.value;
-          const sampleUrl = voiceSamples[selectedVoiceId];
-          
-          if (!sampleUrl) {
-            alert('Preview not available for this voice');
-            return;
-          }
-          
-          // Stop any currently playing audio
-          if (currentAudio) {
-            currentAudio.pause();
-            currentAudio = null;
-          }
-          
-          previewBtn.disabled = true;
-          previewBtn.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div> Playing...';
-          
-          currentAudio = new Audio(sampleUrl);
-          
-          currentAudio.onended = function() {
-            previewBtn.disabled = false;
-            previewBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Preview Voice';
-            currentAudio = null;
-          };
-          
-          currentAudio.onerror = function() {
-            previewBtn.disabled = false;
-            previewBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Preview Voice';
-            alert('Could not play preview audio');
-            currentAudio = null;
-          };
-          
-          currentAudio.play().catch(err => {
-            previewBtn.disabled = false;
-            previewBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Preview Voice';
-            alert('Could not play preview: ' + err.message);
-          });
-        };
-      }
-    }, 100);
-  }
 
-  function renderStyles() {
-    let html = '';
-    if (styles.length === 0) {
-      html = `<div class="py-8 text-center text-gray-500 dark:text-gray-400">
+  // Add voice preview functionality after form is rendered
+  setTimeout(() => {
+    const voiceSelect = document.getElementById('styleVoiceSelect');
+    const previewBtn = document.getElementById('previewVoiceBtn');
+
+    if (previewBtn && voiceSelect) {
+      // ElevenLabs voice sample URLs
+      const voiceSamples = {
+        "21m00Tcm4TlvDq8ikWAM": "https://storage.googleapis.com/eleven-public-prod/premade/voices/21m00Tcm4TlvDq8ikWAM/51827e1e-fe28-40bb-9677-54a5196b7ff7.mp3",
+        "AZnzlk1XvdvUeBnXmlld": "https://storage.googleapis.com/eleven-public-prod/premade/voices/AZnzlk1XvdvUeBnXmlld/5d0e8272-10de-4508-8f0e-aa98936b5db8.mp3",
+        "EXAVITQu4vr4xnSDxMaL": "https://storage.googleapis.com/eleven-public-prod/premade/voices/EXAVITQu4vr4xnSDxMaL/5e5d36f0-6e08-4f6d-94f4-e18b85c1b13d.mp3",
+        "ErXwobaYiN019PkySvjV": "https://storage.googleapis.com/eleven-public-prod/premade/voices/ErXwobaYiN019PkySvjV/b554c2c1-dd66-4fe0-9e6e-2ee7b0c991a8.mp3",
+        "MF3mGyEYCl7XYWbV9V6O": "https://storage.googleapis.com/eleven-public-prod/premade/voices/MF3mGyEYCl7XYWbV9V6O/cb78816b-9d2d-4478-b2a8-b69dec13e04c.mp3",
+        "TxGEqnHWrfWFTfGW9XjX": "https://storage.googleapis.com/eleven-public-prod/premade/voices/TxGEqnHWrfWFTfGW9XjX/c6c80e1e-c725-43b0-a368-db21b9278a7f.mp3",
+        "VR6AewLTigWG4xSOukaG": "https://storage.googleapis.com/eleven-public-prod/premade/voices/VR6AewLTigWG4xSOukaG/0db23d41-ad0d-4247-a3db-d21c42ff9c66.mp3",
+        "pNInz6obpgDQGcFmaJgB": "https://storage.googleapis.com/eleven-public-prod/premade/voices/pNInz6obpgDQGcFmaJgB/98a34ef2-5c3d-4d4c-9a7a-b78cdc3e2a05.mp3",
+        "yoZ06aMxZJJ28mfd3POQ": "https://storage.googleapis.com/eleven-public-prod/premade/voices/yoZ06aMxZJJ28mfd3POQ/6c311dd8-d05d-48d8-b386-a2cf5e0d03ba.mp3",
+        "CwhRBWXzGAHq8TQ4Fs17": "https://storage.googleapis.com/eleven-public-prod/premade/voices/CwhRBWXzGAHq8TQ4Fs17/64e24c7a-bd17-4b45-ab8e-d45d3e466bd8.mp3",
+        "ODq5zmih8GrVes37Dizd": "https://storage.googleapis.com/eleven-public-prod/premade/voices/ODq5zmih8GrVes37Dizd/a502ae24-8b8d-4109-ae18-bbe6e9c4e9f8.mp3",
+        "IKne3meq5aSn9XLyUdCD": "https://storage.googleapis.com/eleven-public-prod/premade/voices/IKne3meq5aSn9XLyUdCD/102de6f2-22ed-43e0-a1f1-111fa75c5481.mp3",
+        "onwK4e9ZLuTAKqWW03F9": "https://storage.googleapis.com/eleven-public-prod/premade/voices/onwK4e9ZLuTAKqWW03F9/f998500f-6266-4274-a8de-b3d6f0e7407e.mp3",
+        "pFZP5JQG7iQjIQuC4Bku": "https://storage.googleapis.com/eleven-public-prod/premade/voices/pFZP5JQG7iQjIQuC4Bku/89b68b35-e0ad-4889-8c38-733f73f593de.mp3",
+        "XB0fDUnXU5powFXDhCwa": "https://storage.googleapis.com/eleven-public-prod/premade/voices/XB0fDUnXU5powFXDhCwa/942356dc-f10d-4d89-bda5-4f8505ee038b.mp3",
+        "iP95p4xoKVk53GoZ742B": "https://storage.googleapis.com/eleven-public-prod/premade/voices/iP95p4xoKVk53GoZ742B/c170d297-64fb-43e5-ad47-4009561f6c1d.mp3",
+        "nPczCjzI2devNBz1zQrb": "https://storage.googleapis.com/eleven-public-prod/premade/voices/nPczCjzI2devNBz1zQrb/65d80f52-703f-4cae-a91d-75d4e200ed02.mp3",
+        "N2lVS1w4EtoT3dr4eOWO": "https://storage.googleapis.com/eleven-public-prod/premade/voices/N2lVS1w4EtoT3dr4eOWO/ac833bd8-ffda-4938-9ebc-b0f99ca25481.mp3",
+        "Zlb1dXrM653N07WRdFW3": "https://storage.googleapis.com/eleven-public-prod/premade/voices/Zlb1dXrM653N07WRdFW3/bb0de50c-84c7-40cd-a09b-6ff7e1713d86.mp3",
+        "ThT5KcBeYPX3keUQqHPh": "https://storage.googleapis.com/eleven-public-prod/premade/voices/ThT5KcBeYPX3keUQqHPh/28b5aa82-7ec9-4a70-a552-fdb17285b97a.mp3"
+      };
+
+      let currentAudio = null;
+
+      previewBtn.onclick = function (e) {
+        e.preventDefault();
+        const selectedVoiceId = voiceSelect.value;
+        const sampleUrl = voiceSamples[selectedVoiceId];
+
+        if (!sampleUrl) {
+          alert('Preview not available for this voice');
+          return;
+        }
+
+        // Stop any currently playing audio
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio = null;
+        }
+
+        previewBtn.disabled = true;
+        previewBtn.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div> Playing...';
+
+        currentAudio = new Audio(sampleUrl);
+
+        currentAudio.onended = function () {
+          previewBtn.disabled = false;
+          previewBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Preview Voice';
+          currentAudio = null;
+        };
+
+        currentAudio.onerror = function () {
+          previewBtn.disabled = false;
+          previewBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Preview Voice';
+          alert('Could not play preview audio');
+          currentAudio = null;
+        };
+
+        currentAudio.play().catch(err => {
+          previewBtn.disabled = false;
+          previewBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Preview Voice';
+          alert('Could not play preview: ' + err.message);
+        });
+      };
+    }
+  }, 100);
+}
+
+function renderStyles() {
+  let html = '';
+  if (styles.length === 0) {
+    html = `<div class="py-8 text-center text-gray-500 dark:text-gray-400">
         No styles yet.<br>
         <button onclick="showCreateStyle()" class="mt-4 px-4 py-2 rounded-lg font-semibold
                         bg-primary-600 hover:bg-primary-700 text-white transition">
           Create Style
         </button>
       </div>`;
-    } else {
-      html += `<div class="flex flex-col gap-3 max-h-[270px] overflow-y-auto pr-1">`;
-      styles.forEach((s, idx) => {
-        const active = currentStyleIdx === idx;
-        html += `
+  } else {
+    html += `<div class="flex flex-col gap-3 max-h-[270px] overflow-y-auto pr-1">`;
+    styles.forEach((s, idx) => {
+      const active = currentStyleIdx === idx;
+      html += `
         <div class="group flex items-center justify-between gap-3 rounded-2xl border transition-all
           ${active ? 'bg-primary-50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800'
-                   : 'bg-white/95 dark:bg-gray-800/95 border-gray-200 dark:border-gray-700'}
+          : 'bg-white/95 dark:bg-gray-800/95 border-gray-200 dark:border-gray-700'}
           hover:shadow-md hover:-translate-y-[1px]">
           <div class="px-4 py-3">
             <div class="font-semibold text-gray-900 dark:text-gray-100">
@@ -5246,183 +5240,183 @@ ${userPrompt}`
           </div>
           <div class="flex items-center gap-2 pr-3 pb-2 pt-2">
             ${active
-              ? `<button onclick="useStyle(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 hover:bg-green-700 text-white transition">On</button>`
-              : `<button onclick="useStyle(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 hover:bg-primary-700 text-white transition">Off</button>`}
+          ? `<button onclick="useStyle(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 hover:bg-green-700 text-white transition">On</button>`
+          : `<button onclick="useStyle(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 hover:bg-primary-700 text-white transition">Off</button>`}
             <button onclick="editStyle(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition">Edit</button>
             <button onclick="deleteStyle(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-600 hover:bg-rose-700 text-white transition">Delete</button>
           </div>
         </div>`;
-      });
-      html += `</div>
+    });
+    html += `</div>
       <button onclick="showCreateStyle()" class="mt-5 w-full px-4 py-2 rounded-xl font-semibold
                      bg-primary-600 hover:bg-primary-700 text-white transition">
         Create Style
       </button>`;
-    }
-    return html;
+  }
+  return html;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('styleModal');
+  if (!modal) return;
+  modal.addEventListener('click', (e) => {
+    const panel = modal.querySelector('.modal-panel');
+    if (panel && !panel.contains(e.target)) closeStyleModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeStyleModal();
+  });
+});
+
+function toggleAdvanced() {
+  let el = document.getElementById('advancedSettings');
+  let arrow = document.getElementById('advancedArrow');
+  el.classList.toggle('hidden');
+  if (arrow) {
+    arrow.style.transform = el.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+}
+
+function submitCreateStyle() {
+  const referenceUrls = (window.getReferenceUrls ? window.getReferenceUrls() : []);
+  let wordCount = parseInt(document.getElementById('styleWordCount').value) || 2000;
+  if (wordCount > 8000) {
+    alert('Maximum word count is 8000 words.');
+    wordCount = 8000;
+    document.getElementById('styleWordCount').value = 8000;
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('styleModal');
-    if (!modal) return;
-    modal.addEventListener('click', (e) => {
-      const panel = modal.querySelector('.modal-panel');
-      if (panel && !panel.contains(e.target)) closeStyleModal();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeStyleModal();
-    });
+  // Get voice ID from either the hidden input or global variable
+  let voiceId = selectedVoiceId || document.getElementById('styleVoiceSelect')?.value || 'aMSt68OGf4xUZAnLpTU8'; // Juniper - Works with AI33.pro
+
+  const s = {
+    name: document.getElementById('styleName').value.trim(),
+    wordCount: wordCount,
+    lang: document.getElementById('styleLang').value,
+    voice: voiceId,
+    voiceSpeed: parseFloat(document.getElementById('styleVoiceSpeed')?.value || 1) || 1,
+    voiceProvider: document.getElementById('voiceProvider')?.value || 'premium',
+    similarity: parseInt(document.getElementById('styleSimilarity')?.value || 100) || 100,
+    stability: parseInt(document.getElementById('styleStability')?.value || 100) || 100,
+    exaggeration: parseInt(document.getElementById('styleExaggeration')?.value || 0) || 0,
+    speechifySpeed: parseFloat(document.getElementById('speechifySpeed')?.value || 1) || 1,
+    speechifyPitch: parseInt(document.getElementById('speechifyPitch')?.value || 0) || 0,
+    speechifyVolume: parseInt(document.getElementById('speechifyVolume')?.value || 100) || 100,
+    youtubeConnected: document.getElementById('youtubeConnected-new')?.value === 'true',
+    youtubeChannelId: document.getElementById('youtubeChannelId-new')?.value || '',
+    youtubeChannelName: document.getElementById('youtubeChannelName-new')?.textContent || '',
+    youtubeChannelAvatar: document.getElementById('youtubeChannelAvatar-new')?.src || '',
+    youtubeChannelSubs: document.getElementById('youtubeChannelSubs-new')?.textContent || '',
+    youtubeAccessToken: document.getElementById('youtubeAccessToken-new')?.value || '',
+    youtubeRefreshToken: document.getElementById('youtubeRefreshToken-new')?.value || '',
+    competitorUrl: document.getElementById('competitorVideoUrl')?.value.trim() || '',
+    referenceUrls,
+    context: document.getElementById('additionalContext').value.trim()
+  };
+
+  console.log('=== Saving New Style ===');
+  console.log('Style data:', s);
+  console.log('Voice settings:', {
+    id: s.voice,
+    speed: s.voiceSpeed,
+    similarity: s.similarity,
+    stability: s.stability,
+    exaggeration: s.exaggeration
   });
 
-  function toggleAdvanced() {
-    let el = document.getElementById('advancedSettings');
-    let arrow = document.getElementById('advancedArrow');
-    el.classList.toggle('hidden');
-    if (arrow) {
-      arrow.style.transform = el.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-    }
-  }
+  styles.push(s);
+  saveStyles();
+  currentStyleIdx = styles.length - 1;
+  localStorage.setItem('currentStyleIdx', currentStyleIdx);
+  showStyleList();
+}
 
-  function submitCreateStyle() {
-    const referenceUrls = (window.getReferenceUrls ? window.getReferenceUrls() : []);
-    let wordCount = parseInt(document.getElementById('styleWordCount').value) || 2000;
-    if (wordCount > 8000) {
-      alert('Maximum word count is 8000 words.');
-      wordCount = 8000;
-      document.getElementById('styleWordCount').value = 8000;
+function useStyle(idx) {
+  if (currentStyleIdx === idx) {
+    currentStyleIdx = null;
+    localStorage.removeItem('currentStyleIdx');
+    document.getElementById('additionalContextHidden').value = '';
+    window.additionalContext = '';
+    document.getElementById('icon').classList.remove('icon-active');
+  } else {
+    currentStyleIdx = idx;
+    localStorage.setItem('currentStyleIdx', idx);
+    const s = styles[idx];
+    if (document.getElementById('mainWordCount')) {
+      document.getElementById('mainWordCount').value = s.wordCount;
+      document.getElementById('mainWordCount').dispatchEvent(new Event('input'));
     }
-    
-    // Get voice ID from either the hidden input or global variable
-    let voiceId = selectedVoiceId || document.getElementById('styleVoiceSelect')?.value || 'aMSt68OGf4xUZAnLpTU8'; // Juniper - Works with AI33.pro
-    
-    const s = {
-      name: document.getElementById('styleName').value.trim(),
-      wordCount: wordCount,
-      lang: document.getElementById('styleLang').value,
-      voice: voiceId,
-      voiceSpeed: parseFloat(document.getElementById('styleVoiceSpeed')?.value || 1) || 1,
-      voiceProvider: document.getElementById('voiceProvider')?.value || 'premium',
-      similarity: parseInt(document.getElementById('styleSimilarity')?.value || 100) || 100,
-      stability: parseInt(document.getElementById('styleStability')?.value || 100) || 100,
-      exaggeration: parseInt(document.getElementById('styleExaggeration')?.value || 0) || 0,
-      speechifySpeed: parseFloat(document.getElementById('speechifySpeed')?.value || 1) || 1,
-      speechifyPitch: parseInt(document.getElementById('speechifyPitch')?.value || 0) || 0,
-      speechifyVolume: parseInt(document.getElementById('speechifyVolume')?.value || 100) || 100,
-      youtubeConnected: document.getElementById('youtubeConnected-new')?.value === 'true',
-      youtubeChannelId: document.getElementById('youtubeChannelId-new')?.value || '',
-      youtubeChannelName: document.getElementById('youtubeChannelName-new')?.textContent || '',
-      youtubeChannelAvatar: document.getElementById('youtubeChannelAvatar-new')?.src || '',
-      youtubeChannelSubs: document.getElementById('youtubeChannelSubs-new')?.textContent || '',
-      youtubeAccessToken: document.getElementById('youtubeAccessToken-new')?.value || '',
-      youtubeRefreshToken: document.getElementById('youtubeRefreshToken-new')?.value || '',
-      competitorUrl: document.getElementById('competitorVideoUrl')?.value.trim() || '',
-      referenceUrls,
-      context: document.getElementById('additionalContext').value.trim()
-    };
-    
-    console.log('=== Saving New Style ===');
-    console.log('Style data:', s);
-    console.log('Voice settings:', {
-      id: s.voice,
-      speed: s.voiceSpeed,
-      similarity: s.similarity,
-      stability: s.stability,
-      exaggeration: s.exaggeration
-    });
-    
-    styles.push(s);
+    document.getElementById('count-text').textContent = s.wordCount;
+    const ctxVal = s.context || '';
+    document.getElementById('additionalContextHidden').value = ctxVal;
+    window.additionalContext = ctxVal;
+    const icon = document.getElementById('icon');
+    if (ctxVal.length > 0) icon.classList.add('icon-active');
+    else icon.classList.remove('icon-active');
+  }
+  document.getElementById('styleListView').innerHTML = renderStyles();
+  closeStyleModal();
+}
+
+function deleteStyle(idx) {
+  if (confirm("Delete this style?")) {
+    styles.splice(idx, 1);
+    if (currentStyleIdx >= styles.length) currentStyleIdx = styles.length - 1;
     saveStyles();
-    currentStyleIdx = styles.length - 1;
     localStorage.setItem('currentStyleIdx', currentStyleIdx);
-    showStyleList();
-  }
-
-  function useStyle(idx) {
-    if (currentStyleIdx === idx) {
-      currentStyleIdx = null;
-      localStorage.removeItem('currentStyleIdx');
-      document.getElementById('additionalContextHidden').value = '';
-      window.additionalContext = '';
-      document.getElementById('icon').classList.remove('icon-active');
-    } else {
-      currentStyleIdx = idx;
-      localStorage.setItem('currentStyleIdx', idx);
-      const s = styles[idx];
-      if (document.getElementById('mainWordCount')) {
-        document.getElementById('mainWordCount').value = s.wordCount;
-        document.getElementById('mainWordCount').dispatchEvent(new Event('input'));
-      }
-      document.getElementById('count-text').textContent = s.wordCount;
-      const ctxVal = s.context || '';
-      document.getElementById('additionalContextHidden').value = ctxVal;
-      window.additionalContext = ctxVal;
-      const icon = document.getElementById('icon');
-      if (ctxVal.length > 0) icon.classList.add('icon-active');
-      else icon.classList.remove('icon-active');
-    }
     document.getElementById('styleListView').innerHTML = renderStyles();
-    closeStyleModal();
   }
+}
 
-  function deleteStyle(idx) {
-    if(confirm("Delete this style?")) {
-      styles.splice(idx,1);
-      if(currentStyleIdx>=styles.length) currentStyleIdx = styles.length-1;
-      saveStyles();
-      localStorage.setItem('currentStyleIdx',currentStyleIdx);
-      document.getElementById('styleListView').innerHTML = renderStyles();
-    }
+function editStyle(idx) {
+  editingIdx = idx;
+  showCreateStyle();
+  renderCreateStyle(true);
+  const btn = document.getElementById('createStyleBtn');
+  if (btn) btn.disabled = false;
+}
+
+function submitEditStyle() {
+  let wordCount = parseInt(document.getElementById('styleWordCount').value) || 2000;
+  if (wordCount > 8000) {
+    alert('Maximum word count is 8000 words.');
+    wordCount = 8000;
   }
+  const s = {
+    name: document.getElementById('styleName').value.trim(),
+    wordCount: wordCount,
+    lang: document.getElementById('styleLang').value,
+    voice: selectedVoiceId || document.getElementById('styleVoiceSelect')?.value || 'aMSt68OGf4xUZAnLpTU8',
+    voiceSpeed: parseFloat(document.getElementById('styleVoiceSpeed')?.value || 1) || 1,
+    voiceProvider: document.getElementById('voiceProvider')?.value || 'premium',
+    similarity: parseInt(document.getElementById('styleSimilarity')?.value || 100) || 100,
+    stability: parseInt(document.getElementById('styleStability')?.value || 100) || 100,
+    exaggeration: parseInt(document.getElementById('styleExaggeration')?.value || 0) || 0,
+    speechifySpeed: parseFloat(document.getElementById('speechifySpeed')?.value || 1) || 1,
+    speechifyPitch: parseInt(document.getElementById('speechifyPitch')?.value || 0) || 0,
+    speechifyVolume: parseInt(document.getElementById('speechifyVolume')?.value || 100) || 100,
+    youtubeConnected: document.getElementById(`youtubeConnected-${editingIdx}`)?.value === 'true',
+    youtubeChannelId: document.getElementById(`youtubeChannelId-${editingIdx}`)?.value || '',
+    youtubeChannelName: document.getElementById(`youtubeChannelName-${editingIdx}`)?.textContent || '',
+    youtubeChannelAvatar: document.getElementById(`youtubeChannelAvatar-${editingIdx}`)?.src || '',
+    youtubeChannelSubs: document.getElementById(`youtubeChannelSubs-${editingIdx}`)?.textContent || '',
+    youtubeAccessToken: document.getElementById(`youtubeAccessToken-${editingIdx}`)?.value || '',
+    youtubeRefreshToken: document.getElementById(`youtubeRefreshToken-${editingIdx}`)?.value || '',
+    competitorUrl: document.getElementById('competitorVideoUrl')?.value.trim() || '',
+    context: document.getElementById('additionalContext').value.trim(),
+  };
+  styles[editingIdx] = s;
+  saveStyles();
+  showStyleList();
+  editingIdx = null;
+}
 
-  function editStyle(idx) {
-    editingIdx = idx;
-    showCreateStyle();
-    renderCreateStyle(true);
-    const btn = document.getElementById('createStyleBtn');
-    if (btn) btn.disabled = false;
-  }
+function cancelEdit() { editingIdx = null; showStyleList(); }
 
-  function submitEditStyle() {
-    let wordCount = parseInt(document.getElementById('styleWordCount').value) || 2000;
-    if (wordCount > 8000) {
-      alert('Maximum word count is 8000 words.');
-      wordCount = 8000;
-    }
-    const s = {
-      name: document.getElementById('styleName').value.trim(),
-      wordCount: wordCount,
-      lang: document.getElementById('styleLang').value,
-      voice: selectedVoiceId || document.getElementById('styleVoiceSelect')?.value || 'aMSt68OGf4xUZAnLpTU8',
-      voiceSpeed: parseFloat(document.getElementById('styleVoiceSpeed')?.value || 1) || 1,
-      voiceProvider: document.getElementById('voiceProvider')?.value || 'premium',
-      similarity: parseInt(document.getElementById('styleSimilarity')?.value || 100) || 100,
-      stability: parseInt(document.getElementById('styleStability')?.value || 100) || 100,
-      exaggeration: parseInt(document.getElementById('styleExaggeration')?.value || 0) || 0,
-      speechifySpeed: parseFloat(document.getElementById('speechifySpeed')?.value || 1) || 1,
-      speechifyPitch: parseInt(document.getElementById('speechifyPitch')?.value || 0) || 0,
-      speechifyVolume: parseInt(document.getElementById('speechifyVolume')?.value || 100) || 100,
-      youtubeConnected: document.getElementById(`youtubeConnected-${editingIdx}`)?.value === 'true',
-      youtubeChannelId: document.getElementById(`youtubeChannelId-${editingIdx}`)?.value || '',
-      youtubeChannelName: document.getElementById(`youtubeChannelName-${editingIdx}`)?.textContent || '',
-      youtubeChannelAvatar: document.getElementById(`youtubeChannelAvatar-${editingIdx}`)?.src || '',
-      youtubeChannelSubs: document.getElementById(`youtubeChannelSubs-${editingIdx}`)?.textContent || '',
-      youtubeAccessToken: document.getElementById(`youtubeAccessToken-${editingIdx}`)?.value || '',
-      youtubeRefreshToken: document.getElementById(`youtubeRefreshToken-${editingIdx}`)?.value || '',
-      competitorUrl: document.getElementById('competitorVideoUrl')?.value.trim() || '',
-      context: document.getElementById('additionalContext').value.trim(),
-    };
-    styles[editingIdx] = s;
-    saveStyles();
-    showStyleList();
-    editingIdx = null;
-  }
-
-  function cancelEdit() { editingIdx = null; showStyleList(); }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    showCreateStyle();
-    if(styles.length && currentStyleIdx!==null && styles[currentStyleIdx]) useStyle(currentStyleIdx);
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  showCreateStyle();
+  if (styles.length && currentStyleIdx !== null && styles[currentStyleIdx]) useStyle(currentStyleIdx);
+});
 
 
 
@@ -5441,8 +5435,8 @@ function setPill(el, tone, text) {
   el.className = "status-pill inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium " +
     (tone === "good" ? "bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-200 dark:border-green-800"
       : tone === "bad" ? "bg-rose-100 text-rose-700 border-rose-300 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800"
-      : tone === "warn" ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800"
-      : "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700");
+        : tone === "warn" ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800"
+          : "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700");
 }
 
 function getYouTubeIdFast(str) {
@@ -5632,17 +5626,17 @@ function initReferenceVideos() {
     return true;
   }
 
-  function isValidHttpUrl(s){
+  function isValidHttpUrl(s) {
     try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; }
     catch { return false; }
   }
-  function isYouTubeUrl(s){
+  function isYouTubeUrl(s) {
     try {
-      const h = new URL(s).hostname.replace(/^www\./,'').toLowerCase();
-      return ['youtube.com','m.youtube.com','youtu.be'].includes(h);
+      const h = new URL(s).hostname.replace(/^www\./, '').toLowerCase();
+      return ['youtube.com', 'm.youtube.com', 'youtu.be'].includes(h);
     } catch { return false; }
   }
-  function looksLikeUrl(s){
+  function looksLikeUrl(s) {
     return /(https?:\/\/|www\.|youtu\.be|youtube\.com|v=|shorts\/)/i.test(s);
   }
 
@@ -5674,8 +5668,8 @@ function initReferenceVideos() {
     el.classList.remove('flex');
     document.removeEventListener('keydown', escClose);
   }
-  function escClose(e){
-    if(e.key === 'Escape'){
+  function escClose(e) {
+    if (e.key === 'Escape') {
       [channelModal, samplesModal].forEach(m => m.classList.contains('hidden') || closeModal(m));
     }
   }
@@ -5723,7 +5717,7 @@ function initReferenceVideos() {
     }
   });
 
-  function enforceSamplesTextOnly(){
+  function enforceSamplesTextOnly() {
     samplesList.querySelectorAll('input').forEach(inp => {
       const val = (inp.value || '').trim();
       const isUrl = looksLikeUrl(val) || isValidHttpUrl(val);
@@ -5787,10 +5781,10 @@ function initReferenceVideos() {
   function getSampleValues() {
     return Array.from(samplesList.querySelectorAll('input')).map(i => i.value.trim());
   }
-  function renderLoading(){
+  function renderLoading() {
     return `<div class="text-sm text-gray-500">Generating…</div>`;
   }
-  function renderError(e){
+  function renderError(e) {
     return `<div class="text-sm text-red-500">Failed: ${e.message || 'Please try again.'}</div>`;
   }
 
@@ -5806,8 +5800,8 @@ function initReferenceVideos() {
     if (src === 'samples') closeModal(samplesModal);
   });
 
-  function buildSamplesPrompt(sampleTitles){
-    const list = sampleTitles.map((t,i)=>`${i+1}. ${t}`).join('\n');
+  function buildSamplesPrompt(sampleTitles) {
+    const list = sampleTitles.map((t, i) => `${i + 1}. ${t}`).join('\n');
     return `
 You are an expert YouTube strategist.
 Given these example videos (titles only):
@@ -5821,7 +5815,7 @@ Rules:
 - Numbers, "you", brackets (), or year where it helps
 - One idea per line; no numbering or extra text.`;
   }
-  function buildChannelPrompt(channelLink){
+  function buildChannelPrompt(channelLink) {
     return `
 You are a YouTube strategist. Analyze this channel: ${channelLink}
 Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas for the next upload.
@@ -5830,7 +5824,7 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
 - One idea per line; no numbering or extra text.`;
   }
 
-  async function callClaude(userPrompt){
+  async function callClaude(userPrompt) {
     const r = await fetch(`${API_BASE_URL}/api/claude`, {
       method: 'POST',
       headers: {
@@ -5849,14 +5843,14 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
     const text = j.content?.[0]?.text || '';
     return splitTitles(text);
   }
-  function splitTitles(text){
+  function splitTitles(text) {
     return text
       .split('\n')
       .map(s => s.replace(/^\d+[\).\-\s]+/, '').trim())
       .filter(Boolean);
   }
 
-  function scoreTitle(t){
+  function scoreTitle(t) {
     let score = 60;
     const len = t.length;
     if (len >= 35 && len <= 65) score += 15;
@@ -5864,19 +5858,19 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
     else score -= 8;
     if (/\b\d{1,3}\b/.test(t)) score += 6;
     if (/[()]/.test(t)) score += 4;
-    const words = ['secret','truth','mistake','why','how','hack','strategy','danger','crazy','surprising','you','ultimate','2025'];
+    const words = ['secret', 'truth', 'mistake', 'why', 'how', 'hack', 'strategy', 'danger', 'crazy', 'surprising', 'you', 'ultimate', '2025'];
     const lower = t.toLowerCase();
-    score += words.reduce((acc,w)=> acc + (lower.includes(w) ? 3 : 0), 0);
+    score += words.reduce((acc, w) => acc + (lower.includes(w) ? 3 : 0), 0);
     if (/[A-Z]{6,}/.test(t)) score -= 5;
     return Math.max(0, Math.min(100, score));
   }
-  function rankTitles(titles){
+  function rankTitles(titles) {
     const unique = uniq(titles);
     return unique
       .map(text => ({ text, score: scoreTitle(text) }))
-      .sort((a,b) => b.score - a.score);
+      .sort((a, b) => b.score - a.score);
   }
-  function uniq(arr){
+  function uniq(arr) {
     const seen = new Set();
     const out = [];
     for (const s of arr) {
@@ -5888,12 +5882,12 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
     }
     return out;
   }
-  function renderTitleChips(items, source){
+  function renderTitleChips(items, source) {
     if (!items || !items.length) return `<div class="text-sm text-gray-500">No ideas found.</div>`;
     return `
       <div class="text-sm text-gray-500 mb-1">Click a title to use it:</div>
       <div class="flex flex-wrap gap-2">
-        ${items.map(({text, score}) => `
+        ${items.map(({ text, score }) => `
           <button class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700
                          hover:bg-gray-50 dark:hover:bg-gray-700 text-sm flex items-center gap-2"
                   data-choose-title="${encodeURIComponent(text)}"
@@ -5907,19 +5901,19 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       </div>`;
   }
 
-  
+
   // ============ TRANSITION SETTINGS FUNCTIONS ============
   function openTransitionSettings() {
     const currentType = localStorage.getItem('transitionType') || 'fade';
     const currentDuration = localStorage.getItem('transitionDuration') || '0.5';
-    
+
     // ✅ ALWAYS default to 'false' (unchecked) if not explicitly set to 'true'
     // User must manually enable - never auto-enable
     if (localStorage.getItem('enableTransitions') !== 'true') {
       localStorage.setItem('enableTransitions', 'false');
       console.log('🔧 Transitions defaulting to UNCHECKED in settings modal');
     }
-    
+
     const transitionTypes = [
       // LEFT COLUMN - GIRLS (indices 0-9)
       { value: 'fade', name: 'Fade', description: 'Classic crossfade', recommended: '0.5s', useGirls: true },
@@ -5943,13 +5937,13 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       { value: 'distance', name: 'Distance', description: 'Distance transform', recommended: '0.8s', useGirls: true },
       { value: 'pixelize', name: 'Pixelize', description: 'Pixelization effect', recommended: '0.5s', useGirls: false }
     ];
-    
+
     // Image URLs
     const girlImage1 = 'https://i.ibb.co/jkCs8Cbv/Untitled-design-27.webp';
     const girlImage2 = 'https://i.ibb.co/Z1R9T33s/Untitled-design-28.webp';
     const boyImage1 = 'https://i.ibb.co/xtvHPKQ2/Untitled-design-21.webp';
     const boyImage2 = 'https://i.ibb.co/spK0PXNW/Untitled-design-22.webp';
-    
+
     const modalHTML = `
       <div class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4" id="transitionModal" onclick="if(event.target.id === 'transitionModal') closeTransitionSettings();">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col" onclick="event.stopPropagation();">
@@ -6014,16 +6008,16 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
                 <div id="transition_${t.value}"
                      onclick="selectTransition('${t.value}')"
                      class="transition-card cursor-pointer p-5 rounded-xl border-2 transition-all hover:scale-[1.02] group
-                            ${currentType === t.value 
-                              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30' 
-                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700/50 hover:border-primary-300 dark:hover:border-primary-600'}">
+                            ${currentType === t.value
+        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30'
+        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700/50 hover:border-primary-300 dark:hover:border-primary-600'}">
                   <div class="flex items-start gap-4">
                     <!-- Radio Button -->
                     <div class="flex-shrink-0 mt-1">
                       <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
-                                  ${currentType === t.value 
-                                    ? 'border-primary-500 bg-primary-500' 
-                                    : 'border-gray-400 dark:border-gray-500 bg-transparent'}">
+                                  ${currentType === t.value
+        ? 'border-primary-500 bg-primary-500'
+        : 'border-gray-400 dark:border-gray-500 bg-transparent'}">
                         ${currentType === t.value ? '<div class="w-2 h-2 rounded-full bg-white"></div>' : ''}
                       </div>
                     </div>
@@ -6031,17 +6025,17 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
                     <!-- Info (Left side) -->
                     <div class="flex-1 min-w-0">
                       <h4 class="font-extrabold text-lg mb-1 transition-colors
-                                 ${currentType === t.value 
-                                   ? 'text-primary-900 dark:text-white group-hover:text-white dark:group-hover:text-white' 
-                                   : 'text-gray-900 dark:text-white'}">${t.name}</h4>
+                                 ${currentType === t.value
+        ? 'text-primary-900 dark:text-white group-hover:text-white dark:group-hover:text-white'
+        : 'text-gray-900 dark:text-white'}">${t.name}</h4>
                       <p class="text-sm mb-2 font-medium transition-colors
-                                ${currentType === t.value 
-                                  ? 'text-primary-800 dark:text-gray-300 group-hover:text-white dark:group-hover:text-gray-100' 
-                                  : 'text-gray-600 dark:text-gray-400'}">${t.description}</p>
+                                ${currentType === t.value
+        ? 'text-primary-800 dark:text-gray-300 group-hover:text-white dark:group-hover:text-gray-100'
+        : 'text-gray-600 dark:text-gray-400'}">${t.description}</p>
                       <div class="inline-block px-2 py-1 rounded text-xs font-bold transition-colors
-                                  ${currentType === t.value 
-                                    ? 'bg-primary-200 dark:bg-primary-800 text-primary-900 dark:text-primary-100 group-hover:bg-white group-hover:text-primary-700 dark:group-hover:bg-primary-700 dark:group-hover:text-white' 
-                                    : 'bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}">
+                                  ${currentType === t.value
+        ? 'bg-primary-200 dark:bg-primary-800 text-primary-900 dark:text-primary-100 group-hover:bg-white group-hover:text-primary-700 dark:group-hover:bg-primary-700 dark:group-hover:text-white'
+        : 'bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}">
                         Recommended: ${t.recommended}
                       </div>
                     </div>
@@ -6125,10 +6119,10 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
         </div>
       </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     document.body.style.overflow = 'hidden';
-    
+
     // Add event delegation for card clicks
     setTimeout(() => {
       const modal = document.getElementById('transitionModal');
@@ -6136,21 +6130,21 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
         // Add click handlers to all cards
         const cards = modal.querySelectorAll('.transition-card');
         cards.forEach(card => {
-          card.addEventListener('click', function(e) {
+          card.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-            
+
             const transitionType = this.id.replace('transition_', '');
             selectTransition(transitionType);
-            
+
             return false;
           }, true); // Use capture phase
         });
       }
     }, 50);
   }
-  
+
   function closeTransitionSettings() {
     const modal = document.getElementById('transitionModal');
     if (modal) {
@@ -6158,14 +6152,14 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       document.body.style.overflow = '';
     }
   }
-  
+
   function selectTransition(type) {
     // Remove selection from all cards
     document.querySelectorAll('.transition-card').forEach(card => {
       // Remove selected classes
       card.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20', 'dark:border-primary-400');
       card.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-700/50');
-      
+
       // Update radio button
       const radioContainer = card.querySelector('.flex-shrink-0');
       if (radioContainer) {
@@ -6177,14 +6171,14 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
         }
       }
     });
-    
+
     // Add selection to clicked card
     const selectedCard = document.getElementById(`transition_${type}`);
     if (selectedCard) {
       // Add selected classes
       selectedCard.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-700/50');
       selectedCard.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20', 'dark:border-primary-400');
-      
+
       // Update radio button
       const radioContainer = selectedCard.querySelector('.flex-shrink-0');
       if (radioContainer) {
@@ -6196,10 +6190,10 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
         }
       }
     }
-    
+
     return false;
   }
-  
+
   function saveTransitionSettings() {
     // Find selected card by checking classes
     let selectedCard = null;
@@ -6208,42 +6202,42 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
         selectedCard = card;
       }
     });
-    
+
     // If no card selected, use default 'fade'
     let transitionType = 'fade';
     if (selectedCard) {
       transitionType = selectedCard.id.replace('transition_', '');
     }
-    
+
     const duration = document.getElementById('transitionDuration').value;
     const checkboxElement = document.getElementById('enableTransitionsCheckbox');
-    
+
     // 🔍 DEBUG: Log checkbox state
     console.log('🔍 DEBUG - Checkbox element:', checkboxElement);
     console.log('🔍 DEBUG - Checkbox checked:', checkboxElement ? checkboxElement.checked : 'ELEMENT NOT FOUND!');
-    
+
     const enableTransitions = checkboxElement ? checkboxElement.checked : false;
-    
+
     localStorage.setItem('transitionType', transitionType);
     localStorage.setItem('transitionDuration', duration);
     localStorage.setItem('enableTransitions', String(enableTransitions)); // Explicitly convert to string
-    
-    console.log('✅ Transition settings saved:', { 
-      type: transitionType, 
+
+    console.log('✅ Transition settings saved:', {
+      type: transitionType,
       duration: duration + 's',
       enableTransitions: enableTransitions,
       enableTransitionsString: String(enableTransitions)
     });
-    
+
     // Verify it was saved
     console.log('🔍 Verification - localStorage value:', localStorage.getItem('enableTransitions'));
-    
+
     // Show success message
     const btn = document.querySelector('#transitionModal button[onclick="saveTransitionSettings()"]');
     const originalText = btn.textContent;
     btn.innerHTML = '✅ Saved!';
     btn.disabled = true;
-    
+
     setTimeout(() => {
       closeTransitionSettings();
     }, 800);
@@ -6255,7 +6249,7 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       alert('No script to copy!');
       return;
     }
-    
+
     navigator.clipboard.writeText(currentProjectData.script).then(() => {
       // Show temporary success message with better visual feedback
       const btn = buttonElement || event?.target?.closest('button');
@@ -6272,20 +6266,20 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       alert('Failed to copy script: ' + err.message);
     });
   }
-  
+
   function downloadScriptFile() {
     if (!currentProjectData || !currentProjectData.script) {
       alert('No script to download!');
       return;
     }
-    
+
     // Get the first 3 words of the script
     const words = currentProjectData.script.trim().split(/\s+/);
     const firstThreeWords = words.slice(0, 3).join('-');
-    
+
     // Clean the filename (remove special characters, make lowercase)
     const cleanFilename = firstThreeWords.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-    
+
     const blob = new Blob([currentProjectData.script], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -6293,13 +6287,13 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
     link.download = cleanFilename + '.txt';
     link.click();
     window.URL.revokeObjectURL(url);
-    
+
     console.log('✅ Script downloaded as:', cleanFilename + '.txt');
   }
-  
+
   // ============ REGENERATE MODAL FUNCTIONS ============
   let currentRegenerateIndex = null;
-  
+
   function openRegenerateModal(index) {
     // 🚨 FIX #3: Better error handling for regenerate
     if (!generatedScenes) {
@@ -6307,21 +6301,21 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       alert('⚠️ No scenes available. Please generate images first!');
       return;
     }
-    
+
     if (!generatedScenes[index]) {
       console.error(`❌ Invalid scene index: ${index} (total scenes: ${generatedScenes.length})`);
       alert(`⚠️ Scene ${index + 1} not found. Please try generating images again.`);
       return;
     }
-    
+
     currentRegenerateIndex = index;
     const scene = generatedScenes[index];
-    
+
     console.log(`🔄 Opening regenerate modal for scene ${index + 1}/${generatedScenes.length}`);
-    
+
     const modal = document.getElementById('regenerateModal');
     const promptInput = document.getElementById('regeneratePromptInput');
-    
+
     if (modal && promptInput) {
       promptInput.value = scene.prompt;
       modal.classList.remove('hidden');
@@ -6332,7 +6326,7 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       alert('⚠️ Modal not found. Please refresh the page and try again.');
     }
   }
-  
+
   function closeRegenerateModal() {
     const modal = document.getElementById('regenerateModal');
     if (modal) {
@@ -6342,24 +6336,24 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       document.body.style.overflow = '';
     }
   }
-  
+
   async function confirmRegenerate() {
     if (currentRegenerateIndex === null || !generatedScenes[currentRegenerateIndex]) return;
-    
+
     const promptInput = document.getElementById('regeneratePromptInput');
     const newPrompt = promptInput.value.trim();
-    
+
     if (!newPrompt) {
       alert('Please enter a prompt!');
       return;
     }
-    
+
     // Update the prompt in the scene
     generatedScenes[currentRegenerateIndex].prompt = newPrompt;
-    
+
     // Close modal
     closeRegenerateModal();
-    
+
     // Regenerate with new prompt
     await regenerateScene(currentRegenerateIndex);
   }
@@ -6371,17 +6365,17 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
   // Check URL for YouTube auth callback
   function checkYouTubeAuth() {
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     if (urlParams.get('youtube_success')) {
       const channelName = urlParams.get('channel');
       const channelId = urlParams.get('channelId');
-      
+
       youtubeChannelInfo = { channelTitle: channelName, channelId };
       localStorage.setItem('youtubeChannel', JSON.stringify(youtubeChannelInfo));
-      
+
       // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
-      
+
       // Show success message
       alert(`✅ YouTube connected: ${channelName}`);
     } else if (urlParams.get('youtube_error')) {
@@ -6394,12 +6388,12 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
   async function checkYouTubeConnection() {
     const saved = localStorage.getItem('youtubeChannel');
     if (!saved) return null;
-    
+
     try {
       const info = JSON.parse(saved);
       const response = await fetch(`${API_BASE_URL}/api/youtube/status?channelId=${info.channelId}`);
       const data = await response.json();
-      
+
       if (data.connected) {
         youtubeChannelInfo = info;
         return info;
@@ -6418,12 +6412,12 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
     try {
       const response = await fetch(`${API_BASE_URL}/api/youtube/auth`);
       const data = await response.json();
-      
+
       if (data.error) {
         alert('❌ ' + data.message);
         return;
       }
-      
+
       // Open OAuth popup
       window.location.href = data.authUrl;
     } catch (error) {
@@ -6435,17 +6429,17 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
   // Disconnect YouTube
   async function disconnectYouTube() {
     if (!youtubeChannelInfo) return;
-    
+
     try {
       await fetch(`${API_BASE_URL}/api/youtube/disconnect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ channelId: youtubeChannelInfo.channelId })
       });
-      
+
       youtubeChannelInfo = null;
       localStorage.removeItem('youtubeChannel');
-      
+
       alert('✅ YouTube disconnected');
       closeYouTubeModal();
     } catch (error) {
@@ -6456,27 +6450,27 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
   // Open YouTube upload modal
   async function openYouTubeUpload(sessionId) {
     youtubeSessionId = sessionId;
-    
+
     // Get current style
     const currentStyle = styles[currentStyleIdx];
-    
+
     // Check if style has YouTube channel connected
     if (!currentStyle || !currentStyle.youtubeConnected) {
       // Show "connect channel" modal
       showYouTubeConnectionRequired();
       return;
     }
-    
+
     // Show upload modal with channel info
     showYouTubeUploadModal(currentStyle);
   }
-  
+
   function showYouTubeConnectionRequired() {
     // Use new function if available
     if (window.showYouTubeConnectionRequiredNew && typeof window.showYouTubeConnectionRequiredNew === 'function') {
       return window.showYouTubeConnectionRequiredNew();
     }
-    
+
     // Fallback to old implementation
     const modal = document.getElementById('youtubeConnectionRequiredModal');
     if (!modal) {
@@ -6488,7 +6482,7 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
       document.body.style.overflow = 'hidden';
     }
   }
-  
+
   function createYouTubeConnectionRequiredModal() {
     const modalHTML = `
       <div id="youtubeConnectionRequiredModal" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 hidden">
@@ -6532,34 +6526,34 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
     `;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
   }
-  
+
   function closeYouTubeConnectionRequiredModal() {
     document.getElementById('youtubeConnectionRequiredModal').classList.add('hidden');
     document.body.style.overflow = 'auto';
   }
-  
+
   function goToStyleSettings() {
     // Open style modal and switch to edit tab
     showStyleList();
     document.getElementById('styleModal').classList.remove('hidden');
   }
-  
+
   function showYouTubeUploadModal(style) {
     // Show upload modal
     const modal = document.getElementById('youtubeUploadModal');
     if (!modal) {
       createYouTubeModal();
     }
-    
+
     // Update channel name in modal
     const channelNameEl = document.getElementById('youtubeChannelName');
     if (channelNameEl && style.youtubeChannelName) {
       channelNameEl.textContent = `Channel: ${style.youtubeChannelName}`;
     }
-    
+
     document.getElementById('youtubeUploadModal').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
-    
+
     // Set default title from project
     if (currentProjectData && currentProjectData.title) {
       document.getElementById('youtubeTitle').value = currentProjectData.title;
@@ -6673,18 +6667,18 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
         </div>
       </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Add character counters
     document.getElementById('youtubeTitle').addEventListener('input', (e) => {
       document.getElementById('titleCharCount').textContent = e.target.value.length;
     });
-    
+
     document.getElementById('youtubeDescription').addEventListener('input', (e) => {
       document.getElementById('descCharCount').textContent = e.target.value.length;
     });
-    
+
     // Update channel name
     if (youtubeChannelInfo) {
       document.getElementById('youtubeChannelName').textContent = `Channel: ${youtubeChannelInfo.channelTitle}`;
@@ -6703,45 +6697,45 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
   // Upload to YouTube
   async function uploadToYouTube(event) {
     event.preventDefault();
-    
+
     // Get current style
     const currentStyle = styles[currentStyleIdx];
-    
+
     if (!currentStyle || !currentStyle.youtubeConnected) {
       alert('YouTube channel not connected. Please connect in style settings.');
       return;
     }
-    
+
     if (!youtubeSessionId) {
       alert('Missing video session. Please try again.');
       return;
     }
-    
+
     const btn = document.getElementById('youtubeUploadBtn');
     const progress = document.getElementById('youtubeUploadProgress');
     const progressBar = document.getElementById('youtubeProgressBar');
     const progressText = document.getElementById('youtubeProgressText');
-    
+
     const title = document.getElementById('youtubeTitle').value.trim();
     const description = document.getElementById('youtubeDescription').value.trim();
     const tagsInput = document.getElementById('youtubeTags').value.trim();
     const privacy = document.getElementById('youtubePrivacy').value;
-    
+
     if (!title) {
       alert('Please enter a video title');
       return;
     }
-    
+
     // Parse tags
     const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
-    
+
     // Show progress
     btn.disabled = true;
     btn.textContent = 'Uploading...';
     progress.classList.remove('hidden');
     progressBar.style.width = '20%';
     progressText.textContent = 'Preparing upload...';
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/youtube/upload`, {
         method: 'POST',
@@ -6757,37 +6751,37 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
           privacyStatus: privacy
         })
       });
-      
+
       progressBar.style.width = '80%';
       progressText.textContent = 'Uploading to YouTube...';
-      
+
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Upload failed');
       }
-      
+
       progressBar.style.width = '100%';
       progressText.textContent = '✅ Upload complete!';
-      
+
       console.log('✅ Video uploaded to YouTube!');
       console.log('   Video URL:', data.youtubeUrl);
-      
+
       // Show success message with link
       alert(`✅ Video uploaded successfully to YouTube!\n\nVideo URL: ${data.videoUrl}`);
-      
+
       // Open video in new tab
       window.open(data.videoUrl, '_blank');
-      
+
       // Close modal after delay
       setTimeout(() => {
         closeYouTubeModal();
       }, 1500);
-      
+
     } catch (error) {
       console.error('❌ YouTube upload error:', error);
       alert('❌ Upload failed: ' + error.message);
-      
+
       progressBar.style.width = '0%';
       progress.classList.add('hidden');
     } finally {
@@ -6856,7 +6850,7 @@ Infer its niche & current trends. Propose 12 NEW, highly clickable title ideas f
   window.uploadToYouTube = uploadToYouTube;
   window.goToStyleSettings = goToStyleSettings;
   window.closeYouTubeConnectionRequiredModal = closeYouTubeConnectionRequiredModal;
-  window.logout = function() {
+  window.logout = function () {
     localStorage.clear();
     window.location.href = 'Login.html.html';
   };
@@ -6915,15 +6909,15 @@ function updateLibraryCount() {
 // Open Video Library modal
 function openVideoLibrary() {
   const library = getVideoLibrary();
-  
+
   // Create modal if doesn't exist
   if (!document.getElementById('videoLibraryModal')) {
     createVideoLibraryModal();
   }
-  
+
   // Update content
   renderVideoLibrary(library);
-  
+
   // Show modal
   document.getElementById('videoLibraryModal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -6974,7 +6968,7 @@ function createVideoLibraryModal() {
 // Render video library content
 function renderVideoLibrary(library) {
   const contentEl = document.getElementById('libraryContent');
-  
+
   if (library.length === 0) {
     contentEl.innerHTML = `
       <div class="flex flex-col items-center justify-center py-16 text-center">
@@ -6991,7 +6985,7 @@ function renderVideoLibrary(library) {
     `;
     return;
   }
-  
+
   const videosHTML = library.map((video, index) => `
     <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600 hover:border-primary-500 dark:hover:border-primary-400 transition">
       <div class="flex items-start gap-6">
@@ -7017,7 +7011,7 @@ function renderVideoLibrary(library) {
         <div class="flex-1 min-w-0">
           <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${video.title}</h3>
           <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <span>📅 ${new Date(video.createdAt).toLocaleDateString()} ${new Date(video.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</span>
+            <span>📅 ${new Date(video.createdAt).toLocaleDateString()} ${new Date(video.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
           
           <!-- Actions -->
@@ -7049,7 +7043,7 @@ function renderVideoLibrary(library) {
       </div>
     </div>
   `).join('');
-  
+
   contentEl.innerHTML = `
     <div class="space-y-4">
       ${videosHTML}
@@ -7061,7 +7055,7 @@ function renderVideoLibrary(library) {
 function viewVideoDetails(index) {
   const library = getVideoLibrary();
   const video = library[index];
-  
+
   alert(`Video Details:\n\nTitle: ${video.title}\nCreated: ${new Date(video.createdAt).toLocaleString()}\nWords: ${video.wordCount || 0}\nStyle: ${video.styleName || 'N/A'}`);
 }
 
@@ -7069,16 +7063,16 @@ function viewVideoDetails(index) {
 function uploadVideoFromLibrary(index) {
   const library = getVideoLibrary();
   const video = library[index];
-  
+
   // Get the style used
   const style = video.styleId !== undefined ? styles[video.styleId] : null;
-  
+
   // Check if style has YouTube connected
   if (!style || !style.youtubeConnected) {
     showYouTubeConnectionRequired();
     return;
   }
-  
+
   // Set session ID and open upload modal
   youtubeSessionId = video.sessionId;
   showYouTubeUploadModal(style);
@@ -7093,11 +7087,11 @@ function deleteVideoFromLibrary(index) {
   if (!confirm('Are you sure you want to delete this video from your library?')) {
     return;
   }
-  
+
   const library = getVideoLibrary();
   library.splice(index, 1);
   localStorage.setItem('videoLibrary', JSON.stringify(library));
-  
+
   // Re-render
   renderVideoLibrary(library);
   updateLibraryCount();
@@ -7113,7 +7107,7 @@ function playVideoInLibrary(videoUrl) {
     alert('Video URL not available');
     return;
   }
-  
+
   // Create video player modal
   const modalHTML = `
     <div id="videoPlayerModal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
@@ -7130,7 +7124,7 @@ function playVideoInLibrary(videoUrl) {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -7144,15 +7138,15 @@ function closeVideoPlayer() {
 function openUploadWithStyleSelection(videoIndex) {
   const library = getVideoLibrary();
   const video = library[videoIndex];
-  
+
   // Get all styles
   const styles = JSON.parse(localStorage.getItem('styles') || '[]');
-  
+
   if (styles.length === 0) {
     alert('Please create a style first in Settings');
     return;
   }
-  
+
   // Create style selection modal
   const stylesHTML = styles.map((style, idx) => `
     <div onclick="selectStyleForUpload(${videoIndex}, ${idx})" 
@@ -7185,7 +7179,7 @@ function openUploadWithStyleSelection(videoIndex) {
       </div>
     </div>
   `).join('');
-  
+
   const modalHTML = `
     <div id="styleSelectionModal" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
       <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl">
@@ -7211,7 +7205,7 @@ function openUploadWithStyleSelection(videoIndex) {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -7221,16 +7215,16 @@ function selectStyleForUpload(videoIndex, styleIdx) {
   const video = library[videoIndex];
   const styles = JSON.parse(localStorage.getItem('styles') || '[]');
   const style = styles[styleIdx];
-  
+
   // Close style selection
   closeStyleSelection();
-  
+
   // Check if style has YouTube connected
   if (!style.youtubeConnected) {
     showYouTubeConnectionRequired();
     return;
   }
-  
+
   // Set session ID and open upload modal
   youtubeSessionId = video.sessionId;
   showYouTubeUploadModal(style);
@@ -7272,20 +7266,20 @@ function getSavedSession() {
   // Fallback to old implementation
   const session = localStorage.getItem('currentSession');
   const timestamp = localStorage.getItem('sessionTimestamp');
-  
+
   if (!session || !timestamp) return null;
-  
+
   // Check if session is less than 24 hours old
   const sessionTime = new Date(timestamp);
   const now = new Date();
   const hoursDiff = (now - sessionTime) / (1000 * 60 * 60);
-  
+
   if (hoursDiff > 24) {
     // Session too old, clear it
     clearCurrentSession();
     return null;
   }
-  
+
   return JSON.parse(session);
 }
 
@@ -7303,7 +7297,7 @@ function clearCurrentSession() {
 function showRecoveryPrompt() {
   const session = getSavedSession();
   if (!session) return;
-  
+
   const promptHTML = `
     <div id="recoveryPrompt" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
       <div class="bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-700 rounded-xl shadow-2xl p-4 max-w-2xl">
@@ -7335,7 +7329,7 @@ function showRecoveryPrompt() {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', promptHTML);
 }
 
@@ -7346,44 +7340,44 @@ function recoverSession() {
     alert('Session expired or not found');
     return;
   }
-  
+
   // Restore title
   if (session.title) {
     const titleInput = document.getElementById('video-title');
     if (titleInput) titleInput.value = session.title;
   }
-  
+
   // Restore script and show it
   if (session.script) {
     const scriptContent = document.getElementById('scriptContent');
     const scriptOutput = document.getElementById('scriptOutput');
     const scriptWrapper = document.getElementById('scriptWrapper');
-    
+
     if (scriptContent) {
       scriptContent.textContent = session.script;
       scriptContent.style.opacity = "1";
     }
-    
+
     // Show script section
     if (scriptWrapper) scriptWrapper.classList.remove('hidden');
     if (scriptOutput) scriptOutput.classList.remove('hidden');
-    
+
     // Update word count
     const wordCount = session.script.split(/\s+/).length;
     const wordCountEl = document.getElementById('wordCount');
     if (wordCountEl) wordCountEl.textContent = wordCount;
-    
+
     // Enable copy/download buttons
     if (typeof setCopyDownloadEnabled === 'function') {
       setCopyDownloadEnabled(true);
     }
-    
+
     // Scroll to script
     if (scriptOutput) {
       scriptOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
-  
+
   // Restore style
   if (session.styleId !== undefined) {
     const styles = JSON.parse(localStorage.getItem('styles') || '[]');
@@ -7394,13 +7388,13 @@ function recoverSession() {
       }
     }
   }
-  
+
   console.log('✅ Session recovered!');
   console.log('   Title:', session.title);
   console.log('   Script length:', session.script?.length || 0);
-  
+
   dismissRecovery();
-  
+
   // Show success message
   setTimeout(() => {
     alert('✅ Session recovered!\n\nYour work has been restored:\n• Title\n• Script\n• Style');
@@ -7421,7 +7415,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // YouTube OAuth Function Exports
 // Direct click handlers for icons (fallback - works even if event listeners fail)
-window.handleVoiceIconClickDirect = function(e) {
+window.handleVoiceIconClickDirect = function (e) {
   if (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -7433,13 +7427,13 @@ window.handleVoiceIconClickDirect = function(e) {
     voiceIcon.style.cursor = 'pointer';
     voiceIcon.classList.remove('disabled');
     voiceIcon.setAttribute('aria-disabled', 'false');
-    
+
     const scriptContent = document.getElementById('scriptContent')?.innerText?.trim() || '';
     if (!scriptContent) {
       alert('Please generate a script first.');
       return;
     }
-    
+
     // Try to use new voice generator if available
     if (window.generateVoiceFromTextNew && typeof window.generateVoiceFromTextNew === 'function') {
       console.log('🎤 Using new voice generator');
@@ -7457,7 +7451,7 @@ window.handleVoiceIconClickDirect = function(e) {
   }
 };
 
-window.handleImageIconClickDirect = function(e) {
+window.handleImageIconClickDirect = function (e) {
   if (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -7469,7 +7463,7 @@ window.handleImageIconClickDirect = function(e) {
     imageIcon.style.cursor = 'pointer';
     imageIcon.classList.remove('disabled');
     imageIcon.setAttribute('aria-disabled', 'false');
-    
+
     // Try to open modal
     if (typeof window.openImageModal === 'function') {
       window.openImageModal();
