@@ -9,7 +9,6 @@ import ProgressBar from './common/ProgressBar';
 
 // Direct API call with abort support
 const generateVoice = async (text, voiceId, voiceSettings, signal) => {
-    // Construct URL - if API_BASE_URL is empty, use relative path (goes through Vite proxy)
     const url = API_BASE_URL ? `${API_BASE_URL}/api/generate-voice` : '/api/generate-voice';
     const response = await fetch(url, {
         method: 'POST',
@@ -21,7 +20,7 @@ const generateVoice = async (text, voiceId, voiceSettings, signal) => {
             voice_id: voiceId,
             voice_settings: voiceSettings
         }),
-        signal // AbortController signal
+        signal 
     });
 
     if (!response.ok) {
