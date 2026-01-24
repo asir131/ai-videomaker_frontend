@@ -18,7 +18,6 @@ const AppPage = () => {
                     element={<VideoCreationWizard />}
                 />
                 <Route path="library" element={<VideoLibrary />} />
-                {/* <Route path="generate" element={<ImageGeneratorPage />} /> */}
                 <Route path="credits" element={<CreditsDashboard />} />
                 <Route path="youtube" element={<YouTubeIntegration />} />
                 <Route path="settings" element={<Settings />} />
