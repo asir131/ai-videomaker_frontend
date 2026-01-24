@@ -6,8 +6,9 @@ import VideoLibrary from '../components/dashboard/VideoLibrary';
 import CreditsDashboard from '../components/dashboard/CreditsDashboard';
 import Settings from '../components/dashboard/Settings';
 import YouTubeIntegration from '../components/dashboard/YouTubeIntegration';
+import ImageGenerationSettingsPage from '../pages/ImageGenerationSettingsPage';
 const AppPage = () => {
-    console.log('AppPage: Using new DashboardLayout');  
+    console.log('AppPage: Using new DashboardLayout');
     return (
         <DashboardLayout>
             <Routes>
@@ -16,9 +17,11 @@ const AppPage = () => {
                     element={<VideoCreationWizard />}
                 />
                 <Route path="library" element={<VideoLibrary />} />
+                {/* <Route path="generate" element={<ImageGeneratorPage />} /> */}
                 <Route path="credits" element={<CreditsDashboard />} />
                 <Route path="youtube" element={<YouTubeIntegration />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="image-settings" element={<ImageGenerationSettingsPage />} />
                 <Route path="help" element={<HelpPage />} />
                 <Route path="*" element={<Navigate to="/app" replace />} />
             </Routes>

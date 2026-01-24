@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   FileText,
   Edit,
@@ -20,7 +21,8 @@ import VoiceGenerator from '../VoiceGenerator';
 import VideoRenderer from '../VideoRenderer';
 
 const VideoCreationWizard = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const location = useLocation();
+  const [currentStep, setCurrentStep] = useState(location.state?.step || 0);
   const [hasAutoAdvanced, setHasAutoAdvanced] = useState({});
   const [manualNavigation, setManualNavigation] = useState(false);
   const { script, scenes, title, selectedStyle } = useScript();

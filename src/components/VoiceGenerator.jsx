@@ -4,7 +4,7 @@ import { useMedia } from '../context/MediaContext';
 import { useUI } from '../context/UIContext';
 import { useToast } from '../context/ToastContext';
 import { VOICES, VOICE_PROVIDERS, API_BASE_URL } from '../utils/constants';
-import { Mic, Play, Pause, Volume2, StopCircle, Music, Download, Check, Loader2, FileText, Clock, Edit2, X, Save } from 'lucide-react';
+import { Mic, Play, Pause, Volume2, StopCircle, Music, Download, Check, Loader2, FileText, Clock, Edit2, X, Save, RefreshCw } from 'lucide-react';
 import ProgressBar from './common/ProgressBar';
 
 // Direct API call with abort support
@@ -20,7 +20,7 @@ const generateVoice = async (text, voiceId, voiceSettings, signal) => {
             voice_id: voiceId,
             voice_settings: voiceSettings
         }),
-        signal 
+        signal
     });
 
     if (!response.ok) {
@@ -34,6 +34,7 @@ const generateVoice = async (text, voiceId, voiceSettings, signal) => {
 
 const VoiceGenerator = () => {
     const audioRef = useRef(null);
+    const audioInputRef = useRef(null);
     const abortControllerRef = useRef(null);
 
     const { script, setScript, title, selectedStyle } = useScript();
@@ -221,6 +222,15 @@ const VoiceGenerator = () => {
         }
     };
 
+    const handleAudioReplacement = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setGeneratedAudioUrl(url);
+            setAudioDuration(0); // Reset duration to trigger recalculation
+        }
+    };
+
     return (
         <div className="glass-card relative overflow-hidden">
             <div className="absolute top-0 left-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl -z-10" />
@@ -283,7 +293,7 @@ const VoiceGenerator = () => {
                                     autoFocus
                                 />
                                 <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                    {editedScript.split(/\s+/).filter(word => word.length > 0).length} words • 
+                                    {editedScript.split(/\s+/).filter(word => word.length > 0).length} words •
                                     ~{Math.ceil(editedScript.split(/\s+/).filter(word => word.length > 0).length / 150)}min audio
                                 </div>
                             </div>
@@ -460,11 +470,10 @@ const VoiceGenerator = () => {
                     <button
                         onClick={handleGenerateVoice}
                         disabled={!script}
-                        className={`w-full py-5 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 ${
-                            script 
+                        className={`w-full py-5 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 ${script
                                 ? 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]'
                                 : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60'
-                        }`}
+                            }`}
                     >
                         <Volume2 size={24} />
                         <span>{script ? 'Generate Voiceover' : 'Paste a script to generate voiceover'}</span>
@@ -519,6 +528,20 @@ const VoiceGenerator = () => {
                             >
                                 <Download size={20} />
                             </a>
+                            <button
+                                onClick={() => audioInputRef.current?.click()}
+                                className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center hover:bg-teal-200 dark:hover:bg-teal-900/50 transition-all hover:scale-110 active:scale-95"
+                                title="Replace with custom audio"
+                            >
+                                <RefreshCw size={20} />
+                            </button>
+                            <input
+                                ref={audioInputRef}
+                                type="file"
+                                accept="audio/*"
+                                onChange={handleAudioReplacement}
+                                className="hidden"
+                            />
                         </div>
                     </div>
 

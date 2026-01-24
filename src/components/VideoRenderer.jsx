@@ -69,8 +69,8 @@ const VideoRenderer = () => {
     if (validScenes.length < scenes.length) {
       const proceed = confirm(
         `You have generated ${validScenes.length} out of ${scenes.length} scene images.\n\n` +
-          `The video will be rendered using only the ${validScenes.length} available scene(s).\n\n` +
-          `Do you want to proceed?`,
+        `The video will be rendered using only the ${validScenes.length} available scene(s).\n\n` +
+        `Do you want to proceed?`,
       );
       if (!proceed) return;
     }
@@ -212,7 +212,7 @@ const VideoRenderer = () => {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row items-center justify-between bg-gray-50 dark:bg-gray-800/50 p-8 rounded-2xl border border-gray-100 dark:border-gray-700">
           <div className="mb-6 md:mb-0">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            {/* <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               {generatedAudioUrl && images.some((img) => img.url)
                 ? "Ready to Render!"
                 : "Almost Ready"}
@@ -221,7 +221,7 @@ const VideoRenderer = () => {
               {generatedAudioUrl && images.some((img) => img.url)
                 ? `We'll combine your script, ${scenes.length} scenes, and voiceover into a complete video.`
                 : "Please generate images and voiceover first, then come back here to render your video."}
-            </p>
+            </p> */}
             {!generatedAudioUrl && (
               <div className="mt-3 flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
                 <AlertCircle size={16} />
@@ -274,11 +274,10 @@ const VideoRenderer = () => {
             onClick={handleRender}
             disabled={isRenderingVideo}
             className={`px-8 py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center gap-3 min-h-[56px]
-                            ${
-                              isRenderingVideo
-                                ? "bg-gray-400 cursor-not-allowed shadow-none"
-                                : "bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98]"
-                            }`}
+                            ${isRenderingVideo
+                ? "bg-gray-400 cursor-not-allowed shadow-none"
+                : "bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98]"
+              }`}
           >
             {isRenderingVideo ? (
               <>
@@ -437,13 +436,12 @@ const VideoRenderer = () => {
                             : "fade",
                       }))
                     }
-                    className={`py-3 px-4 rounded-lg text-center font-medium transition-all ${
-                      (type === "FadeBlack" &&
-                        transitionSettings.type === "fade_black") ||
+                    className={`py-3 px-4 rounded-lg text-center font-medium transition-all ${(type === "FadeBlack" &&
+                      transitionSettings.type === "fade_black") ||
                       (type === "fade" && transitionSettings.type === "fade")
-                        ? "bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800"
-                        : "bg-gray-50 text-gray-600 border border-transparent hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300"
-                    }`}
+                      ? "bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800"
+                      : "bg-gray-50 text-gray-600 border border-transparent hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300"
+                      }`}
                   >
                     {type}
                   </button>

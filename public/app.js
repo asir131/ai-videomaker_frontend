@@ -27,10 +27,7 @@ if (!localStorage.getItem('enableTransitions')) {
   localStorage.setItem('enableTransitions', 'false');
   console.log('🔧 Transitions defaulting to UNCHECKED (user must enable manually)');
 }
-
-// Additional safety check on page load
 document.addEventListener('DOMContentLoaded', function () {
-  // If enableTransitions is not explicitly 'true', force it to 'false'
   if (localStorage.getItem('enableTransitions') !== 'true') {
     localStorage.setItem('enableTransitions', 'false');
     console.log('🔒 Page load: Ensuring transitions are OFF by default');
