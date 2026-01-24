@@ -9,6 +9,7 @@ import YouTubeIntegration from '../components/dashboard/YouTubeIntegration';
 import ImageGenerationSettingsPage from '../pages/ImageGenerationSettingsPage';
 const AppPage = () => {
     console.log('AppPage: Using new DashboardLayout');
+
     return (
         <DashboardLayout>
             <Routes>
