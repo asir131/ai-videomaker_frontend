@@ -54,6 +54,9 @@ const VoiceGenerator = () => {
     const [showAllVoices, setShowAllVoices] = useState(false);
     const [isEditingScript, setIsEditingScript] = useState(false);
     const [editedScript, setEditedScript] = useState('');
+    const [currentTime, setCurrentTime] = useState(0);
+    const [volume, setVolume] = useState(1);
+
 
     // Preview state
     const [previewPlayingId, setPreviewPlayingId] = useState(null);
@@ -231,6 +234,30 @@ const VoiceGenerator = () => {
         }
     };
 
+    const formatTimeMMSS = (seconds) => {
+        if (!seconds || isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${String(secs).padStart(2, '0')}`;
+    };
+
+    const handleSeek = (e) => {
+        const time = parseFloat(e.target.value);
+        if (audioRef.current) {
+            audioRef.current.currentTime = time;
+            setCurrentTime(time);
+        }
+    };
+
+    const handleVolumeChange = (e) => {
+        const val = parseFloat(e.target.value);
+        setVolume(val);
+        if (audioRef.current) {
+            audioRef.current.volume = val;
+        }
+    };
+
+
     return (
         <div className="glass-card relative overflow-hidden">
             <div className="absolute top-0 left-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl -z-10" />
@@ -328,11 +355,6 @@ const VoiceGenerator = () => {
                                             <FileText size={14} />
                                             {script.split(/\s+/).filter(word => word.length > 0).length} words
                                         </span>
-                                        <span className="flex items-center gap-1">
-                                            <FileText size={14} />
-                                            {script.split(/\s+/).filter(word => word.length > 0).length} words
-                                        </span>
-
                                     </div>
                                     <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
                                         {script.substring(0, 150)}{script.length > 150 ? '...' : ''}
@@ -501,72 +523,80 @@ const VoiceGenerator = () => {
                 )}
             </div>
 
-            {/* Audio Player */}
+            {/* Redesigned Audio Player */}
             {generatedAudioUrl && (
-                <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-2xl p-6 border-2 border-green-200 dark:border-green-800 shadow-lg">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white shadow-lg">
-                                <Music size={24} />
-                            </div>
-                            <div>
-                                <div className="font-bold text-gray-900 dark:text-white">Generated Audio</div>
-                                <div className="text-sm text-green-600 dark:text-green-400">Ready to use</div>
-                            </div>
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={togglePlay}
-                                className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-teal-600 text-white flex items-center justify-center hover:from-green-700 hover:to-teal-700 transition-all hover:scale-110 active:scale-95 shadow-lg shadow-green-500/30"
-                            >
-                                {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-0.5" />}
-                            </button>
-                            <a
-                                href={generatedAudioUrl}
-                                download="voiceover.mp3"
-                                className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-all hover:scale-110 active:scale-95"
-                            >
-                                <Download size={20} />
-                            </a>
-                            <button
-                                onClick={() => audioInputRef.current?.click()}
-                                className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center hover:bg-teal-200 dark:hover:bg-teal-900/50 transition-all hover:scale-110 active:scale-95"
-                                title="Replace with custom audio"
-                            >
-                                <RefreshCw size={20} />
-                            </button>
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm mt-8">
+                    <div className="flex items-center gap-4">
+                        {/* Play/Pause Button */}
+                        <button
+                            onClick={togglePlay}
+                            className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-all flex-shrink-0"
+                        >
+                            {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
+                        </button>
+
+                        {/* Current Time */}
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[40px]">
+                            {formatTimeMMSS(currentTime)}
+                        </span>
+
+                        {/* Progress Bar */}
+                        <div className="flex-1 relative flex items-center group">
                             <input
-                                ref={audioInputRef}
-                                type="file"
-                                accept="audio/*"
-                                onChange={handleAudioReplacement}
-                                className="hidden"
+                                type="range"
+                                min="0"
+                                max={audioRef.current?.duration || 0}
+                                value={currentTime}
+                                onChange={handleSeek}
+                                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none"
                             />
                         </div>
+
+                        {/* Total Duration */}
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[40px]">
+                            {formatTimeMMSS(audioRef.current?.duration)}
+                        </span>
+
+                        {/* Volume Control */}
+                        <div className="flex items-center gap-2 group/volume relative">
+                            <button className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                                <Volume2 size={20} />
+                            </button>
+                            <div className="w-20 hidden group-hover/volume:block absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xl lg:static lg:block lg:shadow-none lg:p-0 lg:border-none">
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.01"
+                                    value={volume}
+                                    onChange={handleVolumeChange}
+                                    className="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Download Button */}
+                        <a
+                            href={generatedAudioUrl}
+                            download="voiceover.mp3"
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                            title="Download Audio"
+                        >
+                            <Download size={20} />
+                        </a>
                     </div>
 
                     <audio
                         ref={audioRef}
                         src={generatedAudioUrl}
+                        onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
                         onEnded={() => setIsPlaying(false)}
+                        onLoadedMetadata={() => setAudioDuration(audioRef.current?.duration || 0)}
                         className="hidden"
                     />
-
-                    {/* Waveform Visualization */}
-                    <div className="flex items-center gap-1 h-16">
-                        {[...Array(40)].map((_, i) => (
-                            <div
-                                key={i}
-                                className="flex-1 bg-gradient-to-t from-green-500 to-teal-500 rounded-full transition-all duration-300"
-                                style={{
-                                    height: isPlaying ? `${20 + Math.random() * 80}%` : '20%',
-                                    opacity: isPlaying ? 0.8 : 0.4
-                                }}
-                            />
-                        ))}
-                    </div>
                 </div>
             )}
+
         </div>
     );
 };
