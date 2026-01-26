@@ -9,7 +9,6 @@ import {
   Download,
   ChevronRight,
   FileText,
-  Clock,
   Zap,
   Palette,
 } from "lucide-react";
@@ -198,9 +197,15 @@ const ScriptEditor = ({ handleNext }) => {
             </p>
           </div>
         </div>
-
         <div className="flex items-center gap-2">
+          {/* Word Count / Description Info */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-800/50 mr-1">
+            <FileText size={16} />
+            <span className="text-xs font-bold whitespace-nowrap">{scriptStats?.wordCount || 0} words</span>
+          </div>
+
           <button
+
             onClick={handleCopyScript}
             className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-sm hover:shadow-md"
             title="Copy Script"

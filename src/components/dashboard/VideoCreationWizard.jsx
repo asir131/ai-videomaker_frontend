@@ -173,10 +173,7 @@ const VideoCreationWizard = () => {
                         {selectedStyle.name}
                       </span>
                     )}
-                    <span className="flex items-center gap-1">
-                      <Clock size={12} />
-                      ~{Math.ceil(script.split(/\s+/).filter(word => word.length > 0).length / 150)}min
-                    </span>
+
                   </div>
                 </div>
               </div>

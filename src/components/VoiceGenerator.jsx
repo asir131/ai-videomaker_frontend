@@ -259,24 +259,23 @@ const VoiceGenerator = () => {
                                 <p className="text-sm text-indigo-600 dark:text-indigo-400">Script details for audio processing</p>
                             </div>
                         </div>
-                        {!isEditingScript && (
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={handleEditScript}
-                                    className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center gap-2"
-                                >
-                                    <Edit2 size={16} />
-                                    Replace Script
-                                </button>
-                                <button
-                                    onClick={handleClearScript}
-                                    className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/50 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center gap-2"
-                                >
-                                    <X size={16} />
-                                    Clear
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={handleEditScript}
+                                className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center gap-2"
+                            >
+                                <Edit2 size={16} />
+                                Edit Script
+                            </button>
+                            <button
+                                onClick={handleClearScript}
+                                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/50 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center gap-2"
+                            >
+                                <X size={16} />
+                                Clear
+                            </button>
+                        </div>
+
                     </div>
 
                     {isEditingScript ? (
@@ -293,9 +292,9 @@ const VoiceGenerator = () => {
                                     autoFocus
                                 />
                                 <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                    {editedScript.split(/\s+/).filter(word => word.length > 0).length} words •
-                                    ~{Math.ceil(editedScript.split(/\s+/).filter(word => word.length > 0).length / 150)}min audio
+                                    {editedScript.split(/\s+/).filter(word => word.length > 0).length} words
                                 </div>
+
                             </div>
                             <div className="flex items-center gap-2">
                                 <button
@@ -330,9 +329,10 @@ const VoiceGenerator = () => {
                                             {script.split(/\s+/).filter(word => word.length > 0).length} words
                                         </span>
                                         <span className="flex items-center gap-1">
-                                            <Clock size={14} />
-                                            ~{Math.ceil(script.split(/\s+/).filter(word => word.length > 0).length / 150)}min audio
+                                            <FileText size={14} />
+                                            {script.split(/\s+/).filter(word => word.length > 0).length} words
                                         </span>
+
                                     </div>
                                     <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
                                         {script.substring(0, 150)}{script.length > 150 ? '...' : ''}
@@ -471,8 +471,8 @@ const VoiceGenerator = () => {
                         onClick={handleGenerateVoice}
                         disabled={!script}
                         className={`w-full py-5 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 ${script
-                                ? 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]'
-                                : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60'
+                            ? 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]'
+                            : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60'
                             }`}
                     >
                         <Volume2 size={24} />
