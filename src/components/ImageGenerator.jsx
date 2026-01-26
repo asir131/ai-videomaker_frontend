@@ -16,6 +16,7 @@ import {
   Music,
   Upload,
   X,
+  Check,
 } from "lucide-react";
 import { API_BASE_URL } from "../utils/constants.js";
 import ProgressBar from "./common/ProgressBar";
@@ -201,11 +202,12 @@ const ImageGenerator = () => {
     imageGenerationProgress,
     setImageGenerationProgress,
     generatedAudioUrl,
+    setGeneratedAudioUrl,
   } = useMedia();
   const { setLoading } = useUI();
 
-  const [selectedStyle, setSelectedStyle] = useState("cinematic");
-  const [showPrompts, setShowPrompts] = useState(false);
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+  const [showStyleModal, setShowStyleModal] = useState(false);
 
   // Modal states
   const [showImageModal, setShowImageModal] = useState(false);
@@ -601,6 +603,39 @@ Output ONLY the final prompt - no analysis or additional text.`;
     console.log("🖼️ State updated");
   };
 
+  const handleGenerateClick = async () => {
+    if (!isAdvancedMode) {
+      if (!generationSettings.imageCount || generationSettings.imageCount < 1) {
+        alert("Please enter a valid image count.");
+        return;
+      }
+    } else {
+      if (!generationSettings.imageCount || generationSettings.imageCount < 1) {
+        const settingsWithImageCount = {
+          ...generationSettings,
+          imageCount: Math.min(scenes.length, 15),
+        };
+        await handleGenerateImages(settingsWithImageCount);
+        setShowSettings(false);
+        return;
+      }
+    }
+    await handleGenerateImages(generationSettings);
+    setShowSettings(false);
+  };
+
+
+  const isFormValid = () => {
+    if (!generationSettings.selectedStyle) return false;
+    if (
+      (!generationSettings.imageCount || generationSettings.imageCount < 1) &&
+      !isAdvancedMode
+    )
+      return false;
+    return true;
+  };
+
+
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
     setIsDragging(true);
@@ -817,8 +852,6 @@ Output ONLY the final prompt - no analysis or additional text.`;
 
   return (
     <>
-
-
       {/* Image Viewer Modal */}
       {showImageModal && selectedImageIndex !== null && (
         <div
@@ -826,7 +859,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
           onClick={() => setShowImageModal(false)}
         >
           <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-800"
+            className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-800"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -1094,13 +1127,13 @@ Output ONLY the final prompt - no analysis or additional text.`;
               </a>
 
               {/* Replace Button */}
-              <button
+              {/* <button
                 onClick={() => audioInputRef.current?.click()}
                 className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                 title="Replace with custom audio"
               >
                 <RefreshCw size={20} />
-              </button>
+              </button> */}
               <input
                 ref={audioInputRef}
                 type="file"
@@ -1122,65 +1155,622 @@ Output ONLY the final prompt - no analysis or additional text.`;
         )}
 
 
-        {/* Generate Button / Header */}
-        <div className={`p-4 rounded-xl border-2 transition-all duration-300 ${!scenes.length
-          ? "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700"
-          : "bg-white dark:bg-gray-800 border-indigo-100 dark:border-indigo-900/50 shadow-sm"
-          }`}>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div>
-                <h3 className="font-bold">Scene to Image</h3>
-                <p className="text-xs text-gray-500">{scenes.length} scenes</p>
+        <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            {/* Settings Header */}
+            <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                  <Sparkles size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Generation Settings
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Configure and generate scenes ({scenes.length} available)
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* Upload Button integrated here */}
+                <button
+                  onClick={() => setShowUploadModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-semibold text-gray-700 dark:text-gray-300"
+                >
+                  <Upload size={18} />
+                  <span>Upload Images</span>
+                </button>
+
+                {/* Mode Toggle */}
+                <div className="flex items-center justify-between p-2 pl-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm min-w-[180px]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">
+                        {isAdvancedMode ? "A" : "B"}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                      {isAdvancedMode ? "Advanced" : "Basic"}
+                    </h4>
+                  </div>
+                  <button
+                    onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+                    className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 ml-4 ${isAdvancedMode
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600"
+                      : "bg-gray-300 dark:bg-gray-600"
+                      } shadow-inner`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 ${isAdvancedMode ? "translate-x-7" : "translate-x-1"
+                        }`}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            {/* Settings Body */}
+            <div className="p-6 space-y-6">
+              {!isAdvancedMode ? (
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                  {/* Aspect Ratio */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      Aspect Ratio
+                    </label>
+                    <select
+                      value={generationSettings.aspectRatio}
+                      onChange={(e) =>
+                        setGenerationSettings({
+                          ...generationSettings,
+                          aspectRatio: e.target.value,
+                        })
+                      }
+                      className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none"
+                    >
+                      <option value="16:9">16:9 Landscape</option>
+                      <option value="9:16">9:16 Portrait</option>
+                    </select>
+                  </div>
+
+                  {/* Quality */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      Quality Level
+                    </label>
+                    <select
+                      value={generationSettings.quality}
+                      onChange={(e) =>
+                        setGenerationSettings({
+                          ...generationSettings,
+                          quality: e.target.value,
+                        })
+                      }
+                      className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none"
+                    >
+                      <option value="Fine">Fine</option>
+                      <option value="Good">Good</option>
+                      <option value="Better">Better</option>
+                      <option value="Best">Best</option>
+                    </select>
+                  </div>
+
+                  {/* Image Count */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      Image Count ({Math.min(scenes.length, 15)} max)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max={Math.min(scenes.length, 15)}
+                      value={generationSettings.imageCount || ""}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setGenerationSettings({ ...generationSettings, imageCount: isNaN(val) ? null : val });
+                      }}
+                      placeholder="1-15"
+                      className="w-full h-12 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Animation */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      Animation
+                    </label>
+                    <div className="flex h-12 items-center justify-between px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                      <span className="text-sm text-gray-500">
+                        {generationSettings.animate ? "On" : "Off"}
+                      </span>
+                      <button
+                        onClick={() => setGenerationSettings({ ...generationSettings, animate: !generationSettings.animate })}
+                        className={`relative w-11 h-6 rounded-full transition-colors ${generationSettings.animate ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"}`}
+                      >
+                        <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-all ${generationSettings.animate ? "translate-x-5" : ""}`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Style Selection (Full Width) */}
+                  <div className="md:col-span-2 lg:col-span-4 space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      Art Style
+                    </label>
+                    <button
+                      onClick={() => setShowStyleModal(true)}
+                      className="w-full h-12 px-4 flex items-center justify-between rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-blue-500 text-gray-600 dark:text-gray-400 group transition-all"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Palette size={18} />
+                        <span className="font-bold text-blue-500">{generationSettings.selectedStyle || "Select a theme..."}</span>
+                      </div>
+                      <Check size={18} className={generationSettings.selectedStyle ? "text-green-500" : "opacity-0"} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Detailed Advanced Mode */
+                <div className="space-y-8">
+                  {/* Voiceover Section */}
+                  <div className="bg-white dark:bg-gray-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white shrink-0">
+                        <Music size={20} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-bold text-slate-800 dark:text-white truncate">
+                          Use Generated Voiceover
+                        </h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                          Use your generated voiceover to create visuals
+                        </p>
+                      </div>
+                      <div className="ml-auto">
+                        <div className="w-5 h-5 rounded-full border-2 border-indigo-500 flex items-center justify-center">
+                          <div className="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+                      <div className="flex items-center gap-4">
+                        {/* Play/Pause Button */}
+                        <button
+                          onClick={toggleAudioPlay}
+                          className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-all flex-shrink-0"
+                        >
+                          {isAudioPlaying ? (
+                            <Pause size={18} fill="currentColor" />
+                          ) : (
+                            <Play size={18} fill="currentColor" className="ml-0.5" />
+                          )}
+                        </button>
+
+                        {/* Current Time */}
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[40px]">
+                          {formatTimeMMSS(audioCurrentTime)}
+                        </span>
+
+                        {/* Progress Bar */}
+                        <div className="flex-1 relative flex items-center group">
+                          <input
+                            type="range"
+                            min="0"
+                            max={audioDuration || 0}
+                            value={audioCurrentTime}
+                            onChange={handleAudioSeek}
+                            className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none"
+                          />
+                        </div>
+
+                        {/* Total Duration */}
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[40px]">
+                          {formatTimeMMSS(audioDuration)}
+                        </span>
+
+                        {/* Volume Control */}
+                        <div className="flex items-center gap-2 group/volume relative">
+                          <button className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                            <Volume2 size={20} />
+                          </button>
+                          <div className="w-20 hidden group-hover/volume:block absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xl lg:static lg:block lg:shadow-none lg:p-0 lg:border-none">
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={audioVolume}
+                              onChange={handleAudioVolumeChange}
+                              className="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Download Button */}
+                        {generatedAudioUrl && (
+                          <a
+                            href={generatedAudioUrl}
+                            download="voiceover.mp3"
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                            title="Download Audio"
+                          >
+                            <Download size={20} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Configuration Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    {/* Column 1: Aspect Ratio */}
+                    <div className="space-y-3">
+                      <h4 className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
+                        <span className="text-slate-400">1.</span> Aspect
+                        ratio
+                      </h4>
+                      <div className="relative group">
+                        <label className="absolute left-3 -top-2 px-1 bg-white dark:bg-gray-900 text-[10px] font-bold text-slate-400 z-10">
+                          Aspect Ratio
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={generationSettings.aspectRatio}
+                            onChange={(e) =>
+                              setGenerationSettings({
+                                ...generationSettings,
+                                aspectRatio: e.target.value,
+                              })
+                            }
+                            className="w-full h-12 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl pl-12 pr-4 text-sm font-semibold appearance-none focus:border-indigo-500 outline-none transition-all"
+                          >
+                            <option value="16:9">16:9</option>
+                            <option value="9:16">9:16</option>
+                            <option value="1:1">1:1</option>
+                          </select>
+                          <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <div className="w-4 h-3 border-2 border-slate-400 rounded-sm"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Column 2: Safe Prompts */}
+                    <div className="space-y-3">
+                      <h4 className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
+                        <span className="text-slate-400">2.</span> Safe
+                        prompts
+                      </h4>
+                      <div className="flex h-12 items-center justify-between bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-4">
+                        <button
+                          onClick={() =>
+                            setGenerationSettings((prev) => ({
+                              ...prev,
+                              promptSafety: !prev.promptSafety,
+                            }))
+                          }
+                          className={`relative w-12 h-6 rounded-full transition-colors ${generationSettings.promptSafety ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-700"}`}
+                        >
+                          <div
+                            className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm ${generationSettings.promptSafety ? "right-1" : "left-1"}`}
+                          />
+                        </button>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-3">
+                          {generationSettings.promptSafety ? "On" : "Off"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Column 3: Style */}
+                    <div className="space-y-3">
+                      <h4 className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
+                        <span className="text-slate-400">3.</span> Choose
+                        style
+                      </h4>
+                      <button
+                        onClick={() => setShowStyleModal(true)}
+                        className="w-full h-12 flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-1.5 pr-4 hover:border-indigo-500 transition-all group"
+                      >
+                        <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100">
+                          {IMAGE_STYLES[
+                            generationSettings.selectedStyle?.toLowerCase()
+                          ]?.image ? (
+                            <img
+                              src={
+                                IMAGE_STYLES[
+                                  generationSettings.selectedStyle.toLowerCase()
+                                ].image
+                              }
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs">
+                              🎨
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-sm font-bold text-blue-500">
+                          {generationSettings.selectedStyle}
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Column 4: Context */}
+                    <div className="space-y-3">
+                      <h4 className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
+                        <span className="text-slate-400">4.</span> Additional
+                        context
+                      </h4>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Add context..."
+                          value={generationSettings.additionalContext}
+                          onChange={(e) =>
+                            setGenerationSettings({
+                              ...generationSettings,
+                              additionalContext: e.target.value,
+                            })
+                          }
+                          className="w-full h-12 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-4 text-sm font-semibold focus:border-indigo-500 outline-none transition-all placeholder:text-slate-300"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Segment Settings */}
+                  <div className="bg-slate-50/50 dark:bg-slate-900/30 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                        Segment Settings
+                      </h3>
+                      <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                        <Loader2 size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest font-mono">
+                          {formatTimeMMSS(audioDuration)} / {formatTimeMMSS(audioDuration)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      {/* Quality Preset */}
+                      <div>
+                        <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">
+                          Quality Preset
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {["Fine", "Good", "Better", "Best", "Custom"].map(
+                            (q) => (
+                              <button
+                                key={q}
+                                onClick={() =>
+                                  setGenerationSettings({
+                                    ...generationSettings,
+                                    quality: q,
+                                  })
+                                }
+                                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${generationSettings.quality === q
+                                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                                  : "bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-200"
+                                  }`}
+                              >
+                                {q}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Animation & Pacing */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border-2 border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                          <div>
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                              Animate Segment
+                            </div>
+                            <p className="text-xs text-slate-400">
+                              Add motion to generated images
+                            </p>
+                          </div>
+                          <button
+                            onClick={() =>
+                              setGenerationSettings((prev) => ({
+                                ...prev,
+                                animate: !prev.animate,
+                              }))
+                            }
+                            className={`relative w-12 h-6 rounded-full transition-colors ${generationSettings.animate ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-700"}`}
+                          >
+                            <div
+                              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm ${generationSettings.animate ? "right-1" : "left-1"}`}
+                            />
+                          </button>
+                        </div>
+
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border-2 border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                          <div>
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                              Pacing
+                            </div>
+                            <p className="text-xs text-slate-400">
+                              Speed of image transitions
+                            </p>
+                          </div>
+                          <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold font-mono border border-blue-100 dark:border-blue-800">
+                            ~6.35s
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Image Count Slider */}
+                      <div>
+                        <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                          <span>Image Count</span>
+                          <span className="text-slate-500">
+                            {generationSettings.imageCount || 10}/
+                            {scenes.length} images
+                          </span>
+                        </div>
+                        <div className="relative group py-4">
+                          <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full relative overflow-hidden">
+                            <div
+                              className="absolute left-0 top-0 bottom-0 bg-blue-500 rounded-full"
+                              style={{
+                                width: scenes.length > 0
+                                  ? `${((generationSettings.imageCount || 10) / scenes.length) * 100}%`
+                                  : "0%",
+                              }}
+                            ></div>
+                          </div>
+                          <input
+                            type="range"
+                            min="1"
+                            max={scenes.length || 1}
+                            value={generationSettings.imageCount || 10}
+                            onChange={(e) =>
+                              setGenerationSettings({
+                                ...generationSettings,
+                                imageCount: parseInt(e.target.value),
+                              })
+                            }
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          />
+                          <div
+                            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-md z-0 pointer-events-none"
+                            style={{
+                              left: scenes.length > 0
+                                ? `calc(${((generationSettings.imageCount || 10) / scenes.length) * 100}% - 8px)`
+                                : "0%",
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Timeline Section */}
+                  <div className="bg-white dark:bg-gray-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="text-slate-400">
+                          <Loader2 size={18} />
+                        </div>
+                        <h3 className="text-sm font-bold text-slate-800 dark:text-white">
+                          Timeline
+                        </h3>
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {formatTimeMMSS(audioCurrentTime)} / {formatTimeMMSS(audioDuration)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
+                            Zoom
+                          </span>
+                          <div className="w-24 h-1 bg-slate-200 dark:bg-slate-700 rounded-full relative group cursor-pointer">
+                            <div
+                              className="absolute left-0 top-0 bottom-0 bg-blue-500 rounded-full"
+                              style={{ width: `${timelineZoom}%` }}
+                            ></div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={timelineZoom}
+                              onChange={(e) =>
+                                setTimelineZoom(parseInt(e.target.value))
+                              }
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative h-24 bg-blue-50 dark:bg-indigo-900/20 rounded-xl border border-blue-100 dark:border-indigo-900/50 overflow-hidden px-2">
+                      <div className="absolute inset-0 flex items-center px-4">
+                        <div className="w-full h-1 bg-white/30 dark:bg-slate-700/50 absolute top-1/2 -translate-y-1/2 left-1"></div>
+                        {[...Array(8)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="flex-1 border-l-2 border-white/20 dark:border-white/10 h-1 absolute top-1/2 -translate-y-1/2"
+                            style={{ left: `${(i + 1) * 12.5}%` }}
+                          ></div>
+                        ))}
+                      </div>
+
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                        <div className="text-[10px] font-bold text-orange-600 dark:text-orange-400 mb-1">
+                          Total Scenes: {scenes.length}
+                        </div>
+                        <div className="bg-orange-500 text-white text-[8px] font-bold px-2 py-0.5 rounded shadow-sm inline-block mb-1">
+                          BEST
+                        </div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                          {generationSettings.imageCount || scenes.length} img
+                        </div>
+                      </div>
+
+                      {/* Playhead */}
+                      <div
+                        className="absolute top-0 bottom-0 w-[2px] bg-blue-500 z-10"
+                        style={{
+                          left: audioDuration
+                            ? `${(audioCurrentTime / audioDuration) * 100}%`
+                            : "0%",
+                        }}
+                      >
+                        <div className="absolute -top-1 -left-1.5 w-3.5 h-3.5 bg-blue-500 rounded-full border-2 border-white shadow-sm" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Combined Progress Bar & Generation Button */}
+          <div className="px-6 py-6 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 space-y-4">
+            {isGeneratingImages && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                    AI Generation in Progress
+                  </span>
+                  <span className="text-xs font-mono text-gray-500">{Math.round(imageGenerationProgress)}%</span>
+                </div>
+                <ProgressBar
+                  progress={imageGenerationProgress}
+                  status="Creating visuals..."
+                  variant="gradient"
+                  showPercentage={false}
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
               <button
-                onClick={() => navigate('/app/image-settings')}
-                className={`relative overflow-hidden group px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] w-full md:w-auto flex items-center justify-center gap-2 ${isGeneratingImages
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-indigo-500/20"
-                  }`}
-                disabled={isGeneratingImages}
+                onClick={handleGenerateClick}
+                disabled={!isFormValid() || isGeneratingImages}
+                className="px-10 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px] justify-center"
               >
                 {isGeneratingImages ? (
                   <>
                     <Loader2 className="animate-spin" size={18} />
-                    <span>Generating...</span>
+                    <span>Generating Scenes...</span>
                   </>
                 ) : (
                   <>
                     <Sparkles size={18} />
-                    <span>Generate with AI</span>
+                    <span>Generate {generationSettings.imageCount || scenes.length} Images</span>
                   </>
                 )}
               </button>
-              <button onClick={() => setShowUploadModal(true)} className="p-2 border rounded-xl">
-                <Upload size={20} />
-              </button>
             </div>
           </div>
-
-          {/* Progress Bar */}
-          {isGeneratingImages && (
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                  Generating Images...
-                </span>
-                <span className="text-xs font-mono text-gray-500">
-                  {Math.round(imageGenerationProgress)}%
-                </span>
-              </div>
-              <ProgressBar
-                progress={imageGenerationProgress}
-                status="Processing scenes..."
-                variant="gradient"
-                showPercentage={false}
-              />
-            </div>
-          )}
         </div>
       </div>
 
@@ -1413,19 +2003,13 @@ Output ONLY the final prompt - no analysis or additional text.`;
               </div>
 
               {/* Footer Controls */}
-              <div className="mt-8 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-6">
+              <div className="mt-8 flex items-center justify-end border-t border-gray-100 dark:border-gray-700 pt-6">
                 <button
-                  onClick={() => navigate('/app/image-settings')}
-                  className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
-                >
-                  Back to settings
-                </button>
-                <button
-                  onClick={() => navigate('/app/image-settings')}
+                  onClick={() => window.scrollTo({ top: containerRef.current?.offsetTop || 0, behavior: "smooth" })}
                   disabled={isGeneratingImages}
                   className="px-6 py-2.5 border border-blue-600 text-blue-600 dark:text-blue-400 font-bold rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                 >
-                  Generate {generationSettings.imageCount || 10} more Images
+                  Change generation settings
                 </button>
               </div>
             </div>
@@ -1440,8 +2024,56 @@ Output ONLY the final prompt - no analysis or additional text.`;
         onEnded={() => setIsAudioPlaying(false)}
         className="hidden"
       />
+      {/* Style Selection Modal */}
+      {
+        showStyleModal && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowStyleModal(false)}
+          >
+            <div
+              className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden border border-gray-100 dark:border-gray-800 flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Choose Art Style</h3>
+                <button
+                  onClick={() => setShowStyleModal(false)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-4">
+                {Object.entries(IMAGE_STYLES).map(([key, style]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setGenerationSettings({ ...generationSettings, selectedStyle: style.name });
+                      setShowStyleModal(false);
+                    }}
+                    className={`group relative overflow-hidden rounded-2xl border-2 transition-all ${generationSettings.selectedStyle === style.name
+                      ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
+                      : "border-gray-100 dark:border-gray-800 hover:border-blue-200"
+                      }`}
+                  >
+                    <div className="h-28 bg-gray-50 dark:bg-gray-800 flex items-center justify-center relative">
+                      {style.image ? (
+                        <img src={style.image} className="w-full h-full object-cover" alt={style.name} />
+                      ) : (
+                        <span className="text-3xl">{style.icon}</span>
+                      )}
+                    </div>
+                    <div className="p-3 font-bold text-sm text-gray-700 dark:text-gray-300">{style.name}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
     </>
   );
 };
 
 export default ImageGenerator;
+
