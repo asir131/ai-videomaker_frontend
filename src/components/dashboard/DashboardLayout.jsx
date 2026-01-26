@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Video, 
-  Coins, 
-  Settings, 
-  Youtube, 
-  HelpCircle, 
-  Menu, 
+import {
+  Home,
+  Video,
+  Coins,
+  Settings,
+  Youtube,
+  HelpCircle,
+  Menu,
   X,
   LogOut,
 } from 'lucide-react';
@@ -18,11 +18,20 @@ import CreditsNavbar from './CreditsNavbar';
 const DashboardLayout = ({ children }) => {
   // Debug: Confirm DashboardLayout is rendering
   console.log('DashboardLayout: Rendering with sidebar');
-  
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Disable body scroll when sidebar is open on mobile
+  React.useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [sidebarOpen]);
 
   const handleLogout = () => {
     logout();
@@ -54,9 +63,8 @@ const DashboardLayout = ({ children }) => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans flex" data-dashboard-layout="true">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed lg:static inset-y-0 left-0 z-[60] w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
@@ -72,7 +80,7 @@ const DashboardLayout = ({ children }) => {
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="lg:hidden p-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all shadow-sm"
             >
               <X size={20} />
             </button>
@@ -87,11 +95,10 @@ const DashboardLayout = ({ children }) => {
                 <button
                   key={item.path}
                   onClick={() => handleNavClick(item.path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
-                    active
-                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${active
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
                 >
                   <Icon size={20} />
                   <span>{item.label}</span>
@@ -129,7 +136,7 @@ const DashboardLayout = ({ children }) => {
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -158,7 +165,7 @@ const DashboardLayout = ({ children }) => {
             {children}
           </div>
         </main>
-        
+
         {/* Debug indicator - remove after confirming it works */}
         {process.env.NODE_ENV === 'development' && (
           <div className="fixed bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded text-xs z-50">

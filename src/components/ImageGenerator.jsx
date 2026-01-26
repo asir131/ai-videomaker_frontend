@@ -1115,7 +1115,6 @@ Output ONLY the final prompt - no analysis or additional text.`;
                   />
                 </div>
               </div>
-
               {/* Download Button */}
               <a
                 href={generatedAudioUrl}
