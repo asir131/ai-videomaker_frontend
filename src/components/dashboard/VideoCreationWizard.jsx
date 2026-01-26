@@ -159,7 +159,7 @@ const VideoCreationWizard = () => {
                   <FileText size={16} />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white text-sm">
+                  <div className="roboto text-gray-900 dark:text-white text-md">
                     {title || 'Untitled Script'}
                   </div>
                   <div className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-3">

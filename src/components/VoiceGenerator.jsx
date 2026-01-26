@@ -56,6 +56,7 @@ const VoiceGenerator = () => {
     const [editedScript, setEditedScript] = useState('');
     const [currentTime, setCurrentTime] = useState(0);
     const [volume, setVolume] = useState(1);
+    const [isScriptExpanded, setIsScriptExpanded] = useState(false);
 
 
     // Preview state
@@ -345,19 +346,25 @@ const VoiceGenerator = () => {
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <h4 className="font-bold text-gray-900 dark:text-white text-lg">{title || 'Untitled Script'}</h4>
                                         <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-full">
                                             {selectedStyle?.name || 'Custom Style'}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                                        <span className="flex items-center gap-1">
-                                            <FileText size={14} />
-                                            {script.split(/\s+/).filter(word => word.length > 0).length} words
-                                        </span>
-                                    </div>
-                                    <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
-                                        {script.substring(0, 150)}{script.length > 150 ? '...' : ''}
+                                    <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                        {isScriptExpanded ? script : (
+                                            <>
+                                                {script.substring(0, 150)}
+                                                {script.length > 150 && '...'}
+                                            </>
+                                        )}
+                                        {script.length > 150 && (
+                                            <button
+                                                onClick={() => setIsScriptExpanded(!isScriptExpanded)}
+                                                className="ml-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline inline-flex items-center gap-1"
+                                            >
+                                                {isScriptExpanded ? 'See Less' : 'See More'}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
