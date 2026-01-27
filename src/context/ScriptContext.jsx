@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { parseScriptIntoScenes } from '../utils/scriptUtils';
 
 const ScriptContext = createContext();
@@ -16,7 +16,7 @@ export const ScriptProvider = ({ children }) => {
     const [userEdited, setUserEdited] = useState(false);
 
     // Sync scenes when script or sceneCount changes
-    const updateScenes = (newScript, newCount, audioDuration = 0, flagAsUserEdited = false) => {
+    const updateScenes = useCallback((newScript, newCount, audioDuration = 0, flagAsUserEdited = false) => {
         if (!newScript) {
             setScenes([]);
             return;
@@ -27,7 +27,7 @@ export const ScriptProvider = ({ children }) => {
         if (flagAsUserEdited) {
             setUserEdited(true);
         }
-    };
+    }, []);
 
     const value = {
         script,

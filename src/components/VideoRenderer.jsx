@@ -212,16 +212,6 @@ const VideoRenderer = () => {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row items-center justify-between bg-gray-50 dark:bg-gray-800/50 p-8 rounded-2xl border border-gray-100 dark:border-gray-700">
           <div className="mb-6 md:mb-0">
-            {/* <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              {generatedAudioUrl && images.some((img) => img.url)
-                ? "Ready to Render!"
-                : "Almost Ready"}
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 max-w-md">
-              {generatedAudioUrl && images.some((img) => img.url)
-                ? `We'll combine your script, ${scenes.length} scenes, and voiceover into a complete video.`
-                : "Please generate images and voiceover first, then come back here to render your video."}
-            </p> */}
             {!generatedAudioUrl && (
               <div className="mt-3 flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
                 <AlertCircle size={16} />

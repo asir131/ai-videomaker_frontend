@@ -23,8 +23,6 @@ import VideoRenderer from '../VideoRenderer';
 const VideoCreationWizard = () => {
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(location.state?.step || 0);
-  const [hasAutoAdvanced, setHasAutoAdvanced] = useState({});
-  const [manualNavigation, setManualNavigation] = useState(false);
   const { script, scenes, title, selectedStyle } = useScript();
   const { images, generatedAudioUrl } = useMedia();
 
@@ -77,7 +75,6 @@ const VideoCreationWizard = () => {
 
   const handleNext = () => {
     if (canGoNext) {
-      setManualNavigation(true);
       setCurrentStep(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -85,59 +82,16 @@ const VideoCreationWizard = () => {
 
   const handlePrev = () => {
     if (canGoPrev) {
-      setManualNavigation(true);
       setCurrentStep(prev => prev - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleStepClick = (index) => {
-    setManualNavigation(true);
     setCurrentStep(index);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Auto-navigate to next step when current step is completed
-  useEffect(() => {
-    const currentStepData = steps[currentStep];
-    const stepId = currentStepData?.id;
-
-    // Don't auto-navigate on the last step
-    if (currentStep >= steps.length - 1) return;
-
-    //Don't auto-navigate if user manually navigated backwards
-    if (manualNavigation) {
-      setManualNavigation(false);
-      return;
-    }
-
-    // Don't auto-navigate if we've already auto-advanced from this step
-    if (hasAutoAdvanced[stepId]) return;
-
-    // Check if current step is completed
-    // Auto-advance from script step when script is generated
-    if (stepId === 'script' && currentStepData.completed) {
-      const timer = setTimeout(() => {
-        setHasAutoAdvanced(prev => ({ ...prev, [stepId]: true }));
-        setCurrentStep(prev => prev + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 1500); // 1.5 second delay
-
-      return () => clearTimeout(timer);
-    }
-
-    // Auto-advance from other steps (except edit and images steps which user controls)
-    if (currentStepData.completed && stepId !== 'edit' && stepId !== 'images') {
-      // Wait a bit to show the completion state, then move to next
-      const timer = setTimeout(() => {
-        setHasAutoAdvanced(prev => ({ ...prev, [stepId]: true }));
-        setCurrentStep(prev => prev + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 2000); // 2 second delay to review completion
-
-      return () => clearTimeout(timer);
-    }
-  }, [steps[currentStep]?.completed, currentStep, steps.length, manualNavigation, hasAutoAdvanced]);
 
   return (
     <div className="space-y-6">

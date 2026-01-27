@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useScript } from "../context/ScriptContext";
 import { useMedia } from "../context/MediaContext";
-import { parseScriptIntoScenes } from "../utils/scriptUtils";
 import {
   Edit3,
   Loader2,
@@ -21,7 +20,7 @@ const ScriptEditor = ({ handleNext }) => {
   const { script, setScript, setScenes, sceneCount, setSceneCount, updateScenes, title, selectedStyle, userEdited, setUserEdited } = useScript();
   const { audioDuration } = useMedia();
   const { showSuccess, showError } = useToast();
-  const [displayedScript, setDisplayedScript] = useState("");
+  const [displayedScript, setDisplayedScript] = useState(userEdited ? script : "");
   const [isAnimating, setIsAnimating] = useState(false);
 
   // Cleanup function for animation timeouts
@@ -190,24 +189,6 @@ const ScriptEditor = ({ handleNext }) => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* Scene Count Selector */}
-          <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50">
-            <label className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider whitespace-nowrap">
-              Scenes:
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="15"
-              value={sceneCount}
-              onChange={handleSceneCountChange}
-              className="w-24 h-1.5 bg-indigo-200 dark:bg-indigo-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-            />
-            <span className="text-sm font-bold text-indigo-700 dark:text-indigo-400 w-5">
-              {sceneCount}
-            </span>
-          </div>
-
           {/* Word Count / Description Info */}
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-800/50">
             <FileText size={16} />
