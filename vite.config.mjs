@@ -30,7 +30,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: [
-      "pirates-instance-concerts-leonard.trycloudflare.com",
+      "https://gossip-rainbow-learn-treat.trycloudflare.com",
     ],
     port: 5173,
     proxy: {
