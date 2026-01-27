@@ -295,13 +295,13 @@ const VoiceGenerator = () => {
                                 <Edit2 size={16} />
                                 Edit Script
                             </button>
-                            <button
+                            {/* <button
                                 onClick={handleClearScript}
                                 className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/50 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center gap-2"
                             >
                                 <X size={16} />
                                 Clear
-                            </button>
+                            </button> */}
                         </div>
 
                     </div>
@@ -379,15 +379,14 @@ const VoiceGenerator = () => {
                         </div>
                         <div className="flex-1">
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">No Script Available</h3>
-                            <p className="text-sm text-indigo-600 dark:text-indigo-400">Paste your script to generate voiceover</p>
                         </div>
-                        <button
+                        {/* <button
                             onClick={handlePasteNewScript}
                             className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center gap-2"
                         >
                             <FileText size={16} />
                             Paste Script
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             )}
