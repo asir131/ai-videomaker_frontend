@@ -18,12 +18,11 @@ import { useToast } from "../context/ToastContext";
 const ScriptEditor = ({ handleNext }) => {
   const containerRef = useRef(null);
   const timeoutsRef = useRef([]);
-  const { script, setScript, setScenes, title, selectedStyle } = useScript();
+  const { script, setScript, setScenes, sceneCount, setSceneCount, updateScenes, title, selectedStyle, userEdited, setUserEdited } = useScript();
   const { audioDuration } = useMedia();
   const { showSuccess, showError } = useToast();
   const [displayedScript, setDisplayedScript] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
-  const [userEdited, setUserEdited] = useState(false);
 
   // Cleanup function for animation timeouts
   const cleanupAnimation = () => {
@@ -54,26 +53,22 @@ const ScriptEditor = ({ handleNext }) => {
         timeoutsRef.current.push(timeout);
       });
 
-      // Always split script into 15 scenes - user can choose how many images to generate (1-15)
-      const sceneCount = 15;
-      const scenes = parseScriptIntoScenes(script, sceneCount, audioDuration);
-      setScenes(scenes);
+      // Split script into chosen number of scenes
+      updateScenes(script, sceneCount, audioDuration);
     }
 
     // Cleanup on unmount
     return () => {
       cleanupAnimation();
     };
-  }, [script, audioDuration, setScenes, userEdited]);
+  }, [script, audioDuration, updateScenes, userEdited, sceneCount]);
 
-  // Language validation function
   const isEnglishContent = (text) => {
-    // Check for common non-English character ranges
-    const nonEnglishPattern = /[\u0080-\uFFFF]/g; // Non-ASCII characters
-    const banglaPattern = /[\u0980-\u09FF]/g; // Bangla characters
-    const arabicPattern = /[\u0600-\u06FF]/g; // Arabic characters
-    const cyrillicPattern = /[\u0400-\u04FF]/g; // Cyrillic characters
-    const chinesePattern = /[\u4E00-\u9FFF]/g; // Chinese characters
+    const nonEnglishPattern = /[\u0080-\uFFFF]/g;
+    const banglaPattern = /[\u0980-\u09FF]/g;
+    const arabicPattern = /[\u0600-\u06FF]/g;
+    const cyrillicPattern = /[\u0400-\u04FF]/g;
+    const chinesePattern = /[\u4E00-\u9FFF]/g;
 
     const hasNonEnglish = nonEnglishPattern.test(text);
     const hasBangla = banglaPattern.test(text);
@@ -93,7 +88,6 @@ const ScriptEditor = ({ handleNext }) => {
   };
 
   const handleScriptChange = (e) => {
-    // Stop animation when user starts editing
     if (isAnimating) {
       cleanupAnimation();
       setIsAnimating(false);
@@ -101,12 +95,9 @@ const ScriptEditor = ({ handleNext }) => {
 
     const newScript = e.target.value;
 
-    // Language validation (only warn if significant amount of non-English content)
     if (newScript.length > 10) {
-      // Only check after some content is entered
       const languageCheck = isEnglishContent(newScript);
       if (!languageCheck.isEnglish && !userEdited) {
-        // Only show warning once per editing session
         const detectedLangs = Object.entries(languageCheck.detectedLanguages)
           .filter(([lang, detected]) => detected)
           .map(([lang]) => lang.charAt(0).toUpperCase() + lang.slice(1));
@@ -115,7 +106,7 @@ const ScriptEditor = ({ handleNext }) => {
           showWarning(
             `Non-English content detected (${detectedLangs.join(", ")}). For best results with voice generation and video creation, please use English content.`,
           );
-          setUserEdited(true); // Prevent repeated warnings
+          setUserEdited(true);
         }
       }
     }
@@ -123,11 +114,15 @@ const ScriptEditor = ({ handleNext }) => {
     setUserEdited(true);
     setScript(newScript);
     setDisplayedScript(newScript);
+    updateScenes(newScript, sceneCount, audioDuration);
+  };
 
-    // Update scenes when script changes
-    const sceneCount = 15;
-    const scenes = parseScriptIntoScenes(newScript, sceneCount, audioDuration);
-    setScenes(scenes);
+  const handleSceneCountChange = (e) => {
+    const newCount = parseInt(e.target.value);
+    if (!isNaN(newCount) && newCount >= 1 && newCount <= 15) {
+      setSceneCount(newCount);
+      updateScenes(script, newCount, audioDuration);
+    }
   };
 
   const handleCopyScript = () => {
@@ -139,8 +134,6 @@ const ScriptEditor = ({ handleNext }) => {
     try {
       const doc = new jsPDF();
 
-      // Split text into lines that fit the page width
-      // A4 width is 210mm. Margins approx 10mm each side -> 190mm usable.
       const splitText = doc.splitTextToSize(script, 180);
 
       doc.text(splitText, 15, 15);
@@ -152,7 +145,6 @@ const ScriptEditor = ({ handleNext }) => {
     }
   };
 
-  // Calculate script statistics
   const getScriptStats = () => {
     if (!script) return null;
 
@@ -162,8 +154,8 @@ const ScriptEditor = ({ handleNext }) => {
       .filter((word) => word.length > 0);
     const wordCount = words.length;
     const charCount = script.length;
-    const estimatedReadTime = Math.ceil(wordCount / 150); // Average reading speed: 150 words/minute
-    const estimatedAudioDuration = Math.ceil((wordCount / 150) * 60); // Convert to seconds
+    const estimatedReadTime = Math.ceil(wordCount / 150);
+    const estimatedAudioDuration = Math.ceil((wordCount / 150) * 60);
 
     return {
       wordCount,
@@ -193,28 +185,45 @@ const ScriptEditor = ({ handleNext }) => {
             <p className="text-gray-500 dark:text-gray-400 text-sm">
               {isAnimating
                 ? "Animating your script..."
-                : "Refine your story. Script will be split into 15 scenes for image generation."}
+                : `Refine your story. Script will be split into ${sceneCount} scenes for image generation.`}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {/* Scene Count Selector */}
+          <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50">
+            <label className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider whitespace-nowrap">
+              Scenes:
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="15"
+              value={sceneCount}
+              onChange={handleSceneCountChange}
+              className="w-24 h-1.5 bg-indigo-200 dark:bg-indigo-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+            />
+            <span className="text-sm font-bold text-indigo-700 dark:text-indigo-400 w-5">
+              {sceneCount}
+            </span>
+          </div>
+
           {/* Word Count / Description Info */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-800/50 mr-1">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-800/50">
             <FileText size={16} />
             <span className="text-xs font-bold whitespace-nowrap">{scriptStats?.wordCount || 0} words</span>
           </div>
 
           <button
-
             onClick={handleCopyScript}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-sm hover:shadow-md"
+            className="p-2.5 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all shadow-sm hover:shadow-md"
             title="Copy Script"
           >
             <Copy size={18} />
           </button>
           <button
             onClick={handleDownloadPDF}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-sm hover:shadow-md"
+            className="p-2.5 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all shadow-sm hover:shadow-md"
             title="Download PDF"
           >
             <Download size={18} />
@@ -223,15 +232,13 @@ const ScriptEditor = ({ handleNext }) => {
       </div>
 
       {/* Script Information Section */}
-
-
       <div className="space-y-6">
         <div className="relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
           <textarea
             value={displayedScript}
             onChange={handleScriptChange}
-            className="relative w-full h-80 px-6 py-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 focus:border-purple-500 outline-none font-mono text-sm leading-relaxed resize-y shadow-sm hover:shadow-md transition-all"
+            className="relative w-full h-80 px-8 py-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 focus:border-purple-500 outline-none font-jakarta text-lg leading-relaxed resize-y shadow-sm hover:shadow-md transition-all scrollbar-hide"
             placeholder="Your generated script will appear here..."
           />
         </div>

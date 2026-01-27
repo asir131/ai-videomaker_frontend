@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import { useScript } from "../context/ScriptContext";
 import { useMedia } from "../context/MediaContext";
 import { useUI } from "../context/UIContext";
@@ -192,8 +191,7 @@ const getIdeogramStyleType = (styleName) => {
 const ImageGenerator = () => {
   const containerRef = useRef(null);
   const scenesRef = useRef(null);
-  const navigate = useNavigate();
-  const { scenes } = useScript();
+  const { scenes, sceneCount, setSceneCount, updateScenes, script } = useScript();
   const {
     images,
     setImages,
@@ -212,11 +210,6 @@ const ImageGenerator = () => {
   // Modal states
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
-
-  // Drag-and-drop states for timeline reordering
-  const [draggedIndex, setDraggedIndex] = useState(null);
-  const [dragOverIndex, setDragOverIndex] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
 
   // Generation settings
   const [generationSettings, setGenerationSettings] = useState({
@@ -279,19 +272,7 @@ const ImageGenerator = () => {
     console.log("   selectedImageIndex:", selectedImageIndex);
   }, [showImageModal, selectedImageIndex]);
 
-  // Animation effect removed - was causing runtime errors
-  // useEffect(() => {
-  //     if (scenes.length > 0 && containerRef.current) {
-  //         // fadeInUp animation removed
-  //     }
-  // }, [scenes]);
 
-  // Animation effect removed - was causing runtime errors
-  // useEffect(() => {
-  //     if (images.length > 0 && scenesRef.current) {
-  //         // staggerFadeIn animation removed
-  //     }
-  // }, [images]);
 
   const handleGenerateImages = async (checkSettings = null) => {
     // Use passed settings or current state
@@ -347,9 +328,9 @@ const ImageGenerator = () => {
     try {
       const requestedCount = currentSettings.imageCount
         ? parseInt(currentSettings.imageCount, 10)
-        : 0;
+        : scenes.length;
       const targetCount =
-        requestedCount > 0 ? Math.min(requestedCount, scenes.length) : 1;
+        requestedCount > 0 ? Math.min(requestedCount, 15) : scenes.length;
 
       console.log("📊 Image Generation Debug:");
       console.log("   requestedCount:", requestedCount);
@@ -493,9 +474,6 @@ Output ONLY the final prompt - no analysis or additional text.`;
     }
   };
 
-  // Helper function to check if form is valid
-  // const isFormValid = ... (Removed as moved to settings page)
-
   const handleRegenerateImage = async (imageIndex) => {
     if (!generationSettings.selectedStyle) {
       alert("Please select a style in the generation settings first.");
@@ -594,105 +572,26 @@ Output ONLY the final prompt - no analysis or additional text.`;
     }
   };
 
-  const handleImageClick = (index) => {
-    console.log("🖼️ Image clicked! Index:", index);
-    console.log("🖼️ Setting selectedImageIndex to:", index);
-    console.log("🖼️ Setting showImageModal to: true");
-    setSelectedImageIndex(index);
-    setShowImageModal(true);
-    console.log("🖼️ State updated");
-  };
-
   const handleGenerateClick = async () => {
-    if (!isAdvancedMode) {
-      if (!generationSettings.imageCount || generationSettings.imageCount < 1) {
-        alert("Please enter a valid image count.");
-        return;
-      }
-    } else {
-      if (!generationSettings.imageCount || generationSettings.imageCount < 1) {
-        const settingsWithImageCount = {
-          ...generationSettings,
-          imageCount: Math.min(scenes.length, 15),
-        };
-        await handleGenerateImages(settingsWithImageCount);
-        setShowSettings(false);
-        return;
-      }
+    const targetCount = generationSettings.imageCount || sceneCount;
+
+    // If the requested count is different from current scenes, update it
+    if (targetCount !== scenes.length) {
+      setSceneCount(targetCount);
+      updateScenes(script, targetCount, audioDuration, true);
     }
-    await handleGenerateImages(generationSettings);
-    setShowSettings(false);
+
+    const settingsWithImageCount = {
+      ...generationSettings,
+      imageCount: targetCount,
+    };
+    await handleGenerateImages(settingsWithImageCount);
+    if (typeof setShowSettings === 'function') setShowSettings(false);
   };
 
 
   const isFormValid = () => {
-    if (!generationSettings.selectedStyle) return false;
-    if (
-      (!generationSettings.imageCount || generationSettings.imageCount < 1) &&
-      !isAdvancedMode
-    )
-      return false;
-    return true;
-  };
-
-
-  const handleDragStart = (e, index) => {
-    setDraggedIndex(index);
-    setIsDragging(true);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/html", e.target);
-    // Add visual feedback
-    e.target.style.opacity = "0.5";
-  };
-
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    setDragOverIndex(index);
-  };
-
-  const handleDragLeave = (e) => {
-    setDragOverIndex(null);
-  };
-
-  const handleDrop = (e, dropIndex) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (draggedIndex === null || draggedIndex === dropIndex) {
-      setDraggedIndex(null);
-      setDragOverIndex(null);
-      return;
-    }
-
-    // Reorder scenes
-    const newScenes = [...scenes];
-    const [draggedScene] = newScenes.splice(draggedIndex, 1);
-    newScenes.splice(dropIndex, 0, draggedScene);
-    setScenes(newScenes);
-
-    // Reorder images to match
-    const newImages = [...images];
-    const [draggedImage] = newImages.splice(draggedIndex, 1);
-    newImages.splice(dropIndex, 0, draggedImage);
-    setImages(newImages);
-
-    console.log(
-      `🔄 Reordered: Scene ${draggedIndex + 1} moved to position ${dropIndex + 1}`,
-    );
-
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-
-  const handleDragEnd = (e) => {
-    e.target.style.opacity = "1";
-    // Delay resetting to prevent click from firing
-    setTimeout(() => {
-      setIsDragging(false);
-      setDraggedIndex(null);
-      setDragOverIndex(null);
-    }, 100);
+    return !!generationSettings.selectedStyle;
   };
 
   // Audio playback functions
@@ -774,21 +673,20 @@ Output ONLY the final prompt - no analysis or additional text.`;
 
     if (validFiles.length === 0) return;
 
-    // Limit to number of scenes
-    const maxImages = scenes.length;
-    const imagesToUpload = validFiles.slice(0, maxImages);
+    // Dynamically adjust scene count to match number of uploaded images
+    const imagesToUpload = validFiles.slice(0, 15);
+    const newCount = imagesToUpload.length;
 
-    if (validFiles.length > maxImages) {
-      alert(
-        `You can only upload up to ${maxImages} images for ${maxImages} scenes.`,
-      );
+    if (newCount !== scenes.length) {
+      setSceneCount(newCount);
+      updateScenes(script, newCount, audioDuration, true);
     }
 
     setUploadingImages({});
     setShowUploadModal(false);
 
     // Create image objects for upload
-    const newImages = Array(scenes.length)
+    const newImages = Array(newCount)
       .fill(null)
       .map((_, index) => {
         return images[index] || { status: "pending", url: null };

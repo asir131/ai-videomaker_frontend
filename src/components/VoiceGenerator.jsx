@@ -320,22 +320,6 @@ const VoiceGenerator = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleEditScript}
-                className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center gap-2"
-              >
-                <Edit2 size={16} />
-                Edit Script
-              </button>
-              {/* <button
-                                onClick={handleClearScript}
-                                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/50 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center gap-2"
-                            >
-                                <X size={16} />
-                                Clear
-                            </button> */}
-            </div>
           </div>
 
           {isEditingScript ? (
@@ -380,11 +364,6 @@ const VoiceGenerator = () => {
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-full">
-                      {selectedStyle?.name || "Custom Style"}
-                    </span>
-                  </div>
                   <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                     {isScriptExpanded ? (
                       script
@@ -441,11 +420,10 @@ const VoiceGenerator = () => {
               key={p}
               onClick={() => setProvider(p)}
               className={`flex-1 py-3 px-4 text-sm font-semibold rounded-lg transition-all min-h-[44px]
-                                ${
-                                  provider === p
-                                    ? "bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg"
-                                    : "text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-700/50"
-                                }`}
+                                ${provider === p
+                  ? "bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-700/50"
+                }`}
             >
               {p.charAt(0).toUpperCase() + p.slice(1)}
             </button>
@@ -468,11 +446,10 @@ const VoiceGenerator = () => {
                   key={voice.id}
                   onClick={() => setSelectedVoiceId(voice.id)}
                   className={`relative p-6 rounded-2xl border-2 transition-all duration-300 group hover:scale-105 cursor-pointer
-                                    ${
-                                      isSelected
-                                        ? "border-green-500 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30 shadow-xl shadow-green-500/20"
-                                        : "border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600 hover:shadow-lg"
-                                    }`}
+                                    ${isSelected
+                      ? "border-green-500 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30 shadow-xl shadow-green-500/20"
+                      : "border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600 hover:shadow-lg"
+                    }`}
                 >
                   {/* Selected Check */}
                   {isSelected && (
@@ -504,11 +481,10 @@ const VoiceGenerator = () => {
                   {/* Icon */}
                   <div
                     className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center transition-all
-                                    ${
-                                      isSelected
-                                        ? "bg-gradient-to-br from-green-500 to-teal-500 shadow-lg"
-                                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-green-100 dark:group-hover:bg-green-900/30"
-                                    }`}
+                                    ${isSelected
+                        ? "bg-gradient-to-br from-green-500 to-teal-500 shadow-lg"
+                        : "bg-gray-100 dark:bg-gray-800 group-hover:bg-green-100 dark:group-hover:bg-green-900/30"
+                      }`}
                   >
                     <Mic
                       size={32}
@@ -566,11 +542,10 @@ const VoiceGenerator = () => {
           <button
             onClick={handleGenerateVoice}
             disabled={!script}
-            className={`w-full py-5 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 ${
-              script
-                ? "bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]"
-                : "bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60"
-            }`}
+            className={`w-full py-5 rounded-xl font-bold text-lg text-white shadow-lg transition-all transform flex items-center justify-center gap-3 ${script
+              ? "bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] active:scale-[0.98]"
+              : "bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60"
+              }`}
           >
             <Volume2 size={24} />
             <span>

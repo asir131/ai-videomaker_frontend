@@ -17,7 +17,8 @@ const ScriptGenerator = () => {
         script, setScript,
         wordCount, setWordCount,
         isGenerating, setIsGenerating,
-        selectedStyle, setSelectedStyle
+        selectedStyle, setSelectedStyle,
+        setUserEdited
     } = useScript();
 
     const { setLoading } = useUI();
@@ -106,7 +107,7 @@ const ScriptGenerator = () => {
             if (selectedStyle) {
                 userPrompt += ` Writing Mode: ${selectedStyle.mode}.`;
                 if (selectedStyle.referenceVideo) {
-                    const referenceVideos = Array.isArray(selectedStyle.referenceVideo) 
+                    const referenceVideos = Array.isArray(selectedStyle.referenceVideo)
                         ? selectedStyle.referenceVideo.filter(link => link && link.trim())
                         : (selectedStyle.referenceVideo ? [selectedStyle.referenceVideo] : []);
                     if (referenceVideos.length > 0) {
@@ -153,6 +154,7 @@ ${userPrompt}`;
             const data = await generateScript(fullPrompt, 4096);
 
             if (data && data.content && data.content[0] && data.content[0].text) {
+                setUserEdited(false);
                 setScript(data.content[0].text);
                 showSuccess('Script generated successfully! Transitioning to editor...');
             } else {
@@ -161,16 +163,17 @@ ${userPrompt}`;
 
         } catch (error) {
             console.error('Error generating script:', error);
-            
+
             // Check if it's a quota exceeded error
-            const isQuotaError = error.message?.toLowerCase().includes('quota') || 
-                                 error.message?.toLowerCase().includes('exceeded') ||
-                                 error.message?.toLowerCase().includes('billing');
-            
+            const isQuotaError = error.message?.toLowerCase().includes('quota') ||
+                error.message?.toLowerCase().includes('exceeded') ||
+                error.message?.toLowerCase().includes('billing');
+
             if (isQuotaError) {
                 // Generate mock story as fallback
                 console.log('⚠️ API quota exceeded, generating mock story...');
                 const mockStory = generateMockStory(title, 150);
+                setUserEdited(false);
                 setScript(mockStory);
                 showWarning('API quota exceeded. Generated a sample 150-word story. Upgrade your plan for AI-generated content.');
             } else {
@@ -297,6 +300,7 @@ ${userPrompt}`;
             setTitle(extractedTitle);
         }
 
+        setUserEdited(false);
         setScript(scriptContent);
         setUploadedFileName(fileName);
 
@@ -435,7 +439,7 @@ ${userPrompt}`;
                 onDeleteStyle={handleDeleteStyle}
                 onStartEditStyle={startEditStyle}
             />
-            
+
             {!showStyleModal && (
                 <div ref={containerRef} className="glass-card relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -z-10 group-hover:bg-indigo-500/10 transition-colors duration-500" />
@@ -483,7 +487,7 @@ ${userPrompt}`;
                             onSelectStyle={handleSelectStyle}
                             onCreateNew={openStyleCreator}
                             onEditStyle={(style) => {
-                                startEditStyle({ stopPropagation: () => {}, preventDefault: () => {} }, style);
+                                startEditStyle({ stopPropagation: () => { }, preventDefault: () => { } }, style);
                             }}
                             onDeleteStyle={handleDeleteStyle}
                             onOpenModal={openStyleManager}
