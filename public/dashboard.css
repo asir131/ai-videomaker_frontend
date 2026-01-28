@@ -11,11 +11,6 @@ section {
   isolation: isolate;
 }
 
-background-size: 400% 400%;
-animation: gradientShift 15s ease infinite;
-opacity: 1;
-}
-
 @keyframes gradientShift {
 
   0%,
@@ -752,14 +747,11 @@ opacity: 1;
   background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
 }
 
-position: static;
-margin-top: 3rem;
-}
 
 .main-content-section .grid {
   grid-template-columns: 1fr;
 }
-}
+
 
 @media (max-width: 767px) {
   .hero-headline {
