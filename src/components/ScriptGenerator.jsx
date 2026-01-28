@@ -10,7 +10,7 @@ import StyleModal from './dashboard/StyleModal';
 import StyleSelector from './dashboard/StyleSelector';
 import FileUploadSection from './dashboard/FileUploadSection';
 
-const ScriptGenerator = () => {
+const ScriptGenerator = ({ handleNext }) => {
     const containerRef = useRef(null);
     const {
         title, setTitle,
@@ -156,7 +156,8 @@ ${userPrompt}`;
             if (data && data.content && data.content[0] && data.content[0].text) {
                 setUserEdited(false);
                 setScript(data.content[0].text);
-                showSuccess('Script generated successfully! Transitioning to editor...');
+                showSuccess('Script generated successfully!');
+                handleNext();
             } else {
                 throw new Error('Invalid response from script generation API');
             }
@@ -309,6 +310,7 @@ ${userPrompt}`;
         setTimeout(() => {
             showSuccess('You can now proceed to edit and parse it into scenes.');
         }, 500);
+        handleNext();
     };
 
     const handleRemoveUpload = () => {
