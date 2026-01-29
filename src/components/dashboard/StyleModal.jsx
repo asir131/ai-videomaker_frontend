@@ -107,7 +107,7 @@ const StyleModal = ({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
             onClick={onClose}
         >
             <div
@@ -268,8 +268,8 @@ const StyleModal = ({
                                 <div className="space-y-2">
                                     {(() => {
                                         // Convert to array if needed (backward compatibility)
-                                        let links = Array.isArray(newStyle.referenceVideo) 
-                                            ? [...newStyle.referenceVideo] 
+                                        let links = Array.isArray(newStyle.referenceVideo)
+                                            ? [...newStyle.referenceVideo]
                                             : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
                                         // Always show at least one input field
                                         if (links.length === 0) {
@@ -278,15 +278,15 @@ const StyleModal = ({
                                         return links;
                                     })().map((link, index, array) => {
                                         const canRemove = array.length > 1;
-                                        
+
                                         return (
                                             <div key={index} className="flex items-center gap-2">
                                                 <input
                                                     type="text"
                                                     value={link}
                                                     onChange={(e) => {
-                                                        const currentLinks = Array.isArray(newStyle.referenceVideo) 
-                                                            ? [...newStyle.referenceVideo] 
+                                                        const currentLinks = Array.isArray(newStyle.referenceVideo)
+                                                            ? [...newStyle.referenceVideo]
                                                             : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
                                                         const updatedLinks = currentLinks.length === 0 ? [''] : [...currentLinks];
                                                         updatedLinks[index] = e.target.value;
@@ -299,8 +299,8 @@ const StyleModal = ({
                                                     <button
                                                         type="button"
                                                         onClick={() => {
-                                                            const currentLinks = Array.isArray(newStyle.referenceVideo) 
-                                                                ? [...newStyle.referenceVideo] 
+                                                            const currentLinks = Array.isArray(newStyle.referenceVideo)
+                                                                ? [...newStyle.referenceVideo]
                                                                 : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
                                                             const updatedLinks = [...currentLinks];
                                                             updatedLinks.splice(index, 1);
@@ -317,23 +317,23 @@ const StyleModal = ({
                                     })}
                                     {(() => {
                                         // Count all input fields (including empty ones)
-                                        const allLinks = Array.isArray(newStyle.referenceVideo) 
-                                            ? newStyle.referenceVideo 
+                                        const allLinks = Array.isArray(newStyle.referenceVideo)
+                                            ? newStyle.referenceVideo
                                             : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
                                         const totalInputFields = allLinks.length === 0 ? 1 : allLinks.length;
                                         const canAddMore = totalInputFields < 5;
-                                        
+
                                         // Only show button if we can add more
                                         if (!canAddMore) {
                                             return null;
                                         }
-                                        
+
                                         return (
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    const links = Array.isArray(newStyle.referenceVideo) 
-                                                        ? [...newStyle.referenceVideo] 
+                                                    const links = Array.isArray(newStyle.referenceVideo)
+                                                        ? [...newStyle.referenceVideo]
                                                         : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
                                                     const updatedLinks = links.length === 0 ? [''] : [...links];
                                                     setNewStyle({ ...newStyle, referenceVideo: [...updatedLinks, ''] });
@@ -349,12 +349,12 @@ const StyleModal = ({
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                     {(() => {
                                         // Count all input fields (including empty ones)
-                                        const allLinks = Array.isArray(newStyle.referenceVideo) 
-                                            ? newStyle.referenceVideo 
+                                        const allLinks = Array.isArray(newStyle.referenceVideo)
+                                            ? newStyle.referenceVideo
                                             : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
                                         const totalInputFields = allLinks.length === 0 ? 1 : allLinks.length;
                                         const remaining = 5 - totalInputFields;
-                                        return remaining > 0 
+                                        return remaining > 0
                                             ? `You can add up to ${remaining} more video link${remaining > 1 ? 's' : ''} (Maximum 5)`
                                             : 'Maximum of 5 reference videos reached';
                                     })()}
