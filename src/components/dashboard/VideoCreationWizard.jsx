@@ -109,7 +109,7 @@ const VideoCreationWizard = () => {
           <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 mb-4 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white ">
                   <FileText size={16} />
                 </div>
                 <div>

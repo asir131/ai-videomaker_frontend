@@ -41,15 +41,13 @@
 }
 
 .glass-card {
-  @apply bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300;
-  padding: 2rem;
   position: relative;
   overflow: hidden;
   width: 100%;
   display: block;
 }
 
-.glass-card:hover {
+/* .glass-card:hover {
   @apply shadow-xl;
   transform: translateY(-2px);
 }
@@ -68,14 +66,14 @@
 
 .glass-card:hover::before {
   opacity: 1;
-}
+} */
 
 /* Responsive padding for mobile */
-@media (max-width: 640px) {
+/* @media (max-width: 640px) {
   .glass-card {
     padding: 1rem;
   }
-}
+} */
 
 /* Modal animations */
 @keyframes scale-in {

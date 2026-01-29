@@ -754,9 +754,9 @@ Output ONLY the final prompt - no analysis or additional text.`;
   const settingsPanel = (
     <div className="animate-in fade-in duration-500">
       <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-500">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden">
           {/* Settings Header */}
-          <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                 <Sparkles size={24} />
@@ -811,7 +811,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
 
           {/*AUDIO PLAYER SECTION */}
           {voiceoverSource === "upload" && (
-            <div className="px-6 pb-6 animate-in slide-in-from-top-2 duration-300">
+            <div className="pb-6 animate-in slide-in-from-top-2 duration-300">
               <div
                 className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-10 flex flex-col items-center justify-center gap-4 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                 onClick={(e) => {
@@ -838,7 +838,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
             </div>
           )}
           {/* Settings Body */}
-          <div className="p-6 space-y-6">
+          <div className="space-y-6">
             {!isAdvancedMode ? (
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                 {/* Aspect Ratio */}
@@ -1270,7 +1270,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
         </div>
 
         {/* Combined Progress Bar & Generation Button */}
-        <div className="px-6 py-6 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 space-y-4">
+        <div className="pt-6">
           {isGeneratingImages && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="flex items-center justify-between mb-2">
@@ -1869,4 +1869,3 @@ Output ONLY the final prompt - no analysis or additional text.`;
 };
 
 export default ImageGenerator;
-

@@ -213,9 +213,9 @@ const ScriptEditor = ({ handleNext }) => {
       </div>
 
       {/* Script Information Section */}
-      <div className="space-y-6">
+      <div className="px-1">
         <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
+          <div className="absolute -inset-0.5"></div>
           <textarea
             value={displayedScript}
             onChange={handleScriptChange}
