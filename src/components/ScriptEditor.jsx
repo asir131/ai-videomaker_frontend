@@ -17,7 +17,7 @@ import { useToast } from "../context/ToastContext";
 const ScriptEditor = ({ handleNext }) => {
   const containerRef = useRef(null);
   const timeoutsRef = useRef([]);
-  const { script, setScript, setScenes, sceneCount, setSceneCount, updateScenes, title, selectedStyle, userEdited, setUserEdited } = useScript();
+  const { script, setScript, setScenes, sceneCount, setSceneCount, updateScenes, title, selectedStyle, userEdited, setUserEdited, hasShownAnimation, setHasShownAnimation } = useScript();
   const { audioDuration } = useMedia();
   const { showSuccess, showError } = useToast();
   const [displayedScript, setDisplayedScript] = useState(userEdited ? script : "");
@@ -29,38 +29,51 @@ const ScriptEditor = ({ handleNext }) => {
     timeoutsRef.current = [];
   };
 
+  // Effect for script animation - only runs when script changes and hasn't been animated
   useEffect(() => {
-    if (script && !userEdited) {
-      // Cleanup any existing animation
+    // If user edited, or previously animated, or no script -> show full script immediately
+    if (!script || userEdited || hasShownAnimation) {
+      if (script) {
+        setDisplayedScript(script);
+      }
+      setIsAnimating(false);
       cleanupAnimation();
-
-      // Word-by-word animation
-      const words = script.split(/(\s+)/); // Split by whitespace, keeping the separator
-      setDisplayedScript(""); // Reset for animation
-      setIsAnimating(true);
-
-      words.forEach((word, index) => {
-        const timeout = setTimeout(() => {
-          setDisplayedScript((prev) => prev + word);
-
-          // Check if this is the last word
-          if (index === words.length - 1) {
-            setIsAnimating(false);
-          }
-        }, index * 50); // Reduced from 75ms to 50ms for smoother animation
-
-        timeoutsRef.current.push(timeout);
-      });
-
-      // Split script into chosen number of scenes
-      updateScenes(script, sceneCount, audioDuration);
+      return;
     }
+
+    // Otherwise, start animation
+    cleanupAnimation();
+    setIsAnimating(true);
+    setDisplayedScript("");
+
+    const words = script.split(/(\s+)/);
+
+    words.forEach((word, index) => {
+      const timeout = setTimeout(() => {
+        setDisplayedScript((prev) => prev + word);
+
+        // Check if this is the last word
+        if (index === words.length - 1) {
+          setIsAnimating(false);
+          setHasShownAnimation(true);
+        }
+      }, index * 50);
+
+      timeoutsRef.current.push(timeout);
+    });
 
     // Cleanup on unmount
     return () => {
       cleanupAnimation();
     };
-  }, [script, audioDuration, updateScenes, userEdited, sceneCount]);
+  }, [script, userEdited, hasShownAnimation, setHasShownAnimation]);
+
+  // Effect for updating scenes - runs whenever script, count or duration changes
+  useEffect(() => {
+    if (script) {
+      updateScenes(script, sceneCount, audioDuration);
+    }
+  }, [script, sceneCount, audioDuration, updateScenes]);
 
   const isEnglishContent = (text) => {
     const nonEnglishPattern = /[\u0080-\uFFFF]/g;
@@ -189,12 +202,6 @@ const ScriptEditor = ({ handleNext }) => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* Word Count / Description Info */}
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-800/50">
-            <FileText size={16} />
-            <span className="text-xs font-bold whitespace-nowrap">{scriptStats?.wordCount || 0} words</span>
-          </div>
-
           <button
             onClick={handleCopyScript}
             className="p-2.5 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all shadow-sm hover:shadow-md"

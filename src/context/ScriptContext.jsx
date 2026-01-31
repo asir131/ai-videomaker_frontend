@@ -14,6 +14,15 @@ export const ScriptProvider = ({ children }) => {
     const [sceneCount, setSceneCount] = useState(5);
     const [selectedStyle, setSelectedStyle] = useState(null);
     const [userEdited, setUserEdited] = useState(false);
+    const [hasShownAnimation, setHasShownAnimation] = useState(false);
+
+    // Reset flags when generation starts
+    useEffect(() => {
+        if (isGenerating) {
+            setHasShownAnimation(false);
+            setUserEdited(false);
+        }
+    }, [isGenerating]);
 
     // Sync scenes when script or sceneCount changes
     const updateScenes = useCallback((newScript, newCount, audioDuration = 0, flagAsUserEdited = false) => {
@@ -45,8 +54,12 @@ export const ScriptProvider = ({ children }) => {
         updateScenes,
         selectedStyle,
         setSelectedStyle,
+        selectedStyle,
+        setSelectedStyle,
         userEdited,
-        setUserEdited
+        setUserEdited,
+        hasShownAnimation,
+        setHasShownAnimation
     };
 
     return (
