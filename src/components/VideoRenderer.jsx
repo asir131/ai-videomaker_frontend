@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useScript } from "../context/ScriptContext";
 import { useMedia } from "../context/MediaContext";
 import { useUI } from "../context/UIContext";
 import { renderVideos, checkFFmpegStatus } from "../services/videoService";
+import { VIDEO_TRANSITION_TYPES } from "../utils/constants";
 import { addVideoToHistory } from "../services/videoHistoryService";
 import {
   Film,
@@ -331,10 +333,17 @@ const VideoRenderer = () => {
         )}
       </div>
 
-      {/* Transition Settings Modal */}
-      {showTransitionSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100 dark:border-gray-800 animate-in zoom-in-50 duration-200">
+      {/* Transition Settings Modal - portaled to body for full-screen overlay */}
+      {showTransitionSettings &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={(e) => e.target === e.currentTarget && setShowTransitionSettings(false)}
+          >
+            <div
+              className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg border border-gray-100 dark:border-gray-800 animate-in zoom-in-50 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="p-6 space-y-6">
               {/* Duration Input */}
               <div className="flex items-center justify-between">
@@ -413,29 +422,29 @@ const VideoRenderer = () => {
               </div>
 
               {/* Type Selection */}
-              <div className="grid grid-cols-2 gap-3">
-                {["fade", "FadeBlack"].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() =>
-                      setTransitionSettings((prev) => ({
-                        ...prev,
-                        type:
-                          type.toLowerCase() === "fadeblack"
-                            ? "fade_black"
-                            : "fade",
-                      }))
-                    }
-                    className={`py-3 px-4 rounded-lg text-center font-medium transition-all ${(type === "FadeBlack" &&
-                      transitionSettings.type === "fade_black") ||
-                      (type === "fade" && transitionSettings.type === "fade")
-                      ? "bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800"
-                      : "bg-gray-50 text-gray-600 border border-transparent hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300"
+              <div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Transition effect</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
+                  {VIDEO_TRANSITION_TYPES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() =>
+                        setTransitionSettings((prev) => ({
+                          ...prev,
+                          type: value,
+                        }))
+                      }
+                      className={`py-2.5 px-3 rounded-lg text-center text-sm font-medium transition-all ${
+                        transitionSettings.type === value
+                          ? "bg-blue-50 text-blue-600 border-2 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800"
+                          : "bg-gray-50 text-gray-600 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300"
                       }`}
-                  >
-                    {type}
-                  </button>
-                ))}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Footer Actions */}
@@ -454,9 +463,10 @@ const VideoRenderer = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

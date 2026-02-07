@@ -1,27 +1,27 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, ArrowLeft, Plus, Edit, Trash2, Check, Settings, ChevronDown, FileText, Play, Pause, Mic, Loader2, StopCircle, XCircle } from 'lucide-react';
-import { DEFAULTS, LANGUAGES, VOICES, VOICE_PROVIDERS, API_BASE_URL } from '../../utils/constants';
+import { DEFAULTS, LANGUAGES, VOICES, VOICE_PROVIDERS, SPEECHIFY_VOICES, API_BASE_URL } from '../../utils/constants';
+import { fetchSpeechifyVoices, getSpeechifyVoicesCache, generateSpeechifySpeech } from '../../services/voiceService';
 
-// Voice preview function
+// Voice preview: Speechify -> /api/speechify/speech (data URL); ElevenLabs -> /api/generate-voice (URL from response).
 const generateVoicePreview = async (text, voiceId, provider) => {
+    if (provider === VOICE_PROVIDERS.SPEECHIFY) {
+        return await generateSpeechifySpeech(text, voiceId, {});
+    }
     const url = API_BASE_URL ? `${API_BASE_URL}/api/generate-voice` : '/api/generate-voice';
     const response = await fetch(url, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             text,
             voice_id: voiceId,
             voice_settings: provider
         })
     });
-
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Request failed' }));
         throw new Error(errorData.error || errorData.message || `HTTP ${response.status}`);
     }
-
     const data = await response.json();
     return data.audio_url || data.url || data.audioUrl || data;
 };
@@ -45,6 +45,7 @@ const StyleModal = ({
 }) => {
     // Voice preview state
     const [voiceProvider, setVoiceProvider] = useState(newStyle.voiceProvider || VOICE_PROVIDERS.ELEVENLABS);
+    const [speechifyVoicesList, setSpeechifyVoicesList] = useState(() => getSpeechifyVoicesCache());
     const [previewPlayingId, setPreviewPlayingId] = useState(null);
     const [previewLoadingId, setPreviewLoadingId] = useState(null);
     const previewAudioRef = useRef(new Audio());
@@ -55,10 +56,22 @@ const StyleModal = ({
         if (newStyle.voiceProvider) {
             setVoiceProvider(newStyle.voiceProvider);
         } else {
-            // Default to ElevenLabs if not set
             setVoiceProvider(VOICE_PROVIDERS.ELEVENLABS);
         }
     }, [newStyle.voiceProvider]);
+
+    // When Speechify is selected, fetch voices from backend
+    useEffect(() => {
+        if (voiceProvider !== VOICE_PROVIDERS.SPEECHIFY) return;
+        fetchSpeechifyVoices()
+            .then(setSpeechifyVoicesList)
+            .catch(() => setSpeechifyVoicesList(SPEECHIFY_VOICES));
+    }, [voiceProvider]);
+
+    const voicesForProvider =
+        voiceProvider === VOICE_PROVIDERS.SPEECHIFY
+            ? (speechifyVoicesList ?? SPEECHIFY_VOICES)
+            : VOICES[voiceProvider];
 
     const handleVoicePreview = async (e, voice) => {
         e.stopPropagation();
@@ -376,7 +389,8 @@ const StyleModal = ({
                                                 type="button"
                                                 onClick={() => {
                                                     setVoiceProvider(p);
-                                                    setNewStyle({ ...newStyle, voiceProvider: p, voiceId: VOICES[p][0]?.id || null });
+                                                    const list = p === VOICE_PROVIDERS.SPEECHIFY ? (getSpeechifyVoicesCache() ?? SPEECHIFY_VOICES) : VOICES[p];
+                                                    setNewStyle({ ...newStyle, voiceProvider: p, voiceId: list[0]?.id || null });
                                                 }}
                                                 className={`flex-1 py-2 px-4 text-sm font-semibold rounded-lg transition-all min-h-[40px]
                                                     ${voiceProvider === p
@@ -391,7 +405,7 @@ const StyleModal = ({
 
                                 {/* Voice List - Compact Design */}
                                 <div className="space-y-1.5 max-h-[280px] overflow-y-auto pr-2">
-                                    {VOICES[voiceProvider].map((voice) => {
+                                    {voicesForProvider.map((voice) => {
                                         const isSelected = newStyle.voiceId === voice.id;
                                         return (
                                             <div

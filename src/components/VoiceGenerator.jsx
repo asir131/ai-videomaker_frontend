@@ -1,9 +1,14 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useScript } from "../context/ScriptContext";
 import { useMedia } from "../context/MediaContext";
 import { useUI } from "../context/UIContext";
 import { useToast } from "../context/ToastContext";
-import { VOICES, VOICE_PROVIDERS, API_BASE_URL } from "../utils/constants";
+import { VOICES, VOICE_PROVIDERS, SPEECHIFY_VOICES, API_BASE_URL } from "../utils/constants";
+import {
+  fetchSpeechifyVoices,
+  getSpeechifyVoicesCache,
+  generateSpeechifySpeech,
+} from "../services/voiceService";
 import {
   Mic,
   Play,
@@ -20,24 +25,24 @@ import {
 } from "lucide-react";
 import ProgressBar from "./common/ProgressBar";
 
-// Direct API call with abort support
-const generateVoice = async (text, voiceId, voiceSettings, signal) => {
+// Provider-aware TTS: Speechify -> /api/speechify/speech (returns data URL); ElevenLabs -> /api/generate-voice (returns URL from response).
+const generateVoiceForProvider = async (text, voiceId, provider, signal) => {
+  if (provider === VOICE_PROVIDERS.SPEECHIFY) {
+    return await generateSpeechifySpeech(text, voiceId, {}, signal);
+  }
   const url = API_BASE_URL
     ? `${API_BASE_URL}/api/generate-voice`
     : "/api/generate-voice";
   const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       text,
       voice_id: voiceId,
-      voice_settings: voiceSettings,
+      voice_settings: provider,
     }),
     signal,
   });
-
   if (!response.ok) {
     const errorData = await response
       .json()
@@ -46,7 +51,6 @@ const generateVoice = async (text, voiceId, voiceSettings, signal) => {
       errorData.error || errorData.message || `HTTP ${response.status}`,
     );
   }
-
   const data = await response.json();
   return data.audio_url || data.url || data.audioUrl || data;
 };
@@ -82,11 +86,31 @@ const VoiceGenerator = () => {
   const [volume, setVolume] = useState(1);
   const [isScriptExpanded, setIsScriptExpanded] = useState(false);
 
+  // Speechify voices from API (null until fetched); fallback to SPEECHIFY_VOICES when unavailable
+  const [speechifyVoicesList, setSpeechifyVoicesList] = useState(() => getSpeechifyVoicesCache());
+
   // Preview state
   const [previewPlayingId, setPreviewPlayingId] = useState(null);
   const [previewLoadingId, setPreviewLoadingId] = useState(null);
   const previewAudioRef = useRef(new Audio());
   const previewCache = useRef({});
+
+  // When user selects Speechify, fetch voices from backend and sync cache into state
+  useEffect(() => {
+    if (provider !== VOICE_PROVIDERS.SPEECHIFY) return;
+    fetchSpeechifyVoices()
+      .then((list) => {
+        setSpeechifyVoicesList(list);
+      })
+      .catch(() => {
+        setSpeechifyVoicesList(SPEECHIFY_VOICES);
+      });
+  }, [provider]);
+
+  const voicesForProvider =
+    provider === VOICE_PROVIDERS.SPEECHIFY
+      ? (speechifyVoicesList ?? SPEECHIFY_VOICES)
+      : VOICES[provider];
 
   const handlePreview = async (e, voice) => {
     e.stopPropagation();
@@ -110,7 +134,7 @@ const VoiceGenerator = () => {
         const text = `Hello, I am ${voice.name}. This is a preview.`;
         // Use undefined for signal to avoid aborting previews with the main controller
         // Also pass provider as the voiceSettings
-        url = await generateVoice(text, voiceId, provider);
+        url = await generateVoiceForProvider(text, voiceId, provider);
         previewCache.current[voiceId] = url;
       }
 
@@ -158,7 +182,7 @@ const VoiceGenerator = () => {
       setProgressStage("Generating audio...");
       setVoiceGenerationProgress(60);
 
-      const audioUrl = await generateVoice(
+      const audioUrl = await generateVoiceForProvider(
         script,
         selectedVoiceId,
         provider,
@@ -418,7 +442,15 @@ const VoiceGenerator = () => {
           {Object.values(VOICE_PROVIDERS).map((p) => (
             <button
               key={p}
-              onClick={() => setProvider(p)}
+              onClick={() => {
+                setProvider(p);
+                if (p === VOICE_PROVIDERS.SPEECHIFY) {
+                  const list = getSpeechifyVoicesCache() ?? SPEECHIFY_VOICES;
+                  if (list.length) setSelectedVoiceId(list[0].id);
+                } else {
+                  setSelectedVoiceId(VOICES[p][0].id);
+                }
+              }}
               className={`flex-1 py-3 px-4 text-sm font-semibold rounded-lg transition-all min-h-[44px]
                                 ${provider === p
                   ? "bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-lg"
@@ -437,7 +469,7 @@ const VoiceGenerator = () => {
           Select Voice
         </label>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {VOICES[provider]
+          {voicesForProvider
             .slice(0, showAllVoices ? undefined : 8)
             .map((voice) => {
               const isSelected = selectedVoiceId === voice.id;
@@ -522,7 +554,7 @@ const VoiceGenerator = () => {
         </div>
 
         {/* Show More/Less Button */}
-        {VOICES[provider].length > 8 && (
+        {voicesForProvider.length > 8 && (
           <div className="mt-4 text-center">
             <button
               onClick={() => setShowAllVoices(!showAllVoices)}
@@ -530,7 +562,7 @@ const VoiceGenerator = () => {
             >
               {showAllVoices
                 ? "Show Less"
-                : `Show ${VOICES[provider].length - 8} More Voices`}
+                : `Show ${voicesForProvider.length - 8} More Voices`}
             </button>
           </div>
         )}

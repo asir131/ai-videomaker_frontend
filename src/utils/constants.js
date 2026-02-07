@@ -26,7 +26,9 @@ export const API_ENDPOINTS = {
   YOUTUBE_DISCONNECT: '/api/youtube/disconnect',
   YOUTUBE_UPLOAD: '/api/youtube/upload',
   DOWNLOAD_VIDEO: '/api/download-video',
-  DOWNLOAD_ALL: '/api/download-all-videos'
+  DOWNLOAD_ALL: '/api/download-all-videos',
+  SPEECHIFY_VOICES: '/api/speechify/voices',
+  SPEECHIFY_SPEECH: '/api/speechify/speech'
 };
 
 // Default values
@@ -37,6 +39,29 @@ export const DEFAULTS = {
   TRANSITION_DURATION: 0.5,
   TRANSITION_TYPE: 'fade'
 };
+
+// Video transition types (values match FFmpeg xfade filter for backend compatibility)
+export const VIDEO_TRANSITION_TYPES = [
+  { value: 'fade', label: 'Fade' },
+  { value: 'fade_black', label: 'Fade Black' },
+  { value: 'fadewhite', label: 'Fade White' },
+  { value: 'wipeleft', label: 'Wipe Left' },
+  { value: 'wiperight', label: 'Wipe Right' },
+  { value: 'wipeup', label: 'Wipe Up' },
+  { value: 'wipedown', label: 'Wipe Down' },
+  { value: 'slideleft', label: 'Slide Left' },
+  { value: 'slideright', label: 'Slide Right' },
+  { value: 'slideup', label: 'Slide Up' },
+  { value: 'slidedown', label: 'Slide Down' },
+  { value: 'circleopen', label: 'Circle Open' },
+  { value: 'circleclose', label: 'Circle Close' },
+  { value: 'zoomin', label: 'Zoom In' },
+  { value: 'distance', label: 'Distance' },
+  { value: 'coverleft', label: 'Cover Left' },
+  { value: 'coverright', label: 'Cover Right' },
+  { value: 'revealleft', label: 'Reveal Left' },
+  { value: 'revealright', label: 'Reveal Right' },
+];
 
 // Voice constants
 export const ELEVENLABS_VOICES = [
