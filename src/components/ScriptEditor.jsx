@@ -41,7 +41,7 @@ const ScriptEditor = ({ handleNext }) => {
       return;
     }
 
-    // Otherwise, start animation
+    // Otherwise, start animation (only first time we show this script)
     cleanupAnimation();
     setIsAnimating(true);
     setDisplayedScript("");
@@ -52,7 +52,6 @@ const ScriptEditor = ({ handleNext }) => {
       const timeout = setTimeout(() => {
         setDisplayedScript((prev) => prev + word);
 
-        // Check if this is the last word
         if (index === words.length - 1) {
           setIsAnimating(false);
           setHasShownAnimation(true);
@@ -62,9 +61,10 @@ const ScriptEditor = ({ handleNext }) => {
       timeoutsRef.current.push(timeout);
     });
 
-    // Cleanup on unmount
+    // On unmount (e.g. user navigates away): mark as shown so when they come back we show full text, not animation again
     return () => {
       cleanupAnimation();
+      setHasShownAnimation(true);
     };
   }, [script, userEdited, hasShownAnimation, setHasShownAnimation]);
 
