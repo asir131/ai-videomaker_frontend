@@ -772,14 +772,16 @@ Output ONLY the final prompt - no analysis or additional text.`;
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Upload Button integrated here */}
-              <button
-                onClick={() => setShowUploadModal(true)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-semibold text-gray-700 dark:text-gray-300"
-              >
-                <Upload size={18} />
-                <span>Upload Images</span>
-              </button>
+              {/* Upload Images: only for "Upload Your Own Voiceover" (custom workflow); hidden for "Use Generated Voiceover" */}
+              {voiceoverSource === "upload" && (
+                <button
+                  onClick={() => setShowUploadModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-semibold text-gray-700 dark:text-gray-300"
+                >
+                  <Upload size={18} />
+                  <span>Upload Images</span>
+                </button>
+              )}
 
               {/* Mode Toggle */}
               <div className="flex items-center justify-between p-2 pl-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm min-w-[180px]">
