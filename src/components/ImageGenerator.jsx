@@ -754,9 +754,9 @@ Output ONLY the final prompt - no analysis or additional text.`;
   const settingsPanel = (
     <div className="animate-in fade-in duration-500">
       <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-500">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden">
           {/* Settings Header */}
-          <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                 <Sparkles size={24} />
@@ -811,7 +811,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
 
           {/*AUDIO PLAYER SECTION */}
           {voiceoverSource === "upload" && (
-            <div className="px-6 pb-6 animate-in slide-in-from-top-2 duration-300">
+            <div className="pb-6 animate-in slide-in-from-top-2 duration-300">
               <div
                 className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-10 flex flex-col items-center justify-center gap-4 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                 onClick={(e) => {
@@ -838,7 +838,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
             </div>
           )}
           {/* Settings Body */}
-          <div className="p-6 space-y-6">
+          <div className="space-y-6">
             {!isAdvancedMode ? (
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                 {/* Aspect Ratio */}
@@ -1187,90 +1187,123 @@ Output ONLY the final prompt - no analysis or additional text.`;
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Timeline Section */}
-                <div className="bg-white dark:bg-gray-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="text-slate-400">
-                        <Loader2 size={18} />
-                      </div>
-                      <h3 className="text-sm font-bold text-slate-800 dark:text-white">
-                        Timeline
-                      </h3>
+            )}
+
+            {/* Timeline Section - Common for both modes */}
+            <div className="bg-white dark:bg-gray-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-6 shadow-sm mt-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={toggleAudioPlay}
+                    disabled={!generatedAudioUrl}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isAudioPlaying
+                      ? "bg-red-500 text-white shadow-lg shadow-red-500/25"
+                      : "bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:scale-105"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isAudioLoading ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : isAudioPlaying ? (
+                      <Pause size={18} fill="currentColor" />
+                    ) : (
+                      <Play size={18} fill="currentColor" className="ml-0.5" />
+                    )}
+                  </button>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">
+                      Timeline & Audio
+                    </h3>
+                    <div className="flex items-center gap-2">
                       <span className="text-[10px] font-mono text-slate-500">
                         {formatTimeMMSS(audioCurrentTime)} / {formatTimeMMSS(audioDuration)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
-                          Zoom
-                        </span>
-                        <div className="w-24 h-1 bg-slate-200 dark:bg-slate-700 rounded-full relative group cursor-pointer">
-                          <div
-                            className="absolute left-0 top-0 bottom-0 bg-blue-500 rounded-full"
-                            style={{ width: `${timelineZoom}%` }}
-                          ></div>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={timelineZoom}
-                            onChange={(e) =>
-                              setTimelineZoom(parseInt(e.target.value))
-                            }
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          />
-                        </div>
-                      </div>
-                    </div>
                   </div>
-
-                  <div className="relative h-24 bg-blue-50 dark:bg-indigo-900/20 rounded-xl border border-blue-100 dark:border-indigo-900/50 overflow-hidden px-2">
-                    <div className="absolute inset-0 flex items-center px-4">
-                      <div className="w-full h-1 bg-white/30 dark:bg-slate-700/50 absolute top-1/2 -translate-y-1/2 left-1"></div>
-                      {[...Array(8)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 border-l-2 border-white/20 dark:border-white/10 h-1 absolute top-1/2 -translate-y-1/2"
-                          style={{ left: `${(i + 1) * 12.5}%` }}
-                        ></div>
-                      ))}
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center w-6 h-6 text-slate-400">
+                      {audioVolume === 0 ? (
+                        <Volume2 size={16} className="opacity-50" />
+                      ) : (
+                        <Volume2 size={16} />
+                      )}
                     </div>
-
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                      <div className="text-[10px] font-bold text-orange-600 dark:text-orange-400 mb-1">
-                        Total Scenes: {scenes.length}
-                      </div>
-                      <div className="bg-orange-500 text-white text-[8px] font-bold px-2 py-0.5 rounded shadow-sm inline-block mb-1">
-                        BEST
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {generationSettings.imageCount || scenes.length} img
-                      </div>
-                    </div>
-
-                    {/* Playhead */}
-                    <div
-                      className="absolute top-0 bottom-0 w-[2px] bg-blue-500 z-10"
-                      style={{
-                        left: audioDuration
-                          ? `${(audioCurrentTime / audioDuration) * 100}%`
-                          : "0%",
-                      }}
-                    >
-                      <div className="absolute -top-1 -left-1.5 w-3.5 h-3.5 bg-blue-500 rounded-full border-2 border-white shadow-sm" />
+                    <div className="w-24 h-1 bg-slate-200 dark:bg-slate-700 rounded-full relative group cursor-pointer">
+                      <div
+                        className="absolute left-0 top-0 bottom-0 bg-blue-500 rounded-full"
+                        style={{ width: `${audioVolume * 100}%` }}
+                      ></div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={audioVolume}
+                        onChange={handleAudioVolumeChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        title={`Volume: ${Math.round(audioVolume * 100)}%`}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
-            )}
+
+              <div className="relative h-24 bg-blue-50 dark:bg-indigo-900/20 rounded-xl border border-blue-100 dark:border-indigo-900/50 overflow-hidden px-2">
+                <div className="absolute inset-0 flex items-center px-4">
+                  <div className="w-full h-1 bg-white/30 dark:bg-slate-700/50 absolute top-1/2 -translate-y-1/2 left-1"></div>
+                  {[...Array(8)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 border-l-2 border-white/20 dark:border-white/10 h-1 absolute top-1/2 -translate-y-1/2"
+                      style={{ left: `${(i + 1) * 12.5}%` }}
+                    ></div>
+                  ))}
+                </div>
+
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                  <div className="text-[10px] font-bold text-orange-600 dark:text-orange-400 mb-1">
+                    Total Scenes: {scenes.length}
+                  </div>
+                  <div className="bg-orange-500 text-white text-[8px] font-bold px-2 py-0.5 rounded shadow-sm inline-block mb-1">
+                    BEST
+                  </div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                    {generationSettings.imageCount || scenes.length} img
+                  </div>
+                </div>
+
+                {/* Playhead & Seek Bar */}
+                <input
+                  type="range"
+                  min="0"
+                  max={audioDuration || 0}
+                  step="0.01"
+                  value={audioCurrentTime}
+                  onChange={handleAudioSeek}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30"
+                  title="Seek Audio"
+                />
+
+                <div
+                  className="absolute top-0 bottom-0 w-[2px] bg-blue-500 z-10"
+                  style={{
+                    left: audioDuration
+                      ? `${(audioCurrentTime / audioDuration) * 100}%`
+                      : "0%",
+                  }}
+                >
+                  <div className="absolute -top-1 -left-1.5 w-3.5 h-3.5 bg-blue-500 rounded-full border-2 border-white shadow-sm" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Combined Progress Bar & Generation Button */}
-        <div className="px-6 py-6 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 space-y-4">
+        <div className="pt-6">
           {isGeneratingImages && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="flex items-center justify-between mb-2">
@@ -1310,7 +1343,6 @@ Output ONLY the final prompt - no analysis or additional text.`;
         </div>
       </div>
     </div>
-
   );
 
   return (
@@ -1869,4 +1901,3 @@ Output ONLY the final prompt - no analysis or additional text.`;
 };
 
 export default ImageGenerator;
-

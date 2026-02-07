@@ -470,7 +470,7 @@ ${userPrompt}`;
                             <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
                         </div>
 
-                        <div className="group/input">
+                        <div className="group/input px-1">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ml-1">
                                 Video Title
                             </label>
