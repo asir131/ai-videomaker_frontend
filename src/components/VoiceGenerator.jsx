@@ -387,8 +387,8 @@ const VoiceGenerator = () => {
           ) : (
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
               <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                <div className="flex-1 min-w-0">
+                  <div className="mt-3 max-h-[100px] overflow-y-auto rounded-lg text-sm text-gray-700 dark:text-gray-300 leading-relaxed pr-2">
                     {isScriptExpanded ? (
                       script
                     ) : (
