@@ -85,106 +85,91 @@ const generateImageAPI = async (
   return await response.json();
 };
 
+// Art styles: images from public/styles (order matches UI)
 const IMAGE_STYLES = {
-  cinematic: {
-    name: "Cinematic",
-    image: "/style-previews/cinematic.png",
-    gradient: "from-slate-700 via-slate-600 to-slate-500",
-    icon: "🎬",
-  },
   realistic: {
     name: "Realistic",
-    image: "/style-previews/realistic.png",
+    image: "/styles/Realistic.jpg",
     gradient: "from-amber-600 via-amber-500 to-yellow-500",
     icon: "📸",
   },
-  "black & white": {
-    name: "Black & White",
-    image: "/style-previews/blackwhite.png",
-    gradient: "from-gray-900 via-gray-600 to-gray-300",
-    icon: "⚫",
-  },
-  "oil painting": {
-    name: "Oil Painting",
-    image: "/style-previews/oilpainting.png",
-    gradient: "from-orange-700 via-amber-600 to-yellow-600",
-    icon: "🎨",
-  },
-  "3d model": {
-    name: "3D Model",
-    image: "/style-previews/3dmodel.png",
-    gradient: "from-blue-600 via-cyan-500 to-teal-500",
-    icon: "🔷",
-  },
-  drawing: {
-    name: "Drawing",
-    image: "/style-previews/drawing.png",
-    gradient: "from-purple-600 via-purple-500 to-pink-500",
-    icon: "✏️",
-  },
   "comic book": {
     name: "Comic Book",
+    image: "/styles/Comic_Book.jpg",
     gradient: "from-red-600 via-yellow-500 to-blue-600",
     icon: "💥",
   },
-  anime: {
-    name: "Anime",
-    gradient: "from-pink-500 via-rose-500 to-red-500",
-    icon: "🌸",
-  },
-  "pixel art": {
-    name: "Pixel Art",
-    gradient: "from-green-600 via-emerald-500 to-teal-500",
-    icon: "🎮",
-  },
-  "pop art": {
-    name: "Pop Art",
-    gradient: "from-fuchsia-600 via-pink-500 to-rose-500",
-    icon: "🎭",
-  },
-  watercolor: {
-    name: "Watercolor",
-    gradient: "from-sky-400 via-blue-400 to-indigo-400",
-    icon: "💧",
-  },
-  "stick-style": {
-    name: "Stick Style",
-    gradient: "from-gray-700 via-gray-600 to-gray-500",
-    icon: "🖊️",
-  },
   "naruto anime": {
     name: "Naruto Anime",
+    image: "/styles/Naruto%20Anime.jpg",
     gradient: "from-orange-600 via-orange-500 to-yellow-500",
     icon: "🍥",
   },
-  "game of thrones": {
-    name: "Game of Thrones",
-    gradient: "from-gray-800 via-red-900 to-gray-900",
-    icon: "⚔️",
+  "oil painting": {
+    name: "Oil Painting",
+    image: "/styles/Oil%20Painting.jpg",
+    gradient: "from-orange-700 via-amber-600 to-yellow-600",
+    icon: "🎨",
+  },
+  "3d faceless mannequin": {
+    name: "3D Faceless Mannequin",
+    image: "/styles/3D%20Faceless%20Mannequin.jpg",
+    gradient: "from-blue-600 via-cyan-500 to-teal-500",
+    icon: "🔷",
+  },
+  anime: {
+    name: "Anime",
+    image: "/styles/Anime.jpg",
+    gradient: "from-pink-500 via-rose-500 to-red-500",
+    icon: "🌸",
+  },
+  "halftone print": {
+    name: "Halftone Print",
+    image: "/styles/Halftone%20Print.jpg",
+    gradient: "from-gray-700 via-gray-500 to-gray-400",
+    icon: "⚫",
+  },
+  "old cartoons": {
+    name: "Old Cartoons",
+    image: "/styles/Old%20Cartoons.jpg",
+    gradient: "from-yellow-500 via-amber-500 to-orange-500",
+    icon: "📺",
+  },
+  "black & white": {
+    name: "Black & White",
+    image: "/styles/BlackAndWhite.jpg",
+    gradient: "from-gray-900 via-gray-600 to-gray-300",
+    icon: "⚫",
+  },
+  "lowly poly": {
+    name: "Lowly Poly",
+    image: "/styles/Lowly%20Poly.jpg",
+    gradient: "from-emerald-600 via-teal-500 to-cyan-500",
+    icon: "🔶",
+  },
+  "flat art": {
+    name: "Flat Art",
+    image: "/styles/Flat%20Art.jpg",
+    gradient: "from-indigo-500 via-purple-500 to-pink-500",
+    icon: "🖼️",
   },
 };
 
 const getIdeogramStyleType = (styleName) => {
   const styleMap = {
     realistic: "REALISTIC",
-    cinematic: "REALISTIC",
-    "black & white": "REALISTIC",
-    "oil painting": "GENERAL",
-    "3d model": "RENDER_3D",
-    drawing: "GENERAL",
     "comic book": "GENERAL",
-    anime: "ANIME",
-    "pixel art": "GENERAL",
-    "pop art": "GENERAL",
-    watercolor: "GENERAL",
-    "stick-style": "DESIGN",
-    "stick style": "DESIGN",
     "naruto anime": "ANIME",
-    "naruto-anime": "ANIME",
-    "game of thrones": "REALISTIC",
-    "game-of-thrones": "REALISTIC",
+    "oil painting": "GENERAL",
+    "3d faceless mannequin": "RENDER_3D",
+    anime: "ANIME",
+    "halftone print": "GENERAL",
+    "old cartoons": "GENERAL",
+    "black & white": "REALISTIC",
+    "lowly poly": "GENERAL",
+    "flat art": "GENERAL",
   };
-  const lowerStyle = styleName.toLowerCase();
+  const lowerStyle = (styleName || "").toLowerCase();
   return styleMap[lowerStyle] || "GENERAL";
 };
 
@@ -366,7 +351,7 @@ const ImageGenerator = () => {
 
         try {
           // 1. Generate Prompt
-          const styleName = currentSettings.selectedStyle || "cinematic";
+          const styleName = currentSettings.selectedStyle || "Realistic";
           const promptText = `You are an expert at creating ULTRA-DETAILED, ACCURATE image prompts for ${styleName} style.
 
 SCENE ${i + 1} TEXT:
@@ -509,7 +494,7 @@ Output ONLY the final prompt - no analysis or additional text.`;
       const updatedImages = [...images];
       updatedImages[imageIndex] = { status: "generating" };
       setImages(updatedImages);
-      const styleName = generationSettings.selectedStyle || "cinematic";
+      const styleName = generationSettings.selectedStyle || "Realistic";
       const promptText = `You are an expert at creating ULTRA-DETAILED, ACCURATE image prompts for ${styleName} style.
 
 SCENE ${imageIndex + 1} TEXT:
@@ -1875,23 +1860,33 @@ Output ONLY the final prompt - no analysis or additional text.`;
                 {Object.entries(IMAGE_STYLES).map(([key, style]) => (
                   <button
                     key={key}
+                    type="button"
                     onClick={() => {
                       setGenerationSettings({ ...generationSettings, selectedStyle: style.name });
                       setShowStyleModal(false);
                     }}
-                    className={`group relative overflow-hidden rounded-2xl border-2 transition-all ${generationSettings.selectedStyle === style.name
+                    className={`flex flex-col rounded-2xl border-2 transition-all text-left ${generationSettings.selectedStyle === style.name
                       ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
-                      : "border-gray-100 dark:border-gray-800 hover:border-blue-200"
+                      : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600"
                       }`}
                   >
-                    <div className="h-28 bg-gray-50 dark:bg-gray-800 flex items-center justify-center relative">
+                    <div className="h-24 rounded-t-xl bg-gray-100 dark:bg-gray-800 relative overflow-hidden shrink-0">
                       {style.image ? (
-                        <img src={style.image} className="w-full h-full object-cover" alt={style.name} />
+                        <img
+                          src={style.image}
+                          className="w-full h-full object-cover"
+                          alt=""
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
                       ) : (
-                        <span className="text-3xl">{style.icon}</span>
+                        <span className="absolute inset-0 flex items-center justify-center text-3xl">{style.icon}</span>
                       )}
                     </div>
-                    <div className="p-3 font-bold text-sm text-gray-700 dark:text-gray-300">{style.name}</div>
+                    <div className="min-h-[44px] px-3 py-2.5 flex items-center justify-center rounded-b-xl bg-gray-900 dark:bg-gray-800">
+                      <span className="text-sm font-bold text-white text-center leading-tight">
+                        {style.name}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
