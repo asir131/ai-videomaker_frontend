@@ -1,7 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X, ArrowLeft, Plus, Edit, Trash2, Check, Settings, ChevronDown, FileText, Play, Pause, Mic, Loader2, StopCircle, XCircle } from 'lucide-react';
 import { DEFAULTS, LANGUAGES, VOICES, VOICE_PROVIDERS, SPEECHIFY_VOICES, API_BASE_URL } from '../../utils/constants';
 import { fetchSpeechifyVoices, getSpeechifyVoicesCache, generateSpeechifySpeech } from '../../services/voiceService';
+
+const YOUTUBE_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+/i;
+function isYouTubeUrl(str) {
+    if (!str || typeof str !== 'string') return false;
+    return YOUTUBE_REGEX.test(str.trim());
+}
+function normalizeYouTubeUrl(str) {
+    const trimmed = str.trim();
+    const m = trimmed.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/i);
+    return m ? `https://www.youtube.com/watch?v=${m[1]}` : trimmed;
+}
+async function fetchYouTubeTitle(url) {
+    const normalized = normalizeYouTubeUrl(url);
+    try {
+        const res = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(normalized)}`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.title || null;
+    } catch {
+        return null;
+    }
+}
 
 // Voice preview: Speechify -> /api/speechify/speech (data URL); ElevenLabs -> /api/generate-voice (URL from response).
 const generateVoicePreview = async (text, voiceId, provider) => {
@@ -50,6 +72,31 @@ const StyleModal = ({
     const [previewLoadingId, setPreviewLoadingId] = useState(null);
     const previewAudioRef = useRef(new Audio());
     const previewCache = useRef({});
+
+    // YouTube video URL -> title (for Reference Video Links)
+    const [videoTitles, setVideoTitles] = useState({});
+    const [loadingTitles, setLoadingTitles] = useState({});
+    const requestedTitlesRef = useRef(new Set());
+
+    const fetchTitleForUrl = useCallback(async (url) => {
+        if (!isYouTubeUrl(url)) return;
+        const key = normalizeYouTubeUrl(url);
+        if (requestedTitlesRef.current.has(key)) return;
+        requestedTitlesRef.current.add(key);
+        setLoadingTitles(prev => ({ ...prev, [key]: true }));
+        const title = await fetchYouTubeTitle(url);
+        setLoadingTitles(prev => ({ ...prev, [key]: false }));
+        if (title) setVideoTitles(prev => ({ ...prev, [key]: title }));
+    }, []);
+
+    // When reference video links exist, fetch titles for YouTube URLs
+    useEffect(() => {
+        if (!showModal) return;
+        const links = Array.isArray(newStyle.referenceVideo) ? newStyle.referenceVideo : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
+        links.forEach(link => {
+            if (link && isYouTubeUrl(link)) fetchTitleForUrl(link);
+        });
+    }, [newStyle.referenceVideo, showModal, fetchTitleForUrl]);
 
     // Update voice provider when newStyle changes
     React.useEffect(() => {
@@ -293,37 +340,52 @@ const StyleModal = ({
                                         const canRemove = array.length > 1;
 
                                         return (
-                                            <div key={index} className="flex items-center gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={link}
-                                                    onChange={(e) => {
-                                                        const currentLinks = Array.isArray(newStyle.referenceVideo)
-                                                            ? [...newStyle.referenceVideo]
-                                                            : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
-                                                        const updatedLinks = currentLinks.length === 0 ? [''] : [...currentLinks];
-                                                        updatedLinks[index] = e.target.value;
-                                                        setNewStyle({ ...newStyle, referenceVideo: updatedLinks });
-                                                    }}
-                                                    className="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                                    placeholder="https://youtube.com/..."
-                                                />
-                                                {canRemove && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
+                                            <div key={index} className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={link}
+                                                        onChange={(e) => {
                                                             const currentLinks = Array.isArray(newStyle.referenceVideo)
                                                                 ? [...newStyle.referenceVideo]
                                                                 : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
-                                                            const updatedLinks = [...currentLinks];
-                                                            updatedLinks.splice(index, 1);
-                                                            setNewStyle({ ...newStyle, referenceVideo: updatedLinks.length > 0 ? updatedLinks : [] });
+                                                            const updatedLinks = currentLinks.length === 0 ? [''] : [...currentLinks];
+                                                            updatedLinks[index] = e.target.value;
+                                                            setNewStyle({ ...newStyle, referenceVideo: updatedLinks });
                                                         }}
-                                                        className="p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors flex-shrink-0"
-                                                        title="Remove link"
-                                                    >
-                                                        <XCircle size={18} />
-                                                    </button>
+                                                        onBlur={(e) => {
+                                                            const val = e.target.value.trim();
+                                                            if (val && isYouTubeUrl(val)) fetchTitleForUrl(val);
+                                                        }}
+                                                        className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                                        placeholder="https://youtube.com/..."
+                                                    />
+                                                    {canRemove && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const currentLinks = Array.isArray(newStyle.referenceVideo)
+                                                                    ? [...newStyle.referenceVideo]
+                                                                    : (newStyle.referenceVideo ? [newStyle.referenceVideo] : []);
+                                                                const updatedLinks = [...currentLinks];
+                                                                updatedLinks.splice(index, 1);
+                                                                setNewStyle({ ...newStyle, referenceVideo: updatedLinks.length > 0 ? updatedLinks : [] });
+                                                            }}
+                                                            className="p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors flex-shrink-0"
+                                                            title="Remove link"
+                                                        >
+                                                            <XCircle size={18} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                {link && isYouTubeUrl(link) && (
+                                                    <div className="pl-1">
+                                                        {loadingTitles[normalizeYouTubeUrl(link)] ? (
+                                                            <span className="text-sm text-gray-500 dark:text-gray-400 inline-flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Loading title…</span>
+                                                        ) : videoTitles[normalizeYouTubeUrl(link)] ? (
+                                                            <span className="text-base font-semibold text-gray-900 dark:text-white">📺 {videoTitles[normalizeYouTubeUrl(link)]}</span>
+                                                        ) : null}
+                                                    </div>
                                                 )}
                                             </div>
                                         );
