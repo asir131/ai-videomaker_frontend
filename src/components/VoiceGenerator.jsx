@@ -316,8 +316,8 @@ const VoiceGenerator = () => {
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-green-100 dark:bg-green-900/50 flex items-center justify-center text-green-600 dark:text-green-400 shadow-sm">
-          <Mic size={24} />
+        <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white shadow-sm">
+          <Volume2 size={24} />
         </div>
         <div>
           <h2 className="text-2xl font-heading font-bold text-gray-900 dark:text-white">
@@ -329,20 +329,21 @@ const VoiceGenerator = () => {
         </div>
       </div>
 
-      {/* Script Information */}
+      {/* Voiceover Generator card (script section) – matches reference layout */}
       {script || isEditingScript ? (
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-200 dark:border-indigo-800 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
-                <FileText size={20} />
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden mb-8">
+          {/* Header strip: light purple gradient, icon + title + subtitle + Edit Script */}
+          <div className="flex items-center justify-between gap-4 px-5 py-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white shrink-0">
+                <Volume2 size={20} />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                  Voice Generation Source
+                  Voiceover Generator
                 </h3>
-                <p className="text-sm text-indigo-600 dark:text-indigo-400">
-                  Script details for audio processing
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Review your script and generate professional AI voiceover.
                 </p>
               </div>
             </div>
@@ -350,7 +351,7 @@ const VoiceGenerator = () => {
               <button
                 type="button"
                 onClick={handleEditScript}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 rounded-xl transition-colors shrink-0"
               >
                 <Edit2 size={16} />
                 Edit Script
@@ -359,7 +360,7 @@ const VoiceGenerator = () => {
           </div>
 
           {isEditingScript ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
+            <div className="p-5 border-t border-gray-100 dark:border-gray-700">
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Paste or edit your script here
@@ -368,7 +369,7 @@ const VoiceGenerator = () => {
                   value={editedScript}
                   onChange={(e) => setEditedScript(e.target.value)}
                   placeholder="Paste your script here..."
-                  className="w-full min-h-[200px] p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"
+                  className="w-full min-h-[200px] p-4 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y"
                   autoFocus
                 />
                 <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -382,14 +383,14 @@ const VoiceGenerator = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleSaveScript}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors flex items-center gap-2"
+                  className="px-4 py-2 text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 rounded-xl transition-colors flex items-center gap-2"
                 >
                   <Save size={16} />
                   Save Script
                 </button>
                 <button
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors flex items-center gap-2"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl transition-colors flex items-center gap-2"
                 >
                   <X size={16} />
                   Cancel
@@ -397,49 +398,50 @@ const VoiceGenerator = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-indigo-100 dark:border-indigo-800 overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setIsScriptExpanded(!isScriptExpanded)}
-                className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-colors"
-              >
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {isScriptExpanded ? "Hide Script" : "Show Script"}
-                </span>
-                {isScriptExpanded ? (
-                  <ChevronUp size={20} className="text-gray-500 dark:text-gray-400 shrink-0" />
-                ) : (
-                  <ChevronDown size={20} className="text-gray-500 dark:text-gray-400 shrink-0" />
-                )}
-              </button>
-              {isScriptExpanded && (
-                <div className="max-h-[100px] overflow-y-auto border-t border-indigo-100 dark:border-indigo-800 px-4 py-3">
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed pr-2">
-                    {script}
+            <>
+              {/* Show Script toggle: white field, light gray border, chevron */}
+              <div className="p-4 border-t border-gray-100 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => setIsScriptExpanded(!isScriptExpanded)}
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                >
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {isScriptExpanded ? "Hide Script" : "Show Script"}
+                  </span>
+                  {isScriptExpanded ? (
+                    <ChevronUp size={20} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                  ) : (
+                    <ChevronDown size={20} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                  )}
+                </button>
+                {isScriptExpanded && (
+                  <div className="mt-3 max-h-[100px] overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/50 px-4 py-3">
+                    <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed pr-2">
+                      {script}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       ) : (
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-200 dark:border-indigo-800 mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
-              <FileText size={20} />
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden mb-8">
+          <div className="flex items-center justify-between gap-4 px-5 py-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white shrink-0">
+                <Volume2 size={20} />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Voiceover Generator
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  No script available. Complete the script step first.
+                </p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                No Script Available
-              </h3>
-            </div>
-            {/* <button
-                            onClick={handlePasteNewScript}
-                            className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors flex items-center gap-2"
-                        >
-                            <FileText size={16} />
-                            Paste Script
-                        </button> */}
           </div>
         </div>
       )}
