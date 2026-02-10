@@ -22,6 +22,8 @@ import {
   Edit2,
   X,
   Save,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import ProgressBar from "./common/ProgressBar";
 
@@ -344,6 +346,16 @@ const VoiceGenerator = () => {
                 </p>
               </div>
             </div>
+            {!isEditingScript && script && (
+              <button
+                type="button"
+                onClick={handleEditScript}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+              >
+                <Edit2 size={16} />
+                Edit Script
+              </button>
+            )}
           </div>
 
           {isEditingScript ? (
@@ -385,29 +397,28 @@ const VoiceGenerator = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-indigo-100 dark:border-indigo-800">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="mt-3 max-h-[100px] overflow-y-auto rounded-lg text-sm text-gray-700 dark:text-gray-300 leading-relaxed pr-2">
-                    {isScriptExpanded ? (
-                      script
-                    ) : (
-                      <>
-                        {script.substring(0, 150)}
-                        {script.length > 150 && "..."}
-                      </>
-                    )}
-                    {script.length > 150 && (
-                      <button
-                        onClick={() => setIsScriptExpanded(!isScriptExpanded)}
-                        className="ml-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline inline-flex items-center gap-1"
-                      >
-                        {isScriptExpanded ? "See Less" : "See More"}
-                      </button>
-                    )}
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-indigo-100 dark:border-indigo-800 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setIsScriptExpanded(!isScriptExpanded)}
+                className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-colors"
+              >
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {isScriptExpanded ? "Hide Script" : "Show Script"}
+                </span>
+                {isScriptExpanded ? (
+                  <ChevronUp size={20} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                ) : (
+                  <ChevronDown size={20} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                )}
+              </button>
+              {isScriptExpanded && (
+                <div className="max-h-[100px] overflow-y-auto border-t border-indigo-100 dark:border-indigo-800 px-4 py-3">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed pr-2">
+                    {script}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </div>
