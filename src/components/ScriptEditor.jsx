@@ -10,7 +10,10 @@ import {
   FileText,
   Zap,
   Palette,
+  FileSearch,
+  RefreshCw,
 } from "lucide-react";
+import { generateScriptDescription } from "../services/scriptService";
 import { jsPDF } from "jspdf";
 import { useToast } from "../context/ToastContext";
 
@@ -22,6 +25,8 @@ const ScriptEditor = ({ handleNext }) => {
   const { showSuccess, showError } = useToast();
   const [displayedScript, setDisplayedScript] = useState(userEdited ? script : "");
   const [isAnimating, setIsAnimating] = useState(false);
+  const [description, setDescription] = useState("");
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
 
   // Cleanup function for animation timeouts
   const cleanupAnimation = () => {
@@ -142,6 +147,31 @@ const ScriptEditor = ({ handleNext }) => {
     showSuccess("Script copied to clipboard!");
   };
 
+  const handleGenerateDescription = async () => {
+    if (!script?.trim()) {
+      showError("No script to describe");
+      return;
+    }
+    setIsGeneratingDescription(true);
+    setDescription("");
+    try {
+      const text = await generateScriptDescription(script);
+      setDescription(text);
+      showSuccess("Description generated!");
+    } catch (err) {
+      console.error("Description generation error:", err);
+      showError(err.message || "Failed to generate description");
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
+
+  const handleCopyDescription = () => {
+    if (!description) return;
+    navigator.clipboard.writeText(description);
+    showSuccess("Description copied to clipboard!");
+  };
+
   const handleDownloadPDF = () => {
     try {
       const doc = new jsPDF();
@@ -203,6 +233,19 @@ const ScriptEditor = ({ handleNext }) => {
         </div>
         <div className="flex items-center gap-3">
           <button
+            onClick={handleGenerateDescription}
+            disabled={!script?.trim() || isGeneratingDescription}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white font-medium transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+            title="Generate Description"
+          >
+            {isGeneratingDescription ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <FileSearch size={18} />
+            )}
+            <span className="hidden sm:inline">{isGeneratingDescription ? "Generating…" : "Generate Description"}</span>
+          </button>
+          <button
             onClick={handleCopyScript}
             className="p-2.5 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all shadow-sm hover:shadow-md"
             title="Copy Script"
@@ -236,6 +279,55 @@ const ScriptEditor = ({ handleNext }) => {
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Loader2 size={16} className="animate-spin" />
             <span>Displaying script word by word...</span>
+          </div>
+        )}
+
+        {/* Generated Description */}
+        {(description || isGeneratingDescription) && (
+          <div className="mt-6 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-br from-indigo-50/80 to-purple-50/80 dark:from-indigo-900/20 dark:to-purple-900/20 overflow-hidden">
+            <div className="px-5 py-4 border-b border-indigo-100 dark:border-indigo-900/50 flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <FileSearch size={20} className="text-indigo-600 dark:text-indigo-400" />
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                  Video Description
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                {description && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleCopyDescription}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors"
+                    >
+                      <Copy size={16} />
+                      Copy
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleGenerateDescription}
+                      disabled={isGeneratingDescription}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors disabled:opacity-50"
+                    >
+                      <RefreshCw size={16} />
+                      Regenerate
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="p-5 min-h-[80px]">
+              {isGeneratingDescription ? (
+                <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
+                  <Loader2 size={20} className="animate-spin shrink-0" />
+                  <span>Generating description from your script…</span>
+                </div>
+              ) : description ? (
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {description}
+                </p>
+              ) : null}
+            </div>
           </div>
         )}
 

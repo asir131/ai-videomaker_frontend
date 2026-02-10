@@ -54,8 +54,6 @@ export const ScriptProvider = ({ children }) => {
         updateScenes,
         selectedStyle,
         setSelectedStyle,
-        selectedStyle,
-        setSelectedStyle,
         userEdited,
         setUserEdited,
         hasShownAnimation,
