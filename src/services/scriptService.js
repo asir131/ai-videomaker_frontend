@@ -38,6 +38,7 @@ export async function generateScriptDescription(script) {
     throw new Error('Script is empty');
   }
   const prompt = `Write a brief video description in 2-4 sentences. It should summarize the story or topic for viewers (e.g. for a video title or YouTube description). Be concise and engaging. Do not include the script itself.
+On the last line, add 3-5 hashtags separated by spaces (e.g. #Topic #Keyword #Category).
 
 SCRIPT:
 ${script.trim().slice(0, 8000)}`;

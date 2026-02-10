@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useScript } from "../context/ScriptContext";
 import { useMedia } from "../context/MediaContext";
 import {
@@ -12,6 +13,7 @@ import {
   Palette,
   FileSearch,
   RefreshCw,
+  X,
 } from "lucide-react";
 import { generateScriptDescription } from "../services/scriptService";
 import { jsPDF } from "jspdf";
@@ -27,6 +29,7 @@ const ScriptEditor = ({ handleNext }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [description, setDescription] = useState("");
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
   // Cleanup function for animation timeouts
   const cleanupAnimation = () => {
@@ -154,6 +157,7 @@ const ScriptEditor = ({ handleNext }) => {
     }
     setIsGeneratingDescription(true);
     setDescription("");
+    setShowDescriptionModal(true);
     try {
       const text = await generateScriptDescription(script);
       setDescription(text);
@@ -161,9 +165,21 @@ const ScriptEditor = ({ handleNext }) => {
     } catch (err) {
       console.error("Description generation error:", err);
       showError(err.message || "Failed to generate description");
+      setShowDescriptionModal(false);
     } finally {
       setIsGeneratingDescription(false);
     }
+  };
+
+  const parseDescription = (text) => {
+    if (!text) return { heading: "", body: "", hashtags: "" };
+    const lines = text.trim().split(/\n/);
+    const last = lines[lines.length - 1] || "";
+    const hasHashtags = /#/.test(last);
+    const hashtags = hasHashtags ? last : "";
+    const bodyLines = hasHashtags ? lines.slice(0, -1) : lines;
+    const body = bodyLines.join("\n").trim();
+    return { heading: title || "Video Description", body, hashtags };
   };
 
   const handleCopyDescription = () => {
@@ -212,6 +228,7 @@ const ScriptEditor = ({ handleNext }) => {
   if (!script) return null;
 
   return (
+    <>
     <div ref={containerRef} className="glass-card relative overflow-hidden">
       <div className="absolute top-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -z-10" />
 
@@ -282,52 +299,17 @@ const ScriptEditor = ({ handleNext }) => {
           </div>
         )}
 
-        {/* Generated Description */}
-        {(description || isGeneratingDescription) && (
-          <div className="mt-6 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-br from-indigo-50/80 to-purple-50/80 dark:from-indigo-900/20 dark:to-purple-900/20 overflow-hidden">
-            <div className="px-5 py-4 border-b border-indigo-100 dark:border-indigo-900/50 flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-2">
-                <FileSearch size={20} className="text-indigo-600 dark:text-indigo-400" />
-                <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                  Video Description
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                {description && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleCopyDescription}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors"
-                    >
-                      <Copy size={16} />
-                      Copy
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleGenerateDescription}
-                      disabled={isGeneratingDescription}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors disabled:opacity-50"
-                    >
-                      <RefreshCw size={16} />
-                      Regenerate
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="p-5 min-h-[80px]">
-              {isGeneratingDescription ? (
-                <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                  <Loader2 size={20} className="animate-spin shrink-0" />
-                  <span>Generating description from your script…</span>
-                </div>
-              ) : description ? (
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                  {description}
-                </p>
-              ) : null}
-            </div>
+        {/* View description link when already generated */}
+        {description && !showDescriptionModal && (
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => setShowDescriptionModal(true)}
+              className="flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              <FileSearch size={16} />
+              View generated description
+            </button>
           </div>
         )}
 
@@ -345,6 +327,88 @@ const ScriptEditor = ({ handleNext }) => {
         )}
       </div>
     </div>
+
+    {/* Generated Description modal (dark popup) */}
+    {showDescriptionModal &&
+      createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="description-modal-title"
+        >
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => !isGeneratingDescription && setShowDescriptionModal(false)}
+            aria-hidden="true"
+          />
+          <div className="relative w-full max-w-lg rounded-2xl bg-gray-900 shadow-xl border border-gray-700 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700">
+              <h2 id="description-modal-title" className="text-lg font-semibold text-white">
+                Generated Description
+              </h2>
+              <div className="flex items-center gap-2">
+                {description && (
+                  <button
+                    type="button"
+                    onClick={handleCopyDescription}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-200 hover:bg-gray-700/80 transition-colors"
+                  >
+                    <Copy size={16} />
+                    Copy
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => !isGeneratingDescription && setShowDescriptionModal(false)}
+                  className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/80 transition-colors"
+                  aria-label="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-5 min-h-[120px]">
+              {isGeneratingDescription ? (
+                <div className="flex items-center gap-3 text-gray-400">
+                  <Loader2 size={20} className="animate-spin shrink-0" />
+                  <span>Generating description from your script…</span>
+                </div>
+              ) : description ? (
+                (() => {
+                  const { heading, body, hashtags } = parseDescription(description);
+                  return (
+                    <div className="rounded-xl bg-gray-800/80 p-4 space-y-3">
+                      <h3 className="text-lg font-bold text-white">{heading}</h3>
+                      <p className="text-gray-300 leading-relaxed whitespace-pre-wrap text-sm">
+                        {body}
+                      </p>
+                      {hashtags && (
+                        <p className="text-gray-400 text-sm">{hashtags}</p>
+                      )}
+                    </div>
+                  );
+                })()
+              ) : null}
+            </div>
+            {description && (
+              <div className="px-5 py-3 border-t border-gray-700 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleGenerateDescription}
+                  disabled={isGeneratingDescription}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700/80 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw size={16} />
+                  Regenerate
+                </button>
+              </div>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 };
 
